@@ -1173,7 +1173,7 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 		wrapping_logV->SetVisAttributes(wrappingVisAtt);
 	
 		// Place the outer wrapping into the assembly.
-		G4ThreeVector wrappingPos(0,0,offsetZ);
+		G4ThreeVector wrappingPos(0,0,(offsetZ + fThick/2));
 		wrapping_physV = addToDetectorBody(wrapping_logV, "Wrapping", wrappingPos);
 
 		// DON'T NEED FRONT WRAPPING FOR PHOSWICH
