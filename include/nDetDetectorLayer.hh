@@ -206,6 +206,7 @@ class phoswichLayer : public nDetWorldObject {
 		G4double fHeight; ///< Size of the detector along the y-axis (in mm)
 		G4double fWrapping; ///< Thickness of the inner and outer phoswich wrapping (in mm)
 		G4String fSegMaterial; ///< String indicating the material to use for the phoswich scintillator
+		G4String fWrapMat; ///< String indicating what material should be used to wrap the phoswich scintillator
 };
 
 /** @class gdmlLightGuideLayer

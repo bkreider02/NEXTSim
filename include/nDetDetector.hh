@@ -1092,7 +1092,7 @@ public:
 
 	void applySegmentedLightGuide(G4int Xseg, G4int Yseg, G4double spacing, G4double topWidth, G4double topThick, G4double botWidth, G4double botThick, G4double zThick);
 
-	void applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial);
+	void applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial, G4String fWrapMat);
 
 protected:
 	bool sipmLogic; ///< Setting whether to use the sipmLogic (1) or pspmt logic (0)

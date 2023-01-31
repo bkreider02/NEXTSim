@@ -152,7 +152,8 @@ bool phoswichLayer::decodeArgs(){
 	fWidth = strtod(args.at(3).c_str(), NULL);
 	fHeight = strtod(args.at(4).c_str(), NULL);
 	fWrapping = strtod(args.at(5).c_str(), NULL);
-	fSegMaterial = strtod(args.at(6).c_str(), NULL);
+	fSegMaterial = args.at(6);
+	fWrapMat = args.at(7);
 	return true;
 }
 
@@ -162,7 +163,7 @@ void phoswichLayer::construct(nDetDetector *obj){
 }
 
 void phoswichLayer::construct(nDetImplant *obj){
-	obj->applyPhoswich(fXseg,fYseg,fThick,fWidth,fHeight,fWrapping,fSegMaterial);
+	obj->applyPhoswich(fXseg,fYseg,fThick,fWidth,fHeight,fWrapping,fSegMaterial,fWrapMat);
 }
 
 std::string phoswichLayer::syntaxStr() const{

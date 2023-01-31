@@ -161,7 +161,7 @@ void nDetConstructionMessenger::addAllCommands(){
 	addGuidance("Sets whether to use a segmented light guide.  Must be true for any segmentation to be implemented.\n SYNTAX: <# x seg> <# y seg> <z thickness> <front x width> <front y width> <back x width> <back y width> <spacing> <material>");
 
 	addCommand(new G4UIcmdWithAString("/nDet/implant/addPhoswich",this));
-	addGuidance("Adds a second scintillator to form a phoswich. \n SYNTAX: <# x seg> <# y seg> <z thickness> <x width> <y height> <mylar thickness> <material>");
+	addGuidance("Adds a second scintillator to form a phoswich. \n SYNTAX: <# x seg> <# y seg> <z thickness> <x width> <y height> <mylar thickness> <phoswich material> <wrapping material>");
 
 	// addCommand(new G4UIcmdWithABool("/nDet/implant/setReconLogic",this));
 	// addGuidance("Sets the logic used for calculating the reconstructed position, 0 = anger logic, 1 = sipm logic");

@@ -1113,7 +1113,7 @@ void nDetImplant::applySegmentedLightGuide(G4int Xseg, G4int Yseg, G4double spac
 	return;
 }
 
-void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial) {
+void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial, G4String fWrapMat) {
 	// START HERE
 
 	// RECALCULATE THE SEGMENT DIMENSIONS
@@ -1130,10 +1130,23 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 
     G4Material* phoswichMaterial = materials->getUserDetectorMaterial(fSegMaterial);
 	G4VisAttributes* phoswichVisAtt = materials->getUserVisAttributes(fSegMaterial);
-	wrappingMaterial = materials->getUserSurfaceMaterial(wrappingMaterialName);
 	outerMylar = materials->fMylar;
-	wrappingVisAtt = materials->getUserVisAttributes(wrappingMaterialName);
-	wrappingOpSurf = materials->getUserOpticalSurface(wrappingMaterialName);
+
+    G4Material* wrapMat;
+	G4VisAttributes* wrapVisAtt;
+	G4OpticalSurface* wrapOpSurf;
+
+	if (fWrapMat != "") {
+		wrapMat = materials->getUserSurfaceMaterial(fWrapMat);
+		wrapVisAtt = materials->getUserVisAttributes(fWrapMat);
+		wrapOpSurf = materials->getUserOpticalSurface(fWrapMat);
+	}
+	else {
+		wrappingMaterial = materials->getUserSurfaceMaterial(wrappingMaterialName);
+		wrappingVisAtt = materials->getUserVisAttributes(wrappingMaterialName);
+		wrappingOpSurf = materials->getUserOpticalSurface(wrappingMaterialName);
+	}
+
 
     // Construct the scintillator cell
     G4Box *cellScint = new G4Box("phoswich", cellWidth/2, cellHeight/2, fThick/2);
@@ -1173,8 +1186,8 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 		mylarVertLayer = new G4Box("mylarVertLayer", fWrapping/2, fHeight/2, fThick/2);
 		mylarHorizLayer = new G4Box("mylarHorizLayer", cellWidth/2, fWrapping/2, fThick/2);
 
-		mylarVertLayer_logV = new G4LogicalVolume(mylarVertLayer, wrappingMaterial, "mylarVertLayer_logV");
-		mylarHorizLayer_logV = new G4LogicalVolume(mylarHorizLayer, wrappingMaterial, "mylarHorizLayer_logV");
+		mylarVertLayer_logV = new G4LogicalVolume(mylarVertLayer, wrapMat, "mylarVertLayer_logV");
+		mylarHorizLayer_logV = new G4LogicalVolume(mylarHorizLayer, wrapMat, "mylarHorizLayer_logV");
 		
 		mylarVertLayer_logV->SetVisAttributes(wrappingVisAtt);
 		mylarHorizLayer_logV->SetVisAttributes(wrappingVisAtt);
