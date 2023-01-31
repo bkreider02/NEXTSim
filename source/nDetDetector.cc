@@ -1199,7 +1199,7 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 	std::vector<std::vector<G4PVPlacement*> > cellScint_physV(Ncol, std::vector<G4PVPlacement*>(Nrow, NULL));	
 	for(int col = 0; col < Ncol; col++){
 		for(int row = 0; row < Nrow; row++){
-			G4ThreeVector cellCenter(-fWidth/2 + col*fWrapping + (col+0.5)*cellWidth, -fHeight/2 + row*fWrapping + (row+0.5)*cellHeight, offsetZ);
+			G4ThreeVector cellCenter(-fWidth/2 + col*fWrapping + (col+0.5)*cellWidth, -fHeight/2 + row*fWrapping + (row+0.5)*cellHeight, offsetZ + fThick/2);
 
 			// Copy numbers (segment IDs), indexed from 1
 			std::stringstream stream; stream << "Phoswich-" << col << "," << row;
@@ -1210,11 +1210,11 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 			if(fWrapping > 0){ 
 				if(row == 0 && col != Ncol-1){ // New vertical reflector layer.
 					std::stringstream stream2; stream2 << "Wrapping-" << col;
-					mylarVertLayer_physV[col] = addToDetectorBody(mylarVertLayer_logV, stream2.str().c_str(), G4ThreeVector(cellCenter.getX()+cellWidth/2+fWrapping/2, 0, offsetZ));
+					mylarVertLayer_physV[col] = addToDetectorBody(mylarVertLayer_logV, stream2.str().c_str(), G4ThreeVector(cellCenter.getX()+cellWidth/2+fWrapping/2, 0, offsetZ + fThick/2));
 				}
 				if(row != Nrow-1){ // New horizontal reflector layer.
 					std::stringstream stream2; stream2 << "Wrapping-" << col << "," << row;
-					mylarHorizLayer_physV[col][row] = addToDetectorBody(mylarHorizLayer_logV, stream2.str().c_str(), G4ThreeVector(cellCenter.getX(), cellCenter.getY()+cellHeight/2+fWrapping/2, offsetZ));
+					mylarHorizLayer_physV[col][row] = addToDetectorBody(mylarHorizLayer_logV, stream2.str().c_str(), G4ThreeVector(cellCenter.getX(), cellCenter.getY()+cellHeight/2+fWrapping/2, offsetZ + fThick/2));
 				}
 			}
 		}
