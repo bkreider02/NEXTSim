@@ -12,6 +12,7 @@ class G4LogicalVolume;
 class G4PVPlacement;
 
 class nDetDetector;
+class nDetImplant;
 class nDetMaterials;
 
 /** @class nDetWorldObject
@@ -104,6 +105,10 @@ class nDetWorldObject{
 	  */
 	virtual void construct(nDetDetector*) = 0;
 
+	/** Construct the object and place it into an implant detector
+	  */
+	virtual void construct(nDetImplant*) = 0;
+
 	/** Return a string containing proper input string syntax
 	  */
 	virtual std::string syntaxStr() const = 0;
@@ -179,6 +184,10 @@ class nDetWorldPrimitive : public nDetWorldObject {
 	/** Does nothing
 	  */
 	virtual void construct(nDetDetector*){ }
+
+	/** Does nothing
+	  */
+	virtual void construct(nDetImplant*){ }
 
 	/** Return a string containing proper input string syntax
 	  */
@@ -286,6 +295,11 @@ class gdmlObject : public nDetWorldObject {
 	  * @param obj A pointer to the detector where the model will be placed
 	  */
 	virtual void construct(nDetDetector *obj);
+
+	/** Load the GDML model and place it into a detector
+	  * @param obj A pointer to the detector where the model will be placed
+	  */
+	virtual void construct(nDetImplant *obj);
 
 	/** Return a string containing proper input string syntax
 	  */

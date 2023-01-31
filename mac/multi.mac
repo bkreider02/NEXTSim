@@ -1,0 +1,155 @@
+#
+# create empty scene
+#
+
+
+# Use a GDML file for the light guides.
+# NOTE: This MUST be done BEFORE calling '/nDet/implant/update'
+#/nDet/implant/loadGDML gdml/modifiedLightGuide.gdml
+#/nDet/implant/loadGDML gdml/nonSegmentedLightGuide.gdml
+#/nDet/implant/setTrapezoidLength 1.27
+
+#/nDet/implant/setGDMLrotation 90 0 0
+
+# This is important to set for GDML light-guide because
+#  we cannot obtain the information from the model itself.
+/nDet/implant/setPmtDimensions 50.0
+/nDet/detector/setPmtDimensions 48.5
+
+# Mylar and optical grease thickness.
+/nDet/implant/setMylarThickness 0.025
+/nDet/implant/setGreaseThickness 0.1
+/nDet/detector/setMylarThickness 0.025
+/nDet/detector/setGreaseThickness 0.1
+
+# Light diffuser.
+#/nDet/implant/setDiffuserLength 0.5
+
+# PMT segmentation.
+/nDet/implant/setPmtColumns 8
+/nDet/implant/setPmtRows 8
+/nDet/detector/setPmtColumns 8
+/nDet/detector/setPmtRows 8
+
+##################
+# IMPLANT SETUP #
+##################
+
+# Implant 2x2x10 in^3
+/nDet/implant/setDetectorLength 5.0
+/nDet/implant/setDetectorWidth 5.08
+/nDet/implant/setDetectorThickness 50.8
+/nDet/implant/setNumColumns 20
+/nDet/implant/setNumRows 20
+/nDet/implant/setStart 1
+
+# Set the wrapping.
+/nDet/implant/setWrapping mylar
+
+# Set the position and rotation of the detector in the lab frame.
+/nDet/implant/setCylindrical 100 0 0
+/nDet/implant/setRotation 0 270 0
+/nDet/implant/addGeometry module
+
+# Load PSPMT gain matrix 
+# NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
+#/nDet/implant/setGainMatrix gains/hamamatsuH12700A_LA0967.dat
+
+# Load PSPMT spectral response function
+#/nDet/implant/setSpectralResponse spectral/hamamatsuH12700A.root
+
+##################
+# DETECTOR SETUP #
+##################
+
+# NEXT 2x2x10 in^3
+/nDet/detector/setDetectorLength 25.4
+/nDet/detector/setDetectorWidth 5.08
+/nDet/detector/setDetectorThickness 50.8
+/nDet/detector/setNumColumns 5
+/nDet/detector/setNumRows 5
+
+# Set the wrapping.
+/nDet/detector/setWrapping mylar
+
+# Set the position and rotation of the detector in the lab frame.
+/nDet/detector/setCylindrical 100 0 6
+#/nDet/detector/setRotation 0 0 90
+/nDet/detector/addGeometry module
+
+# Update the implant.
+/nDet/implant/update
+# Update the detector.
+/nDet/detector/update
+
+# Load PSPMT gain matrix 
+# NOTE: This MUST be done AFTER calling '/nDet/detector/update' otherwise it will fail
+/nDet/detector/setGainMatrix gains/hamamatsuH12700A_LA0967.dat
+/nDet/implant/setGainMatrix gains/hamamatsuH12700A_LA0967.dat
+
+# Load PSPMT spectral response function
+/nDet/detector/setSpectralResponse spectral/hamamatsuH12700A.root
+/nDet/implant/setSpectralResponse spectral/hamamatsuH12700A.root
+
+################
+# OUTPUT SETUP #
+################
+
+# Set the output filename prefix
+/nDet/output/filename multi_test_1m.root
+/nDet/output/title PSPMT_Next, 0.5 MeV, 1 m from detector
+#/nDet/output/index 69
+#/nDet/output/overwrite true
+#/nDet/output/persistent true
+#/nDet/output/enabled false
+#/nDet/output/badEvents true
+/nDet/output/debug true
+
+# Setup information about the PMT response
+/nDet/output/trace/setRisetime 2
+/nDet/output/trace/setFalltime 20
+/nDet/output/trace/setTimeSpread 0.35
+/nDet/output/trace/setGain 1E4
+/nDet/output/trace/setBaseline 7.5
+/nDet/output/trace/setJitter 0.15
+
+# Setup the PMT light pulse output
+#/nDet/output/trace/enabled true
+/nDet/output/trace/setTraceDelay 60
+/nDet/output/trace/setTraceLength 500
+/nDet/output/trace/setBitRange 16
+
+/nDet/output/trace/setCfdFraction 0.5
+/nDet/output/trace/setIntegralLow 5
+/nDet/output/trace/setIntegralHigh 10
+
+################
+# SOURCE SETUP #
+################
+
+# Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
+#/nDet/source/type 252Cf
+
+/nDet/source/type gamma 1.0
+#/nDet/source/beam gamma 0.25
+#/nDet/source/beam 137Cs
+#/nDet/source/beam gamma 0.03
+
+#/nDet/source/spot 38.1
+#/nDet/source/spot 25.4
+#/nDet/source/spot 12.7
+
+# Optical laser beam.
+#/nDet/source/beam laser 360
+#/nDet/source/position 0.1 0 -13.5 cm
+#/nDet/source/direction 0 0 0 
+
+/nDet/source/iso 1
+
+#/nDet/source/range 1.175 1.225 0
+
+###############
+# RUN CONTROL #
+###############
+
+#/run/beamOn 100

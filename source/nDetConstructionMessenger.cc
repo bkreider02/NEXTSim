@@ -11,8 +11,10 @@
 #include "G4UIcmdWith3Vector.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithADouble.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4SystemOfUnits.hh"
 
 void nDetConstructionMessenger::addAllCommands(){
@@ -114,6 +116,56 @@ void nDetConstructionMessenger::addAllCommands(){
 
 	addCommand(new G4UIcmdWithoutParameter("/nDet/output/trace/params", this));
 	addGuidance("Print pulse and digitizer settings");
+
+	///////////////////////////////////////////////////////////////////////////////
+	// Implant commands
+	///////////////////////////////////////////////////////////////////////////////
+
+	addDirectory("/nDet/implant/", "Implant geometry control");
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addGeometry", this));
+	addGuidance("Defines the Geometry of the implant");
+
+	addCommand(new G4UIcommand("/nDet/implant/update", this));
+	addGuidance("Updates the implant Geometry");
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/setSpectralResponse", this));
+	addGuidance("Load PMT spectral response from a root file");
+	addGuidance("Input file MUST contain a TGraph named \"spec\"");
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/setGainMatrix", this));
+	addGuidance("Load segmented PMT anode gain matrix file");
+	
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addGreaseLayer", this));
+	addGuidance("Add a layer of optical grease (all units in mm). SYNTAX: addGreaseLayer <width> <height> [thickness]");	
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addDiffuserLayer", this));
+	addGuidance("Add a straight diffuser to the assembly (all units in mm). SYNTAX: addDiffuserLayer <width> <height> <thickness> [material=G4_SILICON_DIOXIDE]");	
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addLightGuide", this));
+	addGuidance("Add a trapezoidal light-guide to the assembly (all units in mm). SYNTAX: addLightGuide <width1> <width2> <height1> <height2> <thickness> [material=G4_SILICON_DIOXIDE]");	
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/loadLightGuide", this));
+	addGuidance("Load a light-guide from a GDML geometry file. SYNTAX: loadLightGuide <filename> <rotX> <rotY> <rotZ> <matString>");
+
+	addCommand(new G4UIcmdWithoutParameter("/nDet/implant/clear", this));
+	addGuidance("Clear all implant Geometry");
+	
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addArray", this));
+	addGuidance("Add an array of multiple implants. SYNTAX: addArray <geom> <r0> <startTheta> <stopTheta> <Ndet>");
+
+	addCommand(new G4UIcmdWithoutParameter("/nDet/implant/printAll", this));
+	addGuidance("Print construction parameters for all defined implants");
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/setSegmentedLightGuide", this));
+	addGuidance("Sets whether to use a segmented light guide.  Must be true for any segmentation to be implemented.\n SYNTAX: <# x seg> <# y seg> <z thickness> <front x width> <front y width> <back x width> <back y width> <spacing> <material>");
+
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addPhoswich",this));
+	addGuidance("Adds a second scintillator to form a phoswich. \n SYNTAX: <# x seg> <# y seg> <z thickness> <x width> <y height> <mylar thickness> <material>");
+
+	// addCommand(new G4UIcmdWithABool("/nDet/implant/setReconLogic",this));
+	// addGuidance("Sets the logic used for calculating the reconstructed position, 0 = anger logic, 1 = sipm logic");
+
 }
 
 void nDetConstructionMessenger::SetNewChildValue(G4UIcommand* command, G4String newValue){
@@ -246,6 +298,56 @@ void nDetConstructionMessenger::SetNewChildValue(G4UIcommand* command, G4String 
 		}
 		else if(index == 16){
 			prL->print(); // Only show the left side, because they're both the same
+		}
+		
+		//Implant commands
+		else if(index == 17){
+			fDetector->AddImplantGeometry(newValue);
+		}
+		else if(index == 18){
+			fDetector->UpdateGeometry();
+		}	
+		else if(index == 19){
+			fDetector->setPmtSpectralResponse(newValue.c_str());
+		}
+		else if(index == 20){
+			fDetector->setPmtGainMatrix(newValue.c_str());
+		}
+		else if(index == 21){
+			fDetector->AddGrease(newValue);
+		}
+		else if(index == 22){
+			fDetector->AddDiffuser(newValue);
+		}
+		else if(index == 23){
+			fDetector->AddLightGuide(newValue);
+		}
+		else if(index == 24){
+			fDetector->AddLightGuideGDML(newValue);
+		}
+		else if(index == 25){
+			fDetector->ClearGeometry();
+		}
+		else if(index == 26){
+			fDetector->AddImplantArray(newValue);
+		}
+		else if(index == 27){
+			fDetector->PrintAllDetectors();
+		}
+
+		//LightGuideParameterisation commands
+		else if(index == 28){
+			fDetector->AddSegmentedLightGuide(newValue);
+		}
+
+		else if(index == 29){
+			fDetector->AddPhoswich(newValue);
+		}
+
+		else if(index == 30){
+			bool val = command->ConvertToBool(newValue);
+			std::cout<<"Setting Construction Recon Logic to "<<val<<std::endl;
+			// fDetector->setReconLogic(val);
 		}
 	}
 }

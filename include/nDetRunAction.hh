@@ -21,6 +21,7 @@ class nDetTrackingAction;
 class nDetSteppingAction;
 class nDetConstruction;
 class pmtResponse;
+class nDetDetectorParams;
 
 class photonCounter;
 class nDetParticleSource;
@@ -43,7 +44,7 @@ class primaryTrackInfo{
 
 	G4int copyNum; ///< Copy number of object inside which the scatter event occured
 	G4int trackID; ///< Geant track ID of the primary particle track
-	G4int atomicMass; ///< Atomic mass of the recoiling particle after the scatter event (NOT WORKING)
+	G4double atomicMass; ///< Atomic mass of the recoiling particle after the scatter event (NOT WORKING)
 	
 	G4bool inScint; ///< Flag indicating that the scatter event occured in a scintillator material
 
@@ -112,6 +113,10 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	nDetParticleSource *getParticleSource(){ return source; }
 
+	/** Get a pointer to the low level scatter info structure 
+	  */
+	nDetDebugStructure *getDebugData(){ return &debugData; }
+
 	/** Set all user action pointers
 	  * @param action Pointer to thread-local user action manager
 	  */
@@ -128,6 +133,11 @@ class nDetRunAction : public G4UserRunAction
 	/** Enable or disable copying of debug variables to output debug data structure
 	  */
 	void setOutputDebug(const bool &enabled){ outputDebug = enabled; }
+
+	/** Enable or disable copying of certain debug variables to multi detector data structure
+	  */
+	void setOutputMultiDebug(const bool &enabled){ outputMultiDebug = enabled; }
+
 
 	/** Toggle the verbosity flag and return its state
 	  */
@@ -169,6 +179,12 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	pmtResponse *getPmtResponseRight(const size_t &index=0){ return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassR()->getPmtResponse() : NULL); }
 
+		/** Get a pointer to the left PMT dynode response object of one of the defined detectors
+	  * @param index The index of the detector in the list of defined detectors
+	  * @return The pointer to the dynode response if @a index corresponds to a defined detector and return NULL otherwise
+	  */
+	pmtResponse *getPmtResponseImplant(const size_t &index=0){ return (index < userImplants.size() ? userImplants.at(index).getCenterOfMass()->getPmtResponse() : NULL); }
+
 	/** Get a pointer to the array of left PMT anode response objects of one of the defined detectors
 	  * @param index The index of the detector in the list of defined detectors
 	  * @return The pointer to the array of anode responses if @a index corresponds to a defined detector and return NULL otherwise
@@ -181,6 +197,12 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	pmtResponse *getAnodeResponseRight(const size_t &index=0){ return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassR()->getAnodeResponse() : NULL); }	
 
+	/** Get a pointer to the array of left PMT anode response objects of one of the defined detectors
+	  * @param index The index of the detector in the list of defined detectors
+	  * @return The pointer to the array of anode responses if @a index corresponds to a defined detector and return NULL otherwise
+	  */
+	pmtResponse *getAnodeResponseImplant(const size_t &index=0){ return (index < userImplants.size() ? userImplants.at(index).getCenterOfMass()->getAnodeResponse() : NULL); }
+
 	/** Get the total number of optical photons which have been produced during this run
 	  */
     unsigned long long getNumPhotons() const { return numPhotonsTotal; }
@@ -188,6 +210,12 @@ class nDetRunAction : public G4UserRunAction
 	/** Get the total number of detected optical photons for this run
 	  */   
     unsigned long long getNumPhotonsDet() const { return numPhotonsDetTotal; }
+
+	/** Get the vector of detectors added by the user
+	  */
+	std::vector<nDetImplant> getUserImplants() {
+		return userImplants;
+	}
 
 	/** Copy the list of defined detectors and set the start detector (if one exists)
 	  * @param construction Pointer to the singleton detector constructor object
@@ -237,6 +265,7 @@ class nDetRunAction : public G4UserRunAction
 	
 	bool outputTraces; ///< Flag indicating that traces will be written to the output tree
 	bool outputDebug; ///< Flag indicating that the user has requested low-level debug to be written to the output file
+	bool outputMultiDebug; ///< Flag indicating reduced debug readout when using multiple detectors
 	bool verbose; ///< Verbosity flag
 
 	nDetEventAction *eventAction; ///< Pointer to the thread-local user event action
@@ -246,6 +275,7 @@ class nDetRunAction : public G4UserRunAction
 	
 	nDetConstruction *detector; ///< Pointer to the global detector singleton
 	nDetParticleSource *source; ///< Pointer to the thread-local particle source
+	nDetDetectorParams params; ///< not a Pointer to the parameters of the detector
 	
 	std::vector<primaryTrackInfo> primaryTracks; ///< Vector of primary particle scatter events
 	
@@ -255,6 +285,7 @@ class nDetRunAction : public G4UserRunAction
 	nDetDataPack data; ///< Container object for all output data
 	nDetEventStructure evtData; ///< Container object for output event information
 	nDetOutputStructure outData; ///< Container object for single-detector output data
+	nDetImplantOutputStructure outImplantData; ///< Container object for Implant output data
 	nDetMultiOutputStructure multData; ///< Container object for multi-detector output data
 	nDetDebugStructure debugData; ///< Container object for debug output data
 	nDetTraceStructure traceData; ///< Container object for output traces
@@ -265,8 +296,12 @@ class nDetRunAction : public G4UserRunAction
     unsigned long long numPhotonsDetTotal; ///< Total number of detected optical photons (thread-local)
 
 	nDetDetector *startDetector; ///< Pointer to the detector used as a start signal for timing
+	nDetImplant *startImplant; ///< Pointer to the detector used as a start signal for timing
+	bool endImplant=0;
+	bool endDetector=0;
 
 	std::vector<nDetDetector> userDetectors; ///< Vector of detectors added by the user
+	std::vector<nDetImplant> userImplants; ///< Vector of detectors added by the user
 
 	/** Pop a primary scatter off the stack. Set all initial event conditions if this is the first scatter
 	  * @return True if the stack of primary scatters is not empty after popping off a scatter and return false otherwise
@@ -278,6 +313,12 @@ class nDetRunAction : public G4UserRunAction
 	  * @return True if the detector has detected optical photons and return false otherwise
 	  */
 	bool processDetector(nDetDetector* det);
+
+	/** Process a single event for a single detector
+	  * @param det Pointer to the nDetDetector to process
+	  * @return True if the detector has detected optical photons and return false otherwise
+	  */
+	bool processImplant(nDetImplant* imp);
 	
 	/** Process a single event for a single start detector
 	  * @param det Pointer to the nDetDetector to process
@@ -285,6 +326,13 @@ class nDetRunAction : public G4UserRunAction
 	  * @return True if the detector has detected optical photons and return false otherwise
 	  */
 	bool processStartDetector(nDetDetector* det, double &startTime);
+
+		/** Process a single event for a single start detector
+	  * @param det Pointer to the nDetDetector to process
+	  * @param startTime Time-of-flight of the start detector event
+	  * @return True if the detector has detected optical photons and return false otherwise
+	  */
+	bool processStartImplant(nDetImplant* imp, double &startTime);
 };
 
 #endif

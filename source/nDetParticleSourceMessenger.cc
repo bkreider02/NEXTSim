@@ -65,25 +65,39 @@ void nDetParticleSourceMessenger::addAllCommands(){
 
 	addCommand(new G4UIcmdWithAString("/nDet/source/setGaussianEnergy", this));
 	addGuidance("Set the current energy level to a gaussian distribution and set the energy and sigma. SYNTAX: setGaussianEnergy <E(MeV)> <dE(MeV)>");
+	
+	addCommand(new G4UIcmdWith3Vector("/nDet/source/position", this)); // position of source
+	addGuidance("Set the position of the source by specifying angles about the x, y, and z axes");
+
+	// addCommand(new G4UIcmdWithAString("/nDet/source/ion", this)); 
+	// addGuidance("Set a pre-defined isotropic ion particle source");
+	// addGuidance("108Xe for Xenon-108 beam for implantation");
 }
 
 void nDetParticleSourceMessenger::SetNewChildValue(G4UIcommand* command, G4String newValue){ 
 	size_t index;
 	if(!findCommand(command, newValue, index)) return;
-	if(index == 0)
+	if(index == 0){
 		fAction->Print(G4UIcommand::ConvertToInt(newValue));
-	else if(index == 1)
+	}
+	else if(index == 1){
 		fAction->SetSourceDirection(G4UIcommand::ConvertTo3Vector(newValue));
-	else if(index == 2)
+	}
+	else if(index == 2){
 		fAction->SetSourceType(newValue);
-	else if(index == 3)
+	}
+	else if(index == 3){
 		fAction->SetBeamspotRadius(G4UIcommand::ConvertToDouble(newValue));
-	else if(index == 4)
+	}
+	else if(index == 4){
 		fAction->SetBeamspotRadius0(G4UIcommand::ConvertToDouble(newValue));
-	else if(index == 5)
+	}
+	else if(index == 5){
 		fAction->SetBeamspotType(newValue);
-	else if(index == 6)
+	}
+	else if(index == 6){
 		fAction->SetIsotropicMode(G4UIcommand::ConvertToInt(newValue));
+	}
 	else if(index == 7){
 		G4ThreeVector vec = G4UIcommand::ConvertTo3Vector(newValue);
 		fAction->SetEnergyLimits(vec.getX(), vec.getY());
@@ -106,8 +120,13 @@ void nDetParticleSourceMessenger::SetNewChildValue(G4UIcommand* command, G4Strin
 	else if(index == 13){
 		fAction->SetInterpolationMethod(newValue);
 	}
-	else if(index == 14)
+	else if(index == 14){
 		fAction->SetBeamEnergy(G4UIcommand::ConvertToDouble(newValue));
-	else if(index == 15)
+	}
+	else if(index == 15){
 		fAction->SetBeamEnergySigma(newValue);
+	}
+	else if(index==16){
+		fAction->SetSourcePosition(G4UIcommand::ConvertTo3Vector(newValue));
+	}
 }

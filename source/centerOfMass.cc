@@ -42,18 +42,61 @@ double centerOfMass::getCenterZ() const {
 	return (totalMass > 0 ? (1/totalMass)*center.getZ() : 0);
 }
 
+// CHANGE THIS ; FUNCTION DOES NOT WORK RIGHT FOR PMT WITH GAPS
 bool centerOfMass::getCenterSegment(G4ThreeVector &pos, short &col, short &row) const {
-	double xpos = (pos.getX()+activeWidth/2)/pixelWidth;
-	double ypos = (pos.getY()+activeHeight/2)/pixelHeight;
-	
-	col = (short)floor(xpos);
-	row = (short)floor(ypos);
-	
-	//std::cout << " activeWidth=" << activeWidth << ", activeHeight=" << activeHeight << std::endl;
-	//std::cout << " pixelWidth=" << pixelWidth << ", pixelHeight=" << pixelHeight << std::endl;
-	//std::cout << " x=" << xpos << ", y=" << ypos << ", col=" << col << ", row=" << row << std::endl;
-	
-	return ((col >= 0 && col < Ncol) && (row >= 0 && row < Nrow));
+
+	if (pmtHasGaps) {
+		double lowerBoundX, upperBoundX;
+		double lowerBoundY, upperBoundY;
+
+		double xpos = pos.getX() + activeWidth/2;
+		double ypos = pos.getY() + activeHeight/2;
+
+		lowerBoundX = 0;
+		upperBoundX = pixelWidth;
+
+		// column and row set to -1 (not touching the PMT) by default
+		col = -1;
+		row = -1;
+
+		// determine (if any) column/row
+		for (int i=0; i<Ncol; i++) {
+			if ((xpos > lowerBoundX) && (xpos < upperBoundX)) {
+				col = i;
+			}
+
+			// reset Y bounds
+			lowerBoundY = 0;
+			upperBoundY = pixelHeight;
+			for (int j=0; j<Nrow; j++) {
+				if ((ypos > lowerBoundY) && (ypos < upperBoundY)) {
+					row = j;
+				}
+				lowerBoundY = lowerBoundY + pmtGapThickness + pixelHeight;
+				upperBoundY = upperBoundY + pmtGapThickness + pixelHeight;
+			}
+			if (col != -1)
+				break;
+			
+			lowerBoundX = lowerBoundX + pmtGapThickness + pixelWidth;
+			upperBoundX = upperBoundX + pmtGapThickness + pixelWidth;
+		}
+
+		return (col >= 0 && col < Ncol && row >= 0 && row < Nrow);
+	}
+	else {	
+		double xpos = (pos.getX()+activeWidth/2)/pixelWidth;
+		double ypos = (pos.getY()+activeHeight/2)/pixelHeight;
+		
+		col = (short)floor(xpos);
+		row = (short)floor(ypos);
+		
+		//std::cout << " activeWidth=" << activeWidth << ", activeHeight=" << activeHeight << std::endl;
+		//std::cout << " pixelWidth=" << pixelWidth << ", pixelHeight=" << pixelHeight << std::endl;
+		//std::cout << " x=" << xpos << ", y=" << ypos << ", col=" << col << ", row=" << row << std::endl;
+		
+		return ((col >= 0 && col < Ncol) && (row >= 0 && row < Nrow));
+	}
 }
 
 bool centerOfMass::getCenterSegment(short &col, short &row) const {
@@ -75,27 +118,61 @@ double centerOfMass::getReconstructedY() const {
 	return ((anodeCurrent[1]+anodeCurrent[2])-(anodeCurrent[3]+anodeCurrent[0]))/(anodeCurrent[0]+anodeCurrent[1]+anodeCurrent[2]+anodeCurrent[3]);
 }
 
+double centerOfMass::getSipmX() const {
+	double total = 0,x=0;
+	for(int i=0;i<Ncol;i++){
+		for(int j=0;j<Nrow;j++){
+			total += (Ncol-1)*countMatrix[i][j];
+			x += i*countMatrix[i][j];
+		}
+	}
+	return x/total;
+}
+
+double centerOfMass::getSipmY() const {
+	double total = 0,y=0;
+	for(int i=0;i<Ncol;i++){
+		for(int j=0;j<Nrow;j++){
+			total += (Nrow-1)*countMatrix[i][j];
+			y += (Nrow-1-j)*countMatrix[i][j];
+		}
+	}
+	return y/total;
+}
+
 short centerOfMass::setNumColumns(const short &col_){ 
 	Ncol = col_;
-	pixelWidth = activeWidth / (Ncol > 0 ? Ncol : 1);
+	if (pmtHasGaps)
+		pixelWidth = (activeWidth - pmtGapThickness*(Ncol-1))/Ncol;
+	else
+		pixelWidth = activeWidth / (Ncol > 0 ? Ncol : 1);
 	return Ncol; 
 }
 
 short centerOfMass::setNumRows(const short &row_){
 	Nrow = row_;
-	pixelHeight = activeHeight / (Nrow > 0 ? Nrow : 1);
+	if (pmtHasGaps)
+		pixelHeight = (activeHeight - pmtGapThickness*(Nrow-1))/Nrow;
+	else
+		pixelHeight = activeHeight / (Nrow > 0 ? Nrow : 1);
 	return Nrow; 
 }
 
 double centerOfMass::setActiveAreaWidth(const double &width_){
 	activeWidth = width_;
-	pixelWidth = activeWidth / (Ncol > 0 ? Ncol : 1);
+	if (pmtHasGaps) 
+		pixelWidth = (activeWidth - pmtGapThickness*(Ncol-1))/Ncol;
+	else
+		pixelWidth = activeWidth / (Ncol > 0 ? Ncol : 1);
 	return activeWidth;
 }
 
 double centerOfMass::setActiveAreaHeight(const double &height_){
 	activeHeight = height_;
-	pixelHeight = activeHeight / (Nrow > 0 ? Nrow : 1);
+	if (pmtHasGaps) 
+		pixelHeight = (activeHeight - pmtGapThickness*(Nrow-1))/Nrow;
+	else
+		pixelHeight = activeHeight / (Nrow > 0 ? Nrow : 1);
 	return activeHeight;
 }
 
@@ -105,14 +182,26 @@ void centerOfMass::setSegmentedPmt(const nDetDetectorParams *params){
 
 	Ncol = params->GetNumPmtColumns();
 	Nrow = params->GetNumPmtRows();
-	activeWidth = params->GetPmtWidth();
-	activeHeight = params->GetPmtHeight();
-	pixelWidth = activeWidth / Ncol;
-	pixelHeight = activeHeight / Nrow;
+	
+	if (params->PmtHasGaps()) {
+		pmtHasGaps = true;
+		activeWidth = params->GetPmtWidth();
+		activeHeight = params->GetPmtHeight();
+		pixelWidth = params->GetPmtPixelWidth();
+		pixelHeight = params->GetPmtPixelHeight();
+		pmtGapThickness = params->GetPmtGapThickness();
+	}
+	else {
+		activeWidth = params->GetPmtWidth();
+		activeHeight = params->GetPmtHeight();
+		pixelWidth = activeWidth / Ncol;
+		pixelHeight = activeHeight / Nrow;
+	}
 	
 	// Setup the anode gain matrix.
 	gainMatrix.clear();
-	countMatrix.clear();
+	// std::cout<<"Clearing count matrix"<<std::endl;
+	// countMatrix.clear();
 	for(short i = 0; i < Ncol; i++){
 		gainMatrix.push_back(std::vector<double>(Nrow, 100));
 		countMatrix.push_back(std::vector<int>(Nrow, 0));
@@ -124,10 +213,10 @@ bool centerOfMass::loadSpectralResponse(const char *fname){
 }
 
 bool centerOfMass::loadGainMatrix(const char *fname){
-	if(gainMatrix.empty() || Ncol*Nrow == 0) return false;
-	std::ifstream gainFile(fname);
-	if(!gainFile.good()) return false;
-	
+	if(gainMatrix.empty() || Ncol*Nrow == 0) {/*std::cout<<"Gain Matrix Empty"<<std::endl;*/ return false; }
+	std::ifstream gainFile;
+	gainFile.open(fname);
+	if(!gainFile.good()) { std::cout<<"Gain File Bad"<<std::endl; return false;}
 	double readval;
 	for(short col = 0; col < Ncol; col++){
 		for(short row = 0; row < Nrow; row++){
@@ -174,10 +263,9 @@ void centerOfMass::clear(){
 		anodeCurrent[i] = 0;
 		anodeResponse[i].clear();
 	}
+	countMatrix.clear();
 	for(short i = 0; i < Ncol; i++){
-		for(short j = 0; j < Nrow; j++){
-			countMatrix[i][j] = 0;
-		}
+		countMatrix.push_back(std::vector<int>(Nrow, 0));
 	}
 }
 
@@ -202,15 +290,13 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 			increment(xpos, ypos);
 
 			// Add the anger logic currents to the anode outputs.
-			double totalCurrent = 0;
 			double *current = getCurrent(xpos, ypos);
 			if(current){
 				for(size_t i = 0; i < 4; i++){
 					anodeCurrent[i] += gain*mass*current[i];
-					totalCurrent += current[i];
 				}
 				for(size_t i = 0; i < 4; i++){
-					anodeResponse[i].addPhoton(time, 0, gain*mass*(current[i]/totalCurrent));
+					anodeResponse[i].addPhoton(time, 0, gain*mass*(current[i]));
 				}
 			}
 			
@@ -233,7 +319,7 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 			response.addPhoton(time, wavelength, gain);
 
 			// Add the "mass" to the others weighted by the individual anode gain
-			center += pos;
+			center += pos; //add pos calculated based on anode current
 			totalMass += mass;
 		}
 	}

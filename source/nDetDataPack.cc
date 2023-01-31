@@ -4,17 +4,19 @@
 
 #include "nDetDataPack.hh"
 
-void nDetDataPack::setDataAddresses(nDetEventStructure *evt, nDetOutputStructure *out, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace){
+void nDetDataPack::setDataAddresses(nDetEventStructure *evt, nDetOutputStructure *out, nDetImplantOutputStructure *outImp, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace){
 	evtData = evt;
 	outData = out;
+	outImplantData = outImp;
 	multData = mult;
 	debugData = debug;
 	traceData = trace;
 }
 
-void nDetDataPack::copyData(nDetEventStructure *evt, nDetOutputStructure *out, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) const {
+void nDetDataPack::copyData(nDetEventStructure *evt, nDetOutputStructure *out, nDetImplantOutputStructure *outImp, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) const {
 	(*evt) = (*evtData);
 	(*out) = (*outData);
+	(*outImp) = (*outImplantData);
 	(*mult) = (*multData);
 	(*debug) = (*debugData);
 	(*trace) = (*traceData);
@@ -31,6 +33,7 @@ int nDetDataPack::getEventID() const {
 void nDetDataPack::clear(){
 	evtData->Zero();
 	outData->Zero();
+	outImplantData->Zero();
 	multData->Zero();
 	debugData->Zero();
 	traceData->Zero();

@@ -31,11 +31,18 @@ class nDetMaterials{
     G4Element* fO; ///< Oxygen
     G4Element* fF; ///< Flourine
     G4Element* fSi; ///< Silicon
-    G4Element* fAl; ///< Aluminium
+    G4Element* fAl; ///< Aluminum
+ 		G4Element* fY; ///< Yttrium
+		G4Element* fLa; ///< Lanthinum
+		G4Element* fBr; ///< Bromine
+		G4Element* fGd; ///< Gadolinium
+		G4Element* fGa; ///< Gallium
+		G4Element* fCe; ///< Cerium
 
     G4Material* fAir; ///< Material corresponding to air
     G4Material* fVacuum; ///< Material corresponding to natural vacuum
     G4Material* fTeflon; ///< Material corresponding to teflon
+	G4Material* fAl2O3; ///< Material corresponding to aluminum oxide
     G4Material* fEJ200; ///< Material corresponding to EJ-200 scintillator
     G4Material* fEJ276; ///< Material corresponding to EJ-276 scintillator
     G4Material* fGrease; ///< Material corresponding to optical grease
@@ -43,37 +50,52 @@ class nDetMaterials{
     G4Material* fSilicon; ///< Material corresponding to silicon
     G4Material* fMylar; ///< Material corresponding to aluminized mylar
     G4Material* fAcrylic; ///< Material corresponding to acrylic
-	G4Material* fAluminum; ///< Material corresponding to aluminum
+		G4Material* fAluminum; ///< Material corresponding to aluminum
+ 		G4Material* fYSO; ///< Material corresponding to yttrium orthosilicate
+		G4Material* fYAP; ///< yttrium aluminum perovskite
+		G4Material* fGAGG; ///< Gadolinium Aluminum Gallium Garnet (Gd3Al2Ga3O12)
+		G4Material* fLaBr3; ///< Lanthinum Bromide 
+		G4Material* fCeBr3; ///< Cerium Bromide
+
 
     // Material table properties
     G4MaterialPropertiesTable* fAirMPT; ///< Material properties table for air
     G4MaterialPropertiesTable* fTeflonMPT; ///< Material properties table for teflon
+	G4MaterialPropertiesTable* fAl2O3MPT; ///< Material properties table for aluminum oxide
     G4MaterialPropertiesTable* fEJ200MPT; ///< Material properties table for EJ-200 scintillator
     G4MaterialPropertiesTable* fEJ276MPT; ///< Material properties table for EJ-276 scintillator
+		G4MaterialPropertiesTable* fYSOMPT; ///< Material properties table for YSO scintillator
+		G4MaterialPropertiesTable* fYAPMPT; ///< MPT for YAP scintillator
+		G4MaterialPropertiesTable* fGAGGMPT; ///< MPT for GAGG scintillator
+		G4MaterialPropertiesTable* fLaBr3MPT; ///< MPT for LaBr3 scintillator
+		G4MaterialPropertiesTable* fCeBr3MPT; ///< MPT for CeBr3 scintillator
     G4MaterialPropertiesTable* fGreaseMPT; ///< Material properties table for optical grease
     G4MaterialPropertiesTable* fSiO2MPT; ///< Material properties table for quartz
     G4MaterialPropertiesTable* fSiliconMPT; ///< Material properties table for silicon
-	G4MaterialPropertiesTable* fMylarMPT; ///< Material properties table for aluminized mylar
-	G4MaterialPropertiesTable* fPerfectMPT; ///< Material properties table for a perfect reflector
-	G4MaterialPropertiesTable* fAluminumMPT; ///< Material properties table for aluminum
-	G4MaterialPropertiesTable* fEsrMPT; ///< Material properties table for 3M Enhanced Specular Reflector
+		G4MaterialPropertiesTable* fMylarMPT; ///< Material properties table for aluminized mylar
+		G4MaterialPropertiesTable* fPerfectMPT; ///< Material properties table for a perfect reflector
+		G4MaterialPropertiesTable* fAluminumMPT; ///< Material properties table for aluminum
+		G4MaterialPropertiesTable* fEsrMPT; ///< Material properties table for 3M Enhanced Specular Reflector
 
     // Optical Surfaces
     G4OpticalSurface* fTeflonOpSurf; ///< Optical surface for teflon
+	G4OpticalSurface* fAl2O3OpSurf; ///< Optical surface for aluminum oxide
     G4OpticalSurface* fSiliconOpSurf; ///< Optical surface for silicon
     G4OpticalSurface* fMylarOpSurf; ///< Optical surface for aluminized mylar
     G4OpticalSurface* fEsrOpSurf; ///< Optical surface for 3M Enhanced Specular Reflector
-	G4OpticalSurface* fPerfectOpSurf; ///< Optical surface for a perfect reflector
-	G4OpticalSurface* fGreaseOpSurf; ///< Optical surface for optical grease
+		G4OpticalSurface* fPerfectOpSurf; ///< Optical surface for a perfect reflector
+		G4OpticalSurface* fGreaseOpSurf; ///< Optical surface for optical grease
+		G4OpticalSurface* fAirOpSurf; ///< Optical surface for air
+		G4OpticalSurface* fAluminumOpSurf; ///< Optical surface for aluminum
 
-	// Visual attributes
-	G4VisAttributes *visAssembly; ///< Visual attributes for the mother assembly
-	G4VisAttributes *visSensitive; ///< Visual attributes for the photo-sensitive surface
-	G4VisAttributes *visWindow; ///< Visual attributes for the optical window
-	G4VisAttributes *visGrease; ///< Visual attributes for the optical grease
-	G4VisAttributes *visWrapping; ///< Visual attributes for the inner/outer detector wrappint
-	G4VisAttributes *visScint; ///< Visual attributes for the scintillator material
-	G4VisAttributes *visShadow; ///< Visual attributes for the shadow object
+		// Visual attributes
+		G4VisAttributes *visAssembly; ///< Visual attributes for the mother assembly
+		G4VisAttributes *visSensitive; ///< Visual attributes for the photo-sensitive surface
+		G4VisAttributes *visWindow; ///< Visual attributes for the optical window
+		G4VisAttributes *visGrease; ///< Visual attributes for the optical grease
+		G4VisAttributes *visWrapping; ///< Visual attributes for the inner/outer detector wrappint
+		G4VisAttributes *visScint; ///< Visual attributes for the scintillator material
+		G4VisAttributes *visShadow; ///< Visual attributes for the shadow object
 	
 	/** Default constructor
 	  */

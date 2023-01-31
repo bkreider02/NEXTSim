@@ -26,7 +26,7 @@ class centerOfMass{
   public:
 	/** Default constructor
 	  */
-	centerOfMass() : Ncol(-1), Nrow(-1), Npts(0), NnotDetected(0), totalMass(0), t0(std::numeric_limits<double>::max()), tSum(0), lambdaSum(0),
+	centerOfMass() : Ncol(1), Nrow(1), Npts(0), NnotDetected(0), totalMass(0), t0(std::numeric_limits<double>::max()), tSum(0), lambdaSum(0),
 	                 activeWidth(0), activeHeight(0), pixelWidth(0), pixelHeight(0), center(0, 0, 0), response() { }
 
 	/** Destructor
@@ -147,6 +147,14 @@ class centerOfMass{
 	/** Get the vertical photon center-of-mass position computed from the Anger Logic currents
 	  */
 	double getReconstructedY() const ;
+
+	/** Get the horizontal photon center-of-mass position computed from the Sipm Logic 
+	  */
+	double getSipmX() const ;
+	
+	/** Get the vertical photon center-of-mass position computed from the Sipm Logic 
+	  */
+	double getSipmY() const ;
 	
 	/** Get the anode gain matrix
 	  */
@@ -239,9 +247,10 @@ class centerOfMass{
 	void print() const ;
   
   private:
+
 	short Ncol; ///< Number of PMT anode columns
 	short Nrow; ///< Number of PMT anode rows
-	
+
 	size_t Npts; ///< Number of photons added to the weighted average
 	size_t NnotDetected; ///< Number of photons not detected by the sensitive surface
 	
@@ -255,6 +264,9 @@ class centerOfMass{
 	
 	double pixelWidth; ///< Width of each individual PMT anode
 	double pixelHeight; ///< Height of each individual PMT anode
+
+	bool pmtHasGaps = false; ///< Flag indicating whether segmented PMT has gaps
+	double pmtGapThickness = 0; ///< Thickness of the gap between PMT anodes
 	
 	double anodeCurrent[4]; ///< Sum of the current at each Anger Logic readout
 	

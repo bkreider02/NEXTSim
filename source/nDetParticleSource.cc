@@ -8,7 +8,6 @@
 #include "cmcalc.hh"
 #include "termColors.hh"
 #include "optionHandler.hh"
-
 #include "G4Event.hh"
 #include "G4GeneralParticleSource.hh"
 #include "G4ParticleTable.hh"
@@ -17,6 +16,9 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Neutron.hh"
 #include "G4Gamma.hh"
+#include <G4Alpha.hh>
+#include "G4GenericIon.hh"
+#include "G4IonTable.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4Electron.hh"
 #include "Randomize.hh"
@@ -38,7 +40,7 @@ nDetParticleSource &nDetParticleSource::getInstance(){
 	return instance;
 }
 
-nDetParticleSource::nDetParticleSource(nDetDetector *det/*=NULL*/) : G4GeneralParticleSource(), fSourceMessenger(NULL), unitX(1,0,0), unitY(0,1,0), unitZ(0,0,1),
+nDetParticleSource::nDetParticleSource(nDetDetector *det/*=NULL*/, nDetImplant *imp/*=NULL*/) : G4GeneralParticleSource(), fSourceMessenger(NULL), unitX(1,0,0), unitY(0,1,0), unitZ(0,0,1),
                                                                      sourceOrigin(0,0,0), beamspotType(0), beamspot(0), beamspot0(0), rot(), targThickness(0),targEnergyLoss(0),
                                                                      targTimeSlope(0), targTimeOffset(0), beamE0(0), useReaction(false), isotropic(false), back2back(false), realIsotropic(false),
                                                                      particleRxn(NULL), detPos(), detSize(), detRot(), sourceIndex(0), numSources(0), interpolationMethod("Lin")
@@ -51,9 +53,12 @@ nDetParticleSource::nDetParticleSource(nDetDetector *det/*=NULL*/) : G4GeneralPa
 	
 	// Set the default particle reaction.
 	particleRxn = new Reaction();
-
-	if(det)
+	if(det){
 		this->SetDetector(det);
+	}
+	else if(imp){
+		this->SetImplant(imp);
+	}
 	
 	// Create a messenger for this class
 	fSourceMessenger = new nDetParticleSourceMessenger(this); 
@@ -93,6 +98,7 @@ void nDetParticleSource::SetBeamEnergySigma(const G4double &energy, const G4doub
 void nDetParticleSource::SetSourcePosition(const G4ThreeVector &position){
 	G4SingleParticleSource *src;
 	while( (src = nextSource()) ){ // Iterate over all defined sources
+		sourceOrigin = position;
 		src->GetPosDist()->SetCentreCoords(position);
 	}
 }
@@ -130,8 +136,15 @@ bool nDetParticleSource::SetSourceType(const G4String &str){
 
 	std::string typeName = args.at(0);
 	double beamEnergy = 1;
+	// Default ion to alpha particle
+	int mass = 4;
+	int charge = 2;
 	if(Nargs >= 2)
 		beamEnergy = strtod(args.at(1).c_str(), NULL);
+	if(Nargs >= 3){
+		mass = atoi(args.at(2).c_str());
+		charge = atoi(args.at(3).c_str());
+	}
 
 	// Set the type of source or beam
 	if(typeName == "137Cs")
@@ -148,6 +161,10 @@ bool nDetParticleSource::SetSourceType(const G4String &str){
 		Set252Cf();
 	else if(typeName == "neutron")
 		SetNeutronBeam(beamEnergy);
+	else if(typeName == "alpha")
+		SetAlphaBeam(beamEnergy);
+	else if(typeName == "ion")
+		SetIonBeam(beamEnergy,mass,charge);
 	else if(typeName == "gamma")
 		SetGammaRayBeam(beamEnergy);
 	else if(typeName == "laser"){
@@ -210,6 +227,12 @@ void nDetParticleSource::SetDetector(const nDetDetector *det){
 	detPos = det->GetDetectorPos();
 	detSize = det->GetDetectorSize();
 	detRot = det->GetDetectorRot();
+}
+
+void nDetParticleSource::SetImplant(const nDetImplant *imp){
+	detPos = imp->GetDetectorPos();
+	detSize = imp->GetDetectorSize();
+	detRot = imp->GetDetectorRot();
 }
 
 void nDetParticleSource::Set252Cf(const size_t &size_/*=150*/, const double &stepSize_/*=0.1*/){
@@ -297,10 +320,48 @@ void nDetParticleSource::Set90Sr(){
 }
 
 void nDetParticleSource::SetNeutronBeam(const double &energy_){
+	std::cout<<"Neutron Beam"<<std::endl;
 	Reset();
 	GetCurrentSource()->SetParticleDefinition(G4Neutron::NeutronDefinition());
 	SetBeamEnergy(energy_*MeV);
 }
+
+void nDetParticleSource::SetAlphaBeam(const double &energy_){
+	std::cout<<"Alpha Beam"<<std::endl;
+	Reset();
+	GetCurrentSource()->SetParticleDefinition(G4Alpha::AlphaDefinition());
+	SetBeamEnergy(energy_*MeV);
+}
+
+void nDetParticleSource::SetIonBeam(const double &energy_, const int &A, const int &Z, const double &exE/*=0.*/){
+	std::cout<<"Ion Beam with A="<<A<<" and Z="<<Z<<std::endl;
+	Reset();
+	// GetCurrentSource()->SetParticleDefinition(G4ParticleTable::GetIon(A,Z,exE));
+	GetCurrentSource()->SetParticleDefinition(G4IonTable::GetIonTable()->GetIon(Z,A,exE));
+	SetBeamEnergy(energy_*MeV);
+}
+
+/*void nDetParticleSource::SetIonBeam(const G4String &str){
+	// Expects a space-delimited string of the form:
+	//  "<name> [energy(MeV)]"
+	std::vector<std::string> args;
+	unsigned int Nargs = split_str(str, args);
+	if(Nargs < 1){
+		Display::ErrorPrint("Invalid number of arguments given to ::SetSourceType().", "nDetParticleSource");
+		Display::ErrorPrint(" SYNTAX: type <name> [energy(MeV)]", "nDetParticleSource");
+		return;
+	}
+	std::string typeName = args.at(0);
+	double beamEnergy = 1;
+	if(Nargs >= 2)
+		beamEnergy = strtod(args.at(1).c_str(), NULL);
+		
+	std::cout << " nDetParticleSource: Setting " <<beamEnergy<<" MeV "<< typeName << " Ion source.\n";
+	Reset();
+	//GetCurrentSource()->SetParticleDefinition(G4Implant::ImplantDefinition());
+	GetCurrentSource()->SetParticleDefinition(G4Alpha::AlphaDefinition());
+	SetBeamEnergy(beamEnergy*MeV);
+}*/
 
 void nDetParticleSource::SetGammaRayBeam(const double &energy_){
 	Reset();

@@ -1,0 +1,146 @@
+#
+# create empty scene
+#
+
+
+# Use a GDML file for the light guides.
+# NOTE: This MUST be done BEFORE calling '/nDet/implant/update'
+#/nDet/implant/loadGDML gdml/modifiedLightGuide.gdml
+#/nDet/implant/loadGDML gdml/nonSegmentedLightGuide.gdml
+#/nDet/implant/setTrapezoidLength 1.27
+
+#/nDet/implant/setGDMLrotation 90 0 0
+
+# This is important to set for GDML light-guide because
+#  we cannot obtain the information from the model itself.
+/nDet/implant/setPmtDimensions 50.0
+
+
+# Mylar and optical grease thickness.
+/nDet/implant/setMylarThickness 0.025
+/nDet/implant/setGreaseThickness 0.5
+
+# Light 
+/nDet/implant/setDiffuserLength 1.5
+
+# Choose Scintillator
+/nDet/implant/setMaterial yso
+#/nDet/implant/setMaterial cebr3
+
+# PMT segmentation.
+/nDet/implant/setPmtColumns 8
+/nDet/implant/setPmtRows 8
+
+##################
+# DETECTOR SETUP #
+##################
+
+# NEXT 2x2x10 in^3
+/nDet/implant/setDetectorLength 1.2
+/nDet/implant/setDetectorWidth 5.08
+/nDet/implant/setDetectorThickness 50.8
+/nDet/implant/setWindowThickness 1.
+/nDet/implant/setNumColumns 24
+/nDet/implant/setNumRows 24
+/nDet/implant/setStart 1
+
+# NEXT 3x3x10 in^3
+#/nDet/implant/setDetectorLength 5.4
+#/nDet/implant/setDetectorWidth 7.62
+#/nDet/implant/setDetectorThickness 76.2
+#/nDet/implant/setNumColumns 12
+#/nDet/implant/setNumRows 6
+
+# Set the wrapping.
+/nDet/implant/setWrapping perfect
+
+# Load PSPMT gain matrix 
+# NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
+#/nDet/implant/setGainMatrix ~/opt/NEXTSim/gain/hamamatsuH12700A_LA0967.dat
+/nDet/implant/setGainMatrix hamamatsuH12700A_LA0967.dat
+# Load PSPMT spectral response function
+/nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
+
+# Set the position and rotation of the detector in the lab frame.
+/nDet/implant/setPosition 0 0 0 cm
+#/nDet/implant/setCylindrical 0.5 0 0
+/nDet/implant/setRotation 0 270 0
+/nDet/implant/addGeometry module
+
+/nDet/implant/addDiffuserLayer 50 50 0.1
+#/nDet/implant/addLightGuide 50 50 50 50 5 
+#/nDet/segLightGuide/thickness 10
+# setSegmentedLightGuide <# x seg> <# y seg> <z thickness> <front x width> <front y width> <back x width> <back y width> <spacing> <material>
+/nDet/implant/setSegmentedLightGuide 24 24 5 50.8 50.8 45 45 G4_Pyrex_Glass
+
+
+# Update the detector.
+/nDet/implant/update
+
+
+################
+# OUTPUT SETUP #
+################
+
+# Set the output filename prefix
+/nDet/output/filename ionTest_24O_24x24.root
+/nDet/output/title PSPMT, 24O 2 GeV
+#/nDet/output/index 69
+#/nDet/output/overwrite true
+#/nDet/output/persistent true
+#/nDet/output/enabled false
+#/nDet/output/badEvents true
+/nDet/output/debug true
+
+# Setup information about the PMT response
+/nDet/output/trace/setRisetime 2
+/nDet/output/trace/setFalltime 20
+/nDet/output/trace/setTimeSpread 0.35
+/nDet/output/trace/setGain 1E4
+/nDet/output/trace/setBaseline 7.5
+/nDet/output/trace/setJitter 0.15
+
+# Setup the PMT light pulse output
+#/nDet/output/trace/enabled true
+/nDet/output/trace/setTraceDelay 60
+/nDet/output/trace/setTraceLength 500
+/nDet/output/trace/setBitRange 16
+/nDet/output/trace/setGain 1000
+/nDet/output/trace/setCfdFraction 0.5
+/nDet/output/trace/setIntegralLow 5
+/nDet/output/trace/setIntegralHigh 10
+
+################
+# SOURCE SETUP #
+################
+
+# Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
+#/nDet/source/type 252Cf
+
+#/nDet/source/type alpha 5
+#/nDet/source/type 90Sr
+/nDet/source/spot 25 #half-width for beam
+/nDet/source/shape circle
+#/nDet/source/beam 137Cs
+/nDet/source/position -20 0 0 #default to cm.. best above beam
+/nDet/source/type ion 2000 24 8 # Example for 24O at 2 GeV
+
+
+#/nDet/source/spot 38.1
+#/nDet/source/spot 25.4
+#/nDet/source/spot 12.7
+
+# Optical laser beam.
+#/nDet/source/beam laser 360
+/nDet/source/direction 1 0 0 
+
+
+#/nDet/source/iso 1
+
+#/nDet/source/range 1.175 1.225 0
+
+###############
+# RUN CONTROL #
+###############
+
+/run/beamOn 100

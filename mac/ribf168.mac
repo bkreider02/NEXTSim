@@ -1,0 +1,112 @@
+# hagrid.mac
+# Cory R Thornsberry
+# Simulates an elliptical bar (football) with a 1 MeV beam of neutrons
+
+/nDet/implant/setPmtDimensions 50.4
+
+# Mylar and optical grease thickness.
+/nDet/implant/setMylarThickness 0.025
+/nDet/implant/setGreaseThickness 0.1
+
+################
+# OUTPUT SETUP #
+################
+
+# Set the output filename prefix
+/nDet/output/filename ribf168EfficencyTests.root
+/nDet/output/title ribf168 exp setup with ~16 Hagrid and Pspmt implant and 0.4 MeV gamma circle beam w 5 mm rad
+/nDet/output/debug false 
+
+# Setup information about the PMT response
+/nDet/output/trace/setRisetime 2
+/nDet/output/trace/setFalltime 20
+/nDet/output/trace/setTimeSpread 0.35
+/nDet/output/trace/setGain 2E4
+/nDet/output/trace/setBaseline 7.5
+/nDet/output/trace/setJitter 0.15
+
+# Setup the PMT light pulse output
+/nDet/output/trace/setTraceDelay 60
+/nDet/output/trace/setTraceLength 500
+/nDet/output/trace/setBitRange 16
+
+/nDet/output/trace/setCfdFraction 0.5
+/nDet/output/trace/setIntegralLow 5
+
+##################
+# IMPLANT SETUP #
+##################
+
+# IMPLANT Setup
+/nDet/implant/setMaterial yso
+# 5 mm thick scintillator
+/nDet/implant/setDetectorLength 0.5
+/nDet/implant/setDetectorWidth 5.08
+/nDet/implant/setDetectorThickness 50.8
+/nDet/implant/setWindowThickness 1.
+/nDet/implant/setNumColumns 24
+/nDet/implant/setNumRows 24
+#/nDet/implant/setStart 1
+
+# Set the wrapping.
+/nDet/implant/setWrapping perfect
+
+# Load PSPMT gain matrix 
+# NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
+#/nDet/implant/setGainMatrix ~/opt/NEXTSim/gain/hamamatsuH12700A_LA0967.dat
+/nDet/implant/setGainMatrix hamamatsuH12700A_LA0967.dat
+# Load PSPMT spectral response function
+/nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
+
+# Set the position and rotation of the detector in the lab frame.
+/nDet/implant/setPosition 0 0 0 cm
+#/nDet/implant/setCylindrical 0.5 0 0
+/nDet/implant/setRotation 0 270 0
+/nDet/implant/addGeometry module
+
+/nDet/implant/addDiffuserLayer 50 50 0.1
+#/nDet/implant/addLightGuide 50 50 50 50 5 
+#/nDet/segLightGuide/thickness 10
+/nDet/implant/setSegmentedLightGuide 24 24 5 50.8 50.8 45 45 G4_Pyrex_Glass
+
+
+# Update the detector.
+/nDet/implant/update
+/nDet/output/trace/setIntegralHigh 10
+
+##################
+# HAGRID SETUP #
+##################
+
+#### Aluminum case thickness set to 0.305 cm
+
+# Ellipse prototype
+/nDet/implant/setMaterial labr3
+/nDet/implant/setDetectorLength 5.08 cm
+/nDet/implant/setDetectorWidth 5.08 cm
+/nDet/implant/setMylarThickness 3.05 mm
+/nDet/implant/setWrapping aluminum
+
+## Update the detector.
+/nDet/implant/addArray hagrid 5.7 0 180 16
+/nDet/implant/update
+
+################
+# SOURCE SETUP #
+################
+
+# Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
+#/nDet/source/type 60Co
+
+/nDet/source/type gamma 0.4
+/nDet/source/spot 5 mm
+/nDet/source/shape circle
+
+# Set isotropic source (0=off, 1=psuedo, 2=realistic)
+/nDet/source/iso 2
+
+###############
+# RUN CONTROL #
+###############
+
+/run/beamOn 1000000

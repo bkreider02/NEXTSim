@@ -1,0 +1,85 @@
+# hagrid.mac
+# Cory R Thornsberry
+# Simulates an elliptical bar (football) with a 1 MeV beam of neutrons
+
+/nDet/implant/setPmtDimensions 50
+
+# Mylar and optical grease thickness.
+/nDet/implant/setMylarThickness 0.025
+/nDet/implant/setGreaseThickness 0.1
+
+################
+# OUTPUT SETUP #
+################
+
+# Set the output filename prefix
+/nDet/output/filename hagrid.root
+/nDet/output/title 2 in hagrid no implant and gamma with 1 MeV
+/nDet/output/debug false
+
+# Setup information about the PMT response
+/nDet/output/trace/setRisetime 2
+/nDet/output/trace/setFalltime 20
+/nDet/output/trace/setTimeSpread 0.35
+/nDet/output/trace/setGain 2E4
+/nDet/output/trace/setBaseline 7.5
+/nDet/output/trace/setJitter 0.15
+
+# Setup the PMT light pulse output
+/nDet/output/trace/setTraceDelay 60
+/nDet/output/trace/setTraceLength 500
+/nDet/output/trace/setBitRange 16
+
+/nDet/output/trace/setCfdFraction 0.5
+/nDet/output/trace/setIntegralLow 5
+/nDet/output/trace/setIntegralHigh 10
+
+##################
+# DETECTOR SETUP #
+##################
+
+# Ellipse prototype
+/nDet/implant/setMaterial labr3
+/nDet/implant/setDetectorLength 5.08
+/nDet/implant/setDetectorWidth 5.08
+/nDet/implant/setMylarThickness 3.05 mm
+/nDet/implant/setWrapping aluminum
+
+#/nDet/implant/setTrapezoidLength 2
+#/nDet/implant/setTrapezoidAngle 45
+
+# Set the position and rotation of the detector in the lab frame.
+#/nDet/implant/setPosition 0 0 2.769 cm
+#/nDet/implant/setRotation 0 0 90
+
+# Update the detector.
+#/nDet/implant/addGeometry hagrid
+/nDet/implant/addArray hagrid 5.7 0 180 16
+/nDet/implant/update
+
+## Set the position and rotation of the detector in the lab frame.
+#/nDet/implant/setPosition 0 0 -2.769 cm
+#/nDet/implant/setRotation 0 180 90
+#
+## Update the detector.
+#/nDet/implant/addGeometry hagrid
+#/nDet/implant/update
+
+################
+# SOURCE SETUP #
+################
+
+# Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
+#/nDet/source/type 60Co
+
+/nDet/source/type gamma 1
+#/nDet/source/spot 5 mm
+
+# Set isotropic source (0=off, 1=psuedo, 2=realistic)
+/nDet/source/iso 2
+
+###############
+# RUN CONTROL #
+###############
+
+/run/beamOn 1000000

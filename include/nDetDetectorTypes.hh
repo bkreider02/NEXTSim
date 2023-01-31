@@ -22,6 +22,7 @@ namespace nDetDetectorTypes{
   * @return A pointer to the new nDetDetector instance
   */
 nDetDetector* getDetectorType(const G4String &geom);
+nDetImplant* getImplantType(const G4String &geom);
 
 /** Get a pointer to a new detector
   * @param geom The name of the detector type
@@ -30,6 +31,7 @@ nDetDetector* getDetectorType(const G4String &geom);
   * @return A pointer to the new nDetDetector instance
   */
 nDetDetector* getDetectorType(const G4String &geom, nDetConstruction *detector, nDetMaterials *matptr);
+nDetImplant* getImplantType(const G4String &geom, nDetConstruction *detector, nDetMaterials *matptr);
 
 /** @class nextModuleType
   * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
@@ -180,6 +182,78 @@ public:
 
 protected:
 };
+
+
+class implantType : public nDetImplant {
+public:
+	/** Default constructor
+	  */
+	implantType() : nDetImplant() { }
+
+	/** Detector constructor
+	  * @param detector Pointer to a nDetConstruction object where the current detector is defined
+	  * @param matptr Pointer to the Geant materials handler class which will be used for detector construction
+	  */
+	implantType(nDetConstruction *detector, nDetMaterials *matptr) : nDetImplant(detector, matptr) { }
+
+	/** Destructor
+	  */
+	~implantType(){ }
+
+	/** Prepare for the detector volume to be built. In this method, the user should set the maximum
+	  * size constraints of the body of the detector so that the detector handler knows how large to
+	  * make its bounding assembly volume.
+	  */
+	virtual void prepareToBuild();
+
+	/** Build a segmented detector module
+	  *
+	  * The detector will have @a fNumColumns columns (horizontal) and @a fNumRows rows (vertical). If @a fWrappingThickness is
+	  * greater than zero, the user selected wrapping material will be applied between all segments and around the outside
+	  * of the detector.
+	  */
+	virtual void buildDetector();
+
+protected:
+};
+
+/** @class hagridType
+  * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
+  * @date September 25, 2019
+  * @brief Single-segment cylindrical detectector
+  */
+
+class hagridType : public nDetImplant {
+public:
+	/** Default constructor
+	  */
+	hagridType() : nDetImplant() { }
+
+	/** Detector constructor
+	  * @param detector Pointer to a nDetConstruction object where the current detector is defined
+	  * @param matptr Pointer to the Geant materials handler class which will be used for detector construction
+	  */
+	hagridType(nDetConstruction *detector, nDetMaterials *matptr) : nDetImplant(detector, matptr) { }
+
+	/** Destructor
+	  */
+	~hagridType(){ }
+
+	/** Prepare for the detector volume to be built. In this method, the user should set the maximum
+	  * size constraints of the body of the detector so that the detector handler knows how large to
+	  * make its bounding assembly volume.
+	  */
+	virtual void prepareToBuild();
+
+	/** Build a single-segment cylindrical detectector
+	  *
+	  * The parameter @a fDetectorWidth is used as the diameter of the cylindrical body, @a fDetectorheight is not used
+	  */
+	virtual void buildDetector();
+
+protected:
+};
+
 
 } // namespace nDetDetectorTypes
 

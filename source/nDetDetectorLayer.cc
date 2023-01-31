@@ -4,6 +4,7 @@
 #include "nDetDetectorLayer.hh"
 #include "optionHandler.hh" // split_str
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // class greaseLayer
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,6 +21,10 @@ bool greaseLayer::decodeArgs(){
 }
 
 void greaseLayer::construct(nDetDetector *obj){
+	obj->applyGreaseLayer(x, y, thickness);
+}
+
+void greaseLayer::construct(nDetImplant *obj){
 	obj->applyGreaseLayer(x, y, thickness);
 }
 
@@ -46,6 +51,10 @@ bool diffuserLayer::decodeArgs(){
 }
 
 void diffuserLayer::construct(nDetDetector *obj){
+	obj->applyDiffuserLayer(x, y, thickness);
+}
+
+void diffuserLayer::construct(nDetImplant *obj){
 	obj->applyDiffuserLayer(x, y, thickness);
 }
 
@@ -77,9 +86,89 @@ void lightGuideLayer::construct(nDetDetector *obj){
 	obj->applyLightGuide(x1, x2, y1, y2, thickness);
 }
 
+void lightGuideLayer::construct(nDetImplant *obj){
+	obj->applyLightGuide(x1, x2, y1, y2, thickness);
+}
+
 std::string lightGuideLayer::syntaxStr() const {
 	return std::string("addLightGuide <width1> <width2> <height1> <height2> <thickness> [material=G4_SILICON_DIOXIDE]");
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// class segLightGuideLayer
+///////////////////////////////////////////////////////////////////////////////
+
+segLightGuideLayer::segLightGuideLayer(const 
+G4String &arg_) : nDetWorldObject(arg_,8), fXseg(0),fYseg(0),fspacing(0.),ftopWidth(0.),ftopThick(0.),fbotWidth(0.),fbotThick(0.),fzThick(0.),fSegMaterial("G4_Pyrex_Glass"){
+	material = "G4_Pyrex_Glass";
+}
+
+segLightGuideLayer::~segLightGuideLayer(){
+	G4cout<<"Deleting segLightGuideLayer"<<G4endl;
+}
+
+bool segLightGuideLayer::decodeArgs(){
+	fXseg = int(strtod(args.at(0).c_str(), NULL));
+	fYseg = int(strtod(args.at(1).c_str(), NULL));
+	fzThick = strtod(args.at(2).c_str(), NULL);
+	ftopWidth = strtod(args.at(3).c_str(), NULL);
+	ftopThick = strtod(args.at(4).c_str(), NULL);
+	fbotWidth = strtod(args.at(5).c_str(), NULL);
+	fbotThick = strtod(args.at(6).c_str(), NULL);
+	fspacing = strtod(args.at(7).c_str(), NULL);
+	return true;
+}
+
+void segLightGuideLayer::construct(nDetDetector *obj){
+	G4cout<<"Placing segmented light guide on nDetDetector which is not defined"<<G4endl;
+}
+
+void segLightGuideLayer::construct(nDetImplant *obj){
+	obj->applyGreaseLayer(ftopWidth,ftopThick);
+	obj->applySegmentedLightGuide(fXseg, fYseg, fspacing, ftopWidth, ftopThick, fbotWidth, fbotThick, fzThick);
+	obj->setSegZThick(fzThick);
+}
+
+std::string segLightGuideLayer::syntaxStr() const{
+	return std::string("<# x seg> <# y seg> <z thickness> <front x width> <front y width> <back x width> <back y width> <spacing> <material>");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// class phoswichLayer
+///////////////////////////////////////////////////////////////////////////////
+
+phoswichLayer::phoswichLayer(const G4String &arg_) : nDetWorldObject(arg_,8), fXseg(0),fYseg(0),fThick(0.),fWidth(0.),fHeight(0.),fWrapping(0.), fSegMaterial("") 
+{}
+
+phoswichLayer::~phoswichLayer(){
+	G4cout<<"Deleting phoswichLayer"<<G4endl;
+}
+
+bool phoswichLayer::decodeArgs(){
+	fXseg = int(strtod(args.at(0).c_str(), NULL));
+	fYseg = int(strtod(args.at(1).c_str(), NULL));
+	fThick = strtod(args.at(2).c_str(), NULL);
+	fWidth = strtod(args.at(3).c_str(), NULL);
+	fHeight = strtod(args.at(4).c_str(), NULL);
+	fWrapping = strtod(args.at(5).c_str(), NULL);
+	fSegMaterial = strtod(args.at(6).c_str(), NULL);
+	return true;
+}
+
+
+void phoswichLayer::construct(nDetDetector *obj){
+	G4cout<<"Placing phoswich scintillator on nDetDetector which is not defined"<<G4endl;
+}
+
+void phoswichLayer::construct(nDetImplant *obj){
+	obj->applyPhoswich(fXseg,fYseg,fThick,fWidth,fHeight,fWrapping,fSegMaterial);
+}
+
+std::string phoswichLayer::syntaxStr() const{
+	return std::string("<# x seg> <# y seg> <z thickness> <x width> <y height> <wrapping thickness> <material>");
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // class gdmlLightGuideLayer
@@ -103,6 +192,10 @@ bool gdmlLightGuideLayer::decodeArgs(){
 }
 
 void gdmlLightGuideLayer::construct(nDetDetector *obj){
+	obj->loadLightGuide(&solid, rotVector);
+}
+
+void gdmlLightGuideLayer::construct(nDetImplant *obj){
 	obj->loadLightGuide(&solid, rotVector);
 }
 

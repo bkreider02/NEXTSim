@@ -59,6 +59,7 @@ nDetMasterOutputFile::nDetMasterOutputFile(){
 	
 	evtData = new nDetEventStructure();
 	outData = new nDetOutputStructure();
+	outImplantData = new nDetImplantOutputStructure();
 	multData = new nDetMultiOutputStructure();
 	debugData = new nDetDebugStructure();
 	traceData = new nDetTraceStructure();
@@ -70,6 +71,7 @@ nDetMasterOutputFile::~nDetMasterOutputFile(){
 	
 	delete evtData;
 	delete outData;
+	delete outImplantData;
 	delete multData;
 	delete debugData;
 	delete traceData;
@@ -162,6 +164,7 @@ bool nDetMasterOutputFile::openRootFile(const G4Run* aRun){
 	// Add the branches
 	fTree->Branch("event", evtData);
 	if(singleDetectorMode){ // Add the single-detector branches
+		fTree->Branch("implant", outImplantData);
 		fTree->Branch("output", outData);
 		if(outputDebug) // Add the debug branch
 			fTree->Branch("debug", debugData);
@@ -202,10 +205,11 @@ bool nDetMasterOutputFile::fillBranch(const nDetDataPack &pack){
 	fileLock.lock();
 
 	// Copy the data
-	pack.copyData(evtData, outData, multData, debugData, traceData);
+	pack.copyData(evtData, outData, outImplantData, multData, debugData, traceData);
 
-	if(outputBadEvents || pack.goodEvent())
+	if(outputBadEvents || pack.goodEvent()){
 		fTree->Fill(); // Fill the tree
+	}	
 
 	double avgTimePerEvent;
 	double avgTimePerPhoton;

@@ -156,6 +156,7 @@ class nDetMasterOutputFile{
 	
 	TFile *fFile; ///< Pointer to the output root file
 	TTree *fTree; ///< Pointer to the output TTree
+	TTree *fImpTree; ///< Pointer to the output TTree
 
 	bool persistentMode; ///< Flag indicating whether or not the output file should remain open for subsequent runs
 	bool verbose; ///< Verbosity flag
@@ -169,6 +170,7 @@ class nDetMasterOutputFile{
 
 	nDetEventStructure *evtData; ///< Pointer to data structure containing Geant4 event information
 	nDetOutputStructure *outData; ///< Pointer to data structure containing normal (single-detector) output variables
+	nDetImplantOutputStructure *outImplantData; ///< Pointer to data structure containing normal (single-detector) output variables
 	nDetMultiOutputStructure *multData; ///< Pointer to data structure containing multi-detector output variables
 	nDetDebugStructure *debugData; ///< Pointer to data structure containing debug output variables
 	nDetTraceStructure *traceData; ///< Pointer to data structure containing PMT response light pulses

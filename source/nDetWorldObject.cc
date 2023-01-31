@@ -392,6 +392,10 @@ void gdmlObject::construct(nDetDetector *obj){
 	obj->loadGDML(&solid);
 }
 
+void gdmlObject::construct(nDetImplant *obj){
+	obj->loadGDML(&solid);
+}
+
 std::string gdmlObject::syntaxStr() const {
 	return std::string("loadGDML <filename> <posX> <posY> <posZ> <rotX> <rotY> <rotZ> <material>");
 }

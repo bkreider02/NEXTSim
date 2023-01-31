@@ -58,6 +58,29 @@ END_TYPES
 END_CLASS
 
 #####################################################################
+# nDetImplantOutputStructure
+#####################################################################
+
+BEGIN_CLASS	nDetImplantOutput
+SHORT	Container for NEXTSim simulation variable output
+LONG	Structure for storing information about NEXTSim primary particles and optical photons produced by scattering
+BEGIN_TYPES
+u_int	nPhotonsTot	Total number of scintillation photons produced
+u_int	nPhotonsDetTot	Total number of optical photons detected by both PMTs
+double	lightBalance	Ratio of the difference of left and right TQDC to the sum of left and right TQDC	
+double	photonDetEff	Ratio of optical photons detected by a PMT to the total number of photons generated
+double	barTOF	Average of the left and right dynode light pulse phases computed using PolyCFD (in ns)
+double	barQDC	Average of the left and right dynode light pulse integrals
+double	barMaxADC	Average of the left and right dynode light pulse maxima (in ADC channels)
+double	photonComX	Average of the left and right photon center-of-mass X position (in mm)
+double	photonComY	Average of the left and right photon center-of-mass Y position (in mm)
+double	reconComX	Left and right PMT photon center-of-mass along the X-axis computed using Anger Logic reconstruction
+double	reconComY	Left and right PMT photon center-of-mass along the Y-axis computed using Anger Logic reconstruction
+short	photonComCol	Segmented PMT anode column corresponding to the photon center-of-mass for the left and right PMT
+short	photonComRow	Segmented PMT anode row corresponding to the photon center-of-mass for the left and right PMT
+END_CLASS
+
+#####################################################################
 # nDetMultiOutputStructure
 #####################################################################
 
@@ -94,6 +117,9 @@ BEGIN_TYPES
 double	nEnterPosX	X-axis position where the primary particle enters the detector
 double	nEnterPosY	Y-axis position where the primary particle enters the detector
 double	nEnterPosZ	Z-axis position where the primary particle enters the detector
+double nStartPosX  X-axis position where the primary particle begins within the detector
+double nStartPosY  Y-axis position where the primary particle begins within the detector
+double nStartPosZ  Z-axis position where the primary particle begins within the detector
 double	nExitPosX	X-axis position where the primary particle exits the detector
 double	nExitPosY	Y-axis position where the primary particle exits the detector
 double	nExitPosZ	Z-axis position where the primary particle exits the detector

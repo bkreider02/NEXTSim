@@ -16,10 +16,13 @@ class G4ParticleDefinition;
 class G4Event;
 
 class nDetParticleSource;
+//class nDetImplantParticleSource;
 class Reaction;
 
 class nDetParticleSourceMessenger;
+//class nDetImplantParticleSourceMessenger;
 class nDetDetector;
+class nDetImplant;
 
 /** @class nDetParticleSource
   * @brief Wrapper of G4GeneralParticleSource class for added convenience
@@ -51,7 +54,7 @@ class nDetParticleSource : public G4GeneralParticleSource {
 	/** Get an instance of the singleton
 	  */
 	static nDetParticleSource &getInstance();
-	
+
 	/** Get a pointer to the messenger used for this class
 	  */
 	nDetParticleSourceMessenger *GetMessenger(){ return fSourceMessenger; }
@@ -146,6 +149,11 @@ class nDetParticleSource : public G4GeneralParticleSource {
 	  */
 	void SetDetector(const nDetDetector *det);
 
+	/** Set information about the size and position of the detector for isotropic sources
+	  * @param det Pointer to the detector
+	  */
+	void SetImplant(const nDetImplant *imp);
+
 	/** Set the source isotropy mode
 	  * @note 0=off, 1=psuedo, 2=realistic
 	  * @param mode The isotropy mode of the source
@@ -187,6 +195,17 @@ class nDetParticleSource : public G4GeneralParticleSource {
 	  * @param energy_ Energy of the beam (in MeV)
 	  */	
 	void SetNeutronBeam(const double &energy_);
+
+	/** Set a beam of mono-energetic alphas
+	  * @param energy_ Energy of the beam (in MeV)
+	  */	
+	void SetAlphaBeam(const double &energy_);
+
+		/** Set a beam of mono-energetic ions
+	  * @param energy_ Energy of the beam (in MeV)
+	  */	
+	void SetIonBeam(const double &energy_, const int &A, const int &Z, const double &exE=0);
+	//void SetIonBeam(const G4String &str);
 
 	/** Set a beam of mono-energetic gamma-rays
 	  * @param energy_ Energy of the beam (in MeV)
@@ -319,7 +338,7 @@ class nDetParticleSource : public G4GeneralParticleSource {
 
 	/** Default constructor (private for singleton class)
 	  */
-	nDetParticleSource(nDetDetector *det=NULL);
+	nDetParticleSource(nDetDetector *det=NULL, nDetImplant *imp=NULL);
 
 	/** Get the next G4SingleParticleSource in the vector of all sources
 	  * @return A pointer to the next source (starting from the zeroth) or return NULL if the end of the vector has been reached
@@ -390,6 +409,7 @@ class nDetPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction{
 	
   private:
 	nDetParticleSource *source; ///< Pointer to the primary particle generator singleton
+	//DetImplantParticleSource *sourceImp; ///< Pointer to the primary particle generator singleton
 };
 
 #endif

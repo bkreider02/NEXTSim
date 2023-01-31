@@ -39,7 +39,7 @@ public:
 	                   maxBodySize(30, 30, 600),
 	                   scintMaterial(NULL), wrappingMaterial(NULL), wrappingOpSurf(NULL),
 	                   scintVisAtt(NULL), wrappingVisAtt(NULL),
-	                   materials(NULL), fMessenger(NULL) { }
+	                   materials(NULL), fMessenger(NULL),dXseg(0),dYseg(0),dspacing(0.),dtopWidth(0.),dtopThick(0.),dbotWidth(0.),dbotThick(0.),dzThick(50.),dSegMaterial(""){ }
 	                   
 	/** Initialize the detector parameter messenger for this class
 	  * @note Since there may be multiple detectors in any given setup, the nDetDetectorMessenger class
@@ -132,6 +132,21 @@ public:
 	  * @param height The height (y-dimension) in mm. If less than or equal to zero, the width is used for the height
 	  */
 	void SetPmtDimension(const G4double &width, const G4double &height=-1);
+
+	/** Set gap size between PMT segments; also sets correct PMT segment dimensions
+	  * @param gapSize The gap thickness in mm.
+	  */
+	void SetPmtGapThickness(const G4double &gapSize);
+
+	/* Set PMT segment height
+	 * @param segmentHeight The height of the PMT segment in mm.
+	 */
+	void SetPmtPixelHeight(const G4double &segmentHeight);
+
+	/* Set PMT segment width
+	 * @param segmentWidth The height of the PMT segment in mm.
+	 */
+	void SetPmtPixelWidth(const G4double &segmentWidth);
 
 	/** Set the width and height of the PMT optical surface
 	  * @param input Space-delimited string with the format "<width(mm)> [height(mm)]"
@@ -233,6 +248,18 @@ public:
 	  */
 	G4double GetPmtHeight() const { return pmtHeight; }
 
+	/** Get the width of a PMT segment along the x-axis (in mm)
+	  */
+	G4double GetPmtPixelWidth() const { return pmtPixelWidth; }
+
+	/** Get the height of a PMT segment along the y-axis (in mm)
+	  */
+	G4double GetPmtPixelHeight() const { return pmtPixelHeight; }
+
+	/** Get the thickness of the gap in between PMT anodes (in mm)
+	  */
+	G4double GetPmtGapThickness() const { return pmtGapThickness; }
+
 	/** Get the uniform width of scintillator segments for segmented detectors (in mm)
 	  */
 	G4double GetSegmentWidth() const { return fSegmentWidth; }
@@ -252,6 +279,10 @@ public:
 	/** Return true if the PMT is segmented and return false otherwise
 	  */
 	bool PmtIsSegmented() const { return (fNumColumnsPmt > 0 && fNumRowsPmt > 0); }
+
+	/** Return true if the PMT is segmented and has gaps and return false otherwise
+	  */
+	bool PmtHasGaps() const { return pmtHasGaps; }
 	
 	/** Return true if the wrapping thickness is positive and non-zero and return false otherwise
 	  */
@@ -261,9 +292,27 @@ public:
 	  */
 	void Print() const ;
 
+	void setSegX(const G4int xseg){dXseg = xseg;}
+	void setSegY(const G4int yseg){dYseg = yseg;}
+	void setSegSpacing(const G4double spacing){dspacing = spacing;}
+	void setSegTopWidth(const G4double topWidth){dtopWidth = topWidth;}
+	void setSegTopThick(const G4double topThick){dtopThick = topThick;}
+	void setSegBotWidth(const G4double botWidth){dbotWidth = botWidth;}
+	void setSegBotThick(const G4double botThick){dbotThick = botThick;}
+	void setSegZThick(const G4double zThick){dzThick = zThick;}
+	void setSegMaterial(const G4String mat){dSegMaterial = mat;}
+
+	void setReconLogic(const bool logic=0){reconLogic=logic;}
+	bool GetReconLogic(){return reconLogic;}
+
 protected:
+	bool reconLogic; ///< Setting whether to use the sipmLogic (1) or pspmt logic (0)
 	G4double pmtWidth; ///< The width (x-axis) of the PMT (in mm)
 	G4double pmtHeight; ///< The height (y-axis) of the PMT (in mm)
+	G4double pmtPixelWidth; ///< width (x-axis) of a PMT segment (in mm)
+	G4double pmtPixelHeight; ///< height (y-axis) of a PMT segment (in mm)
+	bool pmtHasGaps = false; ///< flag indicating that the user has specified a PMT gap thickness
+	G4double pmtGapThickness = 0; ///< thickness of gap in between PMT segments (in mm)
 	G4double fWrappingThickness; ///< Thickness of the inner and outer detector wrapping (in mm)
 	G4double fGreaseThickness; ///< Thickness of all optical grease layers (in mm)
 	G4double fWindowThickness; ///< Thickness of all optical window layers (in mm)
@@ -303,16 +352,32 @@ protected:
 
 	G4Material* scintMaterial; ///< Pointer to the detector scintillator material
 	G4Material* wrappingMaterial; ///< Pointer to the detector wrapping material
+	G4Material* outerMylar; ///< Pointer to mylar for outer wrapping
 
 	G4OpticalSurface* wrappingOpSurf; ///< Pointer to the wrapping optical surface
+	G4OpticalSurface* wrappingOuterOpSurf; ///< Pointer to the outer wrapping optical surface
 	
 	G4VisAttributes* scintVisAtt; ///< Pointer to the detector scintillator visual attributes
 	G4VisAttributes* wrappingVisAtt; ///< Pointer to the detector wrapping visual attributes
+	G4VisAttributes* windowVisAtt; ///< Pointer to the detector window visual attributes
 
 	nDetMaterials *materials; ///< Pointer to the NEXTSim Geant materials container
 	
 	nDetDetectorMessenger *fMessenger; ///< Geant messenger to use for this class
-	
+
+	////// 
+		//These variables are for a segmented light guide
+	////// 
+		G4int dXseg;
+		G4int dYseg;
+		G4double dspacing;
+		G4double dtopWidth;
+		G4double dtopThick;
+		G4double dbotWidth;
+		G4double dbotThick;
+		G4double dzThick;
+		G4String dSegMaterial;
+
 	/** Update the size of the detector
 	  */
 	void UpdateSize();
@@ -702,5 +767,408 @@ protected:
 	  */
 	G4CSGSolid *getLightGuideVolume(const G4String &name, const G4double &w1, const double &w2, const double &h1, const double &h2, const G4double &length);
 };
+
+/** @class nDetImplant
+  * @brief An individual implant assembly
+  * @author Ian Cox (icox2@vols.utk.edu)
+  * @date July 2020
+  */
+
+class nDetImplant : public nDetDetectorParams {
+public:
+	/** Default constructor
+	  */
+	nDetImplant() : nDetDetectorParams(),
+	                 assembly_logV(NULL), assembly_physV(NULL), layerSizeX(0), layerSizeY(0), offsetZ(0),
+	                 parentCopyNum(0), firstSegmentCopyNum(0), lastSegmentCopyNum(0),
+	                 checkOverlaps(false) { }
+	
+	/** Detector parameter copier constructor
+	  */
+	nDetImplant(const nDetDetectorParams* params) : nDetDetectorParams((*params)),
+	                                                 assembly_logV(NULL), assembly_physV(NULL), layerSizeX(0), layerSizeY(0), offsetZ(0),
+	                                                 parentCopyNum(0), firstSegmentCopyNum(0), lastSegmentCopyNum(0),
+	                                                 checkOverlaps(false) { }
+	
+	/** Detector constructor
+	  * @param detector Pointer to a nDetConstruction object where the current detector is defined
+	  * @param matptr Pointer to the Geant materials handler class which will be used for detector construction
+	  */
+	nDetImplant(nDetConstruction *detector, nDetMaterials *matptr);
+
+	/** Destructor
+	  */
+	virtual ~nDetImplant();
+
+	/** Clone this detector
+	  * @return A new copy of this detector instance
+	  */
+	nDetImplant clone() const ;
+	
+	/** Get a pointer to the logical volume of the detector assembly
+	  */
+	G4LogicalVolume *getLogicalVolume(){ return assembly_logV; }
+
+	/** Get the width and height of the current layer as well as the current offset along the detector length
+	  * @param x_ Width of the current layer (in mm)
+	  * @param y_ Height of the current layer (in mm)
+	  * @param z_ Offset along the detector length (in mm)
+	  */
+	void getCurrentOffset(G4double &x_, G4double &y_, G4double &z_);
+	
+	/** Get the copy number of this detector (i.e. the detector ID)
+	  */
+	G4int getParentCopyNumber() const { return parentCopyNum; }
+	
+	/** Get the copy number of the left PMT
+	  */
+	G4int getPmtCopyNumber() const { return 2*parentCopyNum; }
+	
+	/** Get a pointer to the vector representing the central position of this detector
+	  */
+	G4ThreeVector *getPosition(){ return &detectorPosition; }
+
+	/** Get a pointer to the rotation matrix used for this detector
+	  */	
+	G4RotationMatrix *getRotation(){ return &detectorRotation; }
+	
+	/** Enable or disable checking overlaps with existing geometry when placing objects
+	  */
+	void setCheckOverlaps(const bool &enabled){ checkOverlaps = enabled; }
+	
+	/** Set the position and the rotation of this detector
+	  * @param pos The position of the center of the detector (in mm)
+	  * @param rot The rotation matrix
+	  */
+	void setPositionAndRotation(const G4ThreeVector &pos, const G4RotationMatrix &rot);
+
+	/** Set the width and height of the current layer as well as the current offset along the detector length
+	  * @param x_ Width of the current layer (in mm)
+	  * @param y_ Height of the current layer (in mm)
+	  * @param z_ Offset along the detector length (in mm)
+	  */
+	void setCurrentOffset(const G4double &x_, const G4double &y_, const G4double &z_);
+
+	/** Current offset along the detector length (Z-axis, in mm)
+	  */
+	void setCurrentOffsetZ(const G4double &z_){ offsetZ = z_; }
+
+	/** Set the copy number of this detector (i.e. the detector ID)
+	  */
+	void setParentCopyNumber(const G4int &num){ parentCopyNum = num; }
+
+	/** Build the detector body, add component layers, and attach photo-sensitive surfaces
+	  */
+	void construct();
+
+	/** Add a user defined layer to the queue
+	  * @note When buildAllLayers() is called, the layers will be added on a first-in-first-out basis
+	  */
+	void addLayer(nDetWorldObject *layer){ userLayers.push_back(layer); }
+
+	/** Add all layers added by addLayer() to the detector construction
+	  */
+	void buildAllLayers();
+	
+	/** Place this detector assembly into a parent logical volume
+	  * @param Pointer to the logical volume of the parent assembly
+	  */
+	void placeImplant(G4LogicalVolume *parent);
+
+	/** Clear both the left and right photon center-of-mass calculators
+	  */
+	void clear();
+
+	/** Copy the center-of-mass calculator for the left and right PMTs
+	  * @param left Left PMT center-of-mass calculator
+	  * @param right Right PMT center-of-mass calculator
+	  */	
+	void copyCenterOfMass(const centerOfMass &implant); //This might need to be dealt with
+
+	/** Check if a scintillator copy number is part of this detector
+	  * @param num The copy number of a scintillator segment
+	  * @return True if the copy number is part of this detector and return false otherwise
+	  */
+	bool checkCopyNumber(const G4int &num) const { return (num >= firstSegmentCopyNum && num < lastSegmentCopyNum); }
+
+	/** Check if a PMT copy number is part of this detector
+	  * @param num The copy number of a scintillator segment
+	  * @return True if the copy number is part of this detector and return false otherwise
+	  */
+	bool checkPmtCopyNumber(const G4int &num) const { return (num == 2*parentCopyNum || num == 2*parentCopyNum+1); }
+
+	/** Check if a PMT copy number is part of this detector
+	  * @param num The copy number of a scintillator segment
+	  * @param isLeft Returned flag indicating that the copy number refers to the left PMT
+	  * @return True if the copy number is part of this detector and return false otherwise
+	  */	
+	bool checkPmtCopyNumber(const G4int &num, bool &isLeft) const ; //I believe this is unneeded
+
+	/** Get the column and row corresponding to a segment copy number in a segmented detector
+	  * @param copyNum The copy number of a scintillator segment
+	  * @param col The segmented detector column corresponding to the copy number
+	  * @param row The segmented detector row corresponding to the copy number
+	  * @return True if the copy number is found to be part of a detector and return false otherwise
+	  */	
+	bool getSegmentFromCopyNum(const G4int &copyNum, G4int &col, G4int &row) const ;
+
+	/** Retrun true if both the left and right photon center-of-mass calculators are empty and return false otherwise
+	  */
+	bool empty() const { return (cmI.empty()); }
+
+	/** Return a pointer to the optical photon center-of-mass calculator for the Implant PMT
+	  */
+	centerOfMass *getCenterOfMass(){ return &cmI; }  //Adjusted for 1 pspmt
+
+	/** Return a pointer to the PMT response for the Implant PMT
+	  */
+	pmtResponse *getPmtResponse(){ return cmI.getPmtResponse(); }
+
+	/** Load a light guide model from a file using parameters from a space-delimited input string and place it into the current detector assembly
+	  * @note See gdmlLightGuideLayer::decodeString() for input string syntax
+	  */
+	void addLightGuideGDML(const G4String &input);
+
+	/** Apply a grease layer to the current detector assembly using dimensions from a space-delimited input string
+	  * @note See greaseLayer::decodeString() for input string syntax
+	  */
+	void addGreaseLayer(const G4String &input);
+
+	/** Apply a straight light diffuser layer (quartz) to the current detector assembly using dimensions from a space-delimited input string
+	  * @note See diffuserLayer::decodeString() for input string syntax
+	  */
+	void addDiffuserLayer(const G4String &input);
+
+	/** Apply a trapezoidal light guide layer (quartz) to the current detector assembly using dimensions from a space-delimited input string
+	  * @note See lightGuideLayer::decodeString() for input string syntax
+	  */
+	void addLightGuideLayer(const G4String &input);
+
+	/** Apply a segmented light guide which can be tapered to implant detector assembly 
+	 * @note use messenger to set various parameters
+	 */
+	void addSegmentedLightGuideLayer(const G4String &input);
+
+	/** Apply a phoswich scintillator to the detector behind the first scintillator
+	 * @note a layer of grease should be added before adding a phoswich layer
+	 */
+	void addPhoswichLayer(const G4String &input);
+
+	/** Build the assembly volume for the current detector
+	  * @param boundingBox The returned X, Y, and Z size of the assembly volume for the current detector
+	  * @return A pointer to the logical volume of the assembly of the current detector
+	  */
+	//Here there might need to be an implementation of the front face mylar/esr
+	G4LogicalVolume *constructAssembly();
+
+	/** Add a daughter to the logical volume of the detector body
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param pos The X, Y, and Z position offset of the daughter within the detector body (all in mm)
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  * @return A pointer to the physical volume of the daughter
+	  */
+	G4PVPlacement *addToDetectorBody(G4LogicalVolume *volume, const G4String &name="", const G4ThreeVector &pos=G4ThreeVector(0,0,0), G4RotationMatrix *rot=NULL);
+
+	/** Add a particle-sensitive daughter to the logical volume of the detector body
+	  * @note The copy number of the new physical volume will be automatically set by this method
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param pos The X, Y, and Z position offset of the daughter within the detector body (all in mm)
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  * @return A pointer to the physical volume of the daughter
+	  */
+	G4PVPlacement *addSegmentToBody(G4LogicalVolume *volume, const G4String &name="", const G4ThreeVector &pos=G4ThreeVector(0,0,0), G4RotationMatrix *rot=NULL);
+
+	/** Add a logical volume to the (-z) of the detector assembly
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param offset The position offset along the length axis of the detector (in mm)
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  * @return A pointer to the physical volume of the daughter
+	  */
+	G4PVPlacement *addFrontComponent(G4LogicalVolume *volume, const G4double &offset, const G4String &name="", G4RotationMatrix *rot=NULL);
+
+	void addFrontComponent(G4PVPlacement* &phys1, G4LogicalVolume *volume, const G4double &offset, const G4String &name/*=""*/, G4RotationMatrix *rot/*=NULL*/);
+
+	/** Add a logical volume to the (+z) of the detector assembly
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param offset The position offset along the length axis of the detector (in mm)
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  * @return A pointer to the physical volume of the daughter
+	  */
+	G4PVPlacement *addBackComponent(G4LogicalVolume *volume, const G4double &offset, const G4String &name="", G4RotationMatrix *rot=NULL);
+
+	/** Add segmented PMT with gaps to the (+z) of the detector assembly; similar to addBackComponent, but
+	  * 	adds a 2D array of PMT pixel volumes instead of just a single PMT volume (as when no gap size
+	  * 	is specified by the user)
+	  * @param offset The position offset along the length axis of the detector (in mm)
+	  * @param name The name of the new physical volumes. If the name is blank, the name of the input logical volume will be used
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  */
+	void addPmtWithGaps(const G4double &offset, const G4String &name/*=""*/, G4RotationMatrix *rot/*=NULL*/);
+
+	void addBackComponent(G4PVPlacement* &phys1, G4LogicalVolume *volume, const G4double &offset, const G4String &name/*=""*/, G4RotationMatrix *rot/*=NULL*/);
+
+	/** Add a logical volume to both the left and right sides of the detector assembly
+	  * @note This method assumes that the input volume is symmetric about the z-axis and, thus, it is
+	  *       not rotated when being placed on the opposite side of the detector assembly
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param offset The position offset along the length axis of the detector (in mm)
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  */
+	void addMirroredComponents(G4LogicalVolume *volume, const G4double &offset, const G4String &name="", G4RotationMatrix *rot=NULL);
+
+	/** Add a logical volume to both the left and right sides of the detector assembly and return their physical volumes
+	  *	@note This method assumes that the input volume is symmetric about the z-axis and, thus, it is
+	  *       not rotated when being placed on the opposite side of the detector assembly
+	  * @param phys1 Returned pointer to the physical volume of the left component
+	  * @param phys2 Returned pointer to the physical volume of the right component
+	  * @param volume Pointer to the logical volume to add to the detector body
+	  * @param offset The position offset along the length axis of the detector (in mm)
+	  * @param name The name of the new physical volume. If the name is blank, the name of the input logical volume will be used
+	  * @param rot Pointer to the rotation matrix of the daughter within the detector body
+	  */
+	void addMirroredComponents(G4PVPlacement* &phys1, G4PVPlacement* &phys2, G4LogicalVolume *volume, const G4double &offset, const G4String &name="", G4RotationMatrix *rot=NULL);
+
+	/** Apply a grease layer to the current detector assembly using the current detector width and height
+	  */
+	void applyGreaseLayer();
+
+	/** Apply a grease layer to the current detector assembly
+	  * @param x The width of the grease layer (in mm)
+	  * @param y The height of the grease layer (in mm)
+	  * @param thickness The thickness of the grease layer (in mm). If not specified, @a fGreaseThickness is used
+	  */
+	void applyGreaseLayer(const G4double &x, const G4double &y, double thickness=0);
+
+	/** Apply a straight light diffuser layer (quartz) to the current detector assembly using the current detector width and height
+	  */
+	void applyDiffuserLayer();
+
+	/** Apply a straight light diffuser layer (quartz) to the current detector assembly
+	  * @param x The width of the diffuser layer (in mm)
+	  * @param y The height of the diffuser layer (in mm)
+	  * @param thickness The thickness of the diffuser layer (in mm)
+	  */
+	void applyDiffuserLayer(const G4double &x, const G4double &y, const double &thickness);
+
+	/** Apply a trapezoidal light guide layer (quartz) to the current detector assembly reducing the current detector width and height
+	  * down to the width and height of the PMT
+	  */
+	void applyLightGuide();
+
+	/** Apply a trapezoidal light guide layer (quartz) to the current detector assembly reducing the current detector width and height
+	  * down to a user specified width and height
+	  * @param x2 The width of the small side of the trapezoid (in mm)
+	  * @param y2 The height of the amll side of the trapezoid (in mm)
+	  */
+	void applyLightGuide(const G4double &x2, const G4double &y2);
+
+	/** Apply a trapezoidal light guide layer (quartz) to the current detector assembly
+	  * @param x1 The width of the large side of the trapezoid (in mm)
+	  * @param x2 The width of the small side of the trapezoid (in mm)
+	  * @param y1 The height of the large side of the trapezoid (in mm)
+	  * @param y2 The height of the amll side of the trapezoid (in mm)
+	  * @param thickness The thickness of the light guide (in mm)
+	  */
+	void applyLightGuide(const G4double &x1, const G4double &x2, const G4double &y1, const G4double &y2, const double &thickness);
+
+	/** Load a GDML model from a file and place it into the assembly
+	  * @param solid Pointer to a gdml model loaded from a file
+	  */
+	void loadGDML(gdmlSolid *solid);
+
+	/** Load a GDML light guide model from a file and place it into the assembly
+	  * 
+	  * This method performs the same as loadGDML() except that it also defines logical border surfaces on all intersecting faces
+	  *
+	  * @param solid Pointer to a gdml model loaded from a file
+	  * @param rotation Rotation of the gdml model about the X, Y, and Z axes (all in radians)
+	  */
+	void loadLightGuide(gdmlSolid *solid, const G4ThreeVector &rotation);
+
+	void applySegmentedLightGuide(G4int Xseg, G4int Yseg, G4double spacing, G4double topWidth, G4double topThick, G4double botWidth, G4double botThick, G4double zThick);
+
+	void applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial);
+
+protected:
+	bool sipmLogic; ///< Setting whether to use the sipmLogic (1) or pspmt logic (0)
+	G4LogicalVolume *assembly_logV; ///< Pointer to the logical volume of the mother of the detector
+	G4PVPlacement* assembly_physV; ///< Pointer to the physical volume of the mother of the detector
+
+	G4double layerSizeX; ///< Width of the current user add layer (in mm)
+	G4double layerSizeY; ///< Height of the current user add layer (in mm)
+	G4double offsetZ; ///< Offset of the current user add layer along the z-axis (in mm)
+	
+	G4int parentCopyNum; ///< Copy number of the mother of the detector
+	G4int firstSegmentCopyNum; ///< Copy number of the first scintillator segment
+	G4int lastSegmentCopyNum; ///< Copy number of the last scintillator segment
+
+	bool checkOverlaps; ///< Flag indicating that Geant should check for overlaps between all placed objects
+
+	centerOfMass cmI; ///< Center-of-mass calculator for the PMT
+
+	std::vector<nDetWorldObject*> userLayers; ///< Vector of all layers added by the user
+
+	std::vector<G4PVPlacement*> scintBody_physV; ///< Vector of all physical volumes of all scintillator segments
+
+	/** Prepare for the detector volume to be built. In this method, the user should set the maximum
+	  * size constraints of the body of the detector (@a maxBodySize) so that the detector handler knows
+	  * how large to make its bounding assembly volume.
+	  * @note By default, the maximum body size is taken from @a fDetectorWidth, @a fDetectorHeight, and @a fDetectorLength
+	  */
+	virtual void prepareToBuild();
+
+	/** Build the physical detector volume for the detector handler
+	  */
+	virtual void buildDetector(){ }
+	
+	/** Perform tasks after the detector assembly has been placed into the setup area
+	  */
+	virtual void afterPlacement(){ }
+
+	/** Handle cloning of derived classes
+	  * @note Should usually do nothing, but the derived class may need to modify some nDetDetector members
+	  */
+	virtual void cloneChild(nDetDetector &) const { }
+
+	/** Build PMTs for the current detector and place them in the assembly volume
+	  * 
+	  * Each PMT consists of an optical grease layer, a quartz window, and a photo-sensitive surface. Additionally,
+	  * a reflective wrapping layer is added around the outside of the PMT if @a fWrappingThickness is greater than zero.
+	  */
+	void constructPSPmt(); //this has been changed for singular pspmt
+
+	/** Return a geometric solid volume with a specified size
+	  *
+	  * If the class member @a fSquarePMTs is true, then a G4Box is returned, otherwise a G4Tubs is returned
+	  * @note All size parameters are specified as the TOTAL size and not the half-size as with most Geant geometry methods
+	  * @param name The name of the new geometric solid
+	  * @param width The total size along the X-axis (in mm)
+	  * @param height The total size along the Y-axis (in mm)
+	  * @param length The total size along the Z-axis (in mm)
+	  * @return A pointer to the new G4CSGSolid (Constructed Solid Geometry) volume 
+	  */
+	G4CSGSolid *getVolume(const G4String &name, const G4double &width, const G4double &height, const G4double &length);
+
+	/** Return a geometric solid trapezoid or cone with a specified size
+	  *
+	  * If the class member @a fSquarePMTs is true, then a G4Trd is returned, otherwise a G4Cons is returned
+	  * @note All size parameters are specified as the TOTAL size and not the half-size as with most Geant geometry methods
+	  * @param name The name of the new geometric solid
+	  * @param w1 The total size along the X-axis at z = -length/2 (in mm)
+	  * @param w2 The total size along the X-axis at z = +length/2 (in mm)
+	  * @param h1 The total size along the Y-axis at z = -length/2 (in mm)
+	  * @param h2 The total size along the Y-axis at z = +length/2 (in mm)
+	  * @param length The total size along the Z-axis (in mm)
+	  * @return A pointer to the new G4CSGSolid (Constructed Solid Geometry) volume 
+	  */
+	G4CSGSolid *getLightGuideVolume(const G4String &name, const G4double &w1, const double &w2, const double &h1, const double &h2, const G4double &length);
+
+};
+
 
 #endif

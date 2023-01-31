@@ -9,6 +9,7 @@
 #include "nDetWorldObject.hh"
 
 class nDetDetector;
+class nDetImplant;
 
 /** @class greaseLayer
   * @brief Optical grease component layer which is added to a detector assembly
@@ -41,6 +42,8 @@ class greaseLayer : public nDetWorldObject {
 	  * @param obj A pointer to the detector where the grease layer will be placed
 	  */
 	virtual void construct(nDetDetector *obj);
+
+	virtual void construct(nDetImplant *obj);
 
 	/** Return a string containing proper input string syntax
 	  */
@@ -89,6 +92,8 @@ class diffuserLayer : public nDetWorldObject {
 	  */
 	virtual void construct(nDetDetector *obj);
 
+	virtual void construct(nDetImplant *obj);
+
 	/** Return a string containing proper input string syntax
 	  */
 	virtual std::string syntaxStr() const ;
@@ -118,7 +123,7 @@ class lightGuideLayer : public nDetWorldObject {
 
 	/** Destructor
 	  */
-	lightGuideLayer(){ }
+	~lightGuideLayer(){ }
 
 	/** Apply a trapezoidal light guide layer (quartz) to the current detector assembly using dimensions from a space-delimited input string
 	  * @note String syntax: <width1> <width2> <height1> <height2> <thickness> [material=G4_SILICON_DIOXIDE]
@@ -138,6 +143,8 @@ class lightGuideLayer : public nDetWorldObject {
 	  */
 	virtual void construct(nDetDetector *obj);
 
+	virtual void construct(nDetImplant *obj);
+
 	/** Return a string containing proper input string syntax
 	  */
 	virtual std::string syntaxStr() const ;
@@ -152,6 +159,53 @@ class lightGuideLayer : public nDetWorldObject {
 	G4double y1; ///< Height of the large side of the trapezoid (in mm)
 	G4double y2; ///< Height of the small side of the trapezoid (in mm)
 	G4double thickness; ///< Thickness of the trapezoid (in mm)
+};
+
+class segLightGuideLayer : public nDetWorldObject {
+	public:
+		segLightGuideLayer(const G4String &arg_);
+		~segLightGuideLayer();
+
+		virtual bool decodeArgs();
+		virtual void construct(nDetDetector *obj);
+		virtual void construct(nDetImplant *obj);
+		virtual std::string syntaxStr() const;
+		virtual void placeObject(G4LogicalVolume*, nDetMaterials*) {}
+	private:
+		G4int fXseg;
+		G4int fYseg;
+		G4double fspacing;
+		G4double ftopWidth;
+		G4double ftopThick;
+		G4double fbotWidth;
+		G4double fbotThick;
+		G4double fzThick;
+		G4String fSegMaterial;
+};
+
+/* @class phoswichLayer
+ * @brief phoswich scintillator which is added to a detector assembly
+ * @author Ben T. Kreider (bkreider@vols.utk.edu)
+ * @date Jan 27, 2023
+*/
+class phoswichLayer : public nDetWorldObject {
+	public:
+		phoswichLayer(const G4String &arg_);
+		~phoswichLayer();
+
+		virtual bool decodeArgs();
+		virtual void construct(nDetDetector *obj);
+		virtual void construct(nDetImplant *obj);
+		virtual std::string syntaxStr() const;
+		virtual void placeObject(G4LogicalVolume*,nDetMaterials*) {}
+	private:
+		G4int fXseg; ///< Current number of scintillator columns (x-axis) for modular detectors
+		G4int fYseg; ///< Current number of scintillator rows (y-axis) for modular detectors
+		G4double fThick; ///< Size of the detector along the z-axis (in mm)
+		G4double fWidth; ///< Size of the detector along the x-axis (in mm)
+		G4double fHeight; ///< Size of the detector along the y-axis (in mm)
+		G4double fWrapping; ///< Thickness of the inner and outer phoswich wrapping (in mm)
+		G4String fSegMaterial; ///< String indicating the material to use for the phoswich scintillator
 };
 
 /** @class gdmlLightGuideLayer
@@ -190,6 +244,8 @@ class gdmlLightGuideLayer : public nDetWorldObject {
 	  * @param obj A pointer to the detector where the light-guide model will be placed
 	  */
 	virtual void construct(nDetDetector *obj);
+
+	virtual void construct(nDetImplant *obj);
 
 	/** Return a string containing proper input string syntax
 	  */

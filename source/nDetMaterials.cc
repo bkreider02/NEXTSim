@@ -1,3 +1,4 @@
+#include <fstream>
 #include "G4Element.hh"
 #include "G4Material.hh"
 #include "G4MaterialPropertiesTable.hh"
@@ -18,18 +19,22 @@ nDetMaterials::~nDetMaterials(){
 	if(isInitialized){
 		// Optical surfaces
 		delete fTeflonOpSurf;
+		delete fAl2O3OpSurf;
 		delete fSiliconOpSurf;
 		delete fPerfectOpSurf;
 		delete fGreaseOpSurf;	
 		delete fMylarOpSurf;
 		delete fEsrOpSurf;
+		delete fAluminum;
 		
 		// Materials
 		delete fGrease;
+		delete fAl2O3;
 		
 		// Material properties tables
 		delete fPerfectMPT;
 		delete fGreaseMPT;
+		delete fAl2O3MPT;
 		delete fEsrMPT;
 
 		// Vis attributes
@@ -46,6 +51,16 @@ nDetMaterials::~nDetMaterials(){
 		delete fEJ276;
 		delete fEJ200MPT;
 		delete fEJ276MPT;
+		delete fYSO;
+		delete fYSOMPT;
+		delete fLaBr3;
+		delete fLaBr3MPT;
+		delete fYAP;
+		delete fYAPMPT;
+		delete fGAGG;
+		delete fGAGGMPT;
+		delete fCeBr3;
+		delete fCeBr3MPT;
 	}
 	delete messenger;
 }
@@ -62,13 +77,24 @@ void nDetMaterials::initialize(){
 	elementList["F"] = fF;
 	elementList["Si"] = fSi;
 	elementList["Al"] = fAl;
+ 	elementList["Y"] = fY;
+	elementList["La"] = fLa;
+	elementList["Br"] = fBr;
+	elementList["Gd"] = fGd;
+	elementList["Ga"] = fGa;
+	elementList["Ce"] = fCe;
 	
 	materialList["air"] = fAir;
 	materialList["vacuum"] = fVacuum;
 	materialList["teflon"] = fTeflon;
-    materialList["ej200"] = fEJ200;
-    materialList["ej276"] = fEJ276; 
+	materialList["al2o3"] = fAl2O3;
+	materialList["ej200"] = fEJ200;
+	materialList["ej276"] = fEJ276; 
 	materialList["grease"] = fGrease;
+ 	materialList["yso"] = fYSO;
+	materialList["labr3"] = fLaBr3;
+	materialList["yap"] = fYAP;
+	materialList["cebr3"] = fCeBr3;
 	materialList["quartz"] = fSiO2;
 	materialList["silicon"] = fSilicon;
 	materialList["mylar"] = fMylar;
@@ -76,17 +102,25 @@ void nDetMaterials::initialize(){
 	materialList["aluminum"] = fAluminum;
 
 	opticalSurfaceList["teflon"] = fTeflonOpSurf;
+	opticalSurfaceList["al2o3"] = fAl2O3OpSurf;
 	opticalSurfaceList["silicon"] = fSiliconOpSurf;
 	opticalSurfaceList["mylar"] = fMylarOpSurf;
 	opticalSurfaceList["esr"] = fEsrOpSurf;
 	opticalSurfaceList["perfect"] = fPerfectOpSurf;
 	opticalSurfaceList["grease"] = fGreaseOpSurf;
+	opticalSurfaceList["air"] = fAirOpSurf;
+	opticalSurfaceList["aluminum"] = fAluminumOpSurf;
 
-	//visAttributesList["air"] = &G4VisAttributes::Invisible;
+	visAttributesList["air"] = visWrapping;
 	//visAttributesList["vacuum"] = &G4VisAttributes::Invisible;
 	visAttributesList["teflon"] = visWrapping;
+	visAttributesList["al2o3"] = visWrapping;
 	visAttributesList["ej200"] = visScint;
 	visAttributesList["ej276"] = visScint;
+	visAttributesList["yso"] = visScint;
+	visAttributesList["labr3"] = visScint;
+	visAttributesList["yap"] = visScint;
+	// visAttributesList["cebr3"] = visScint;
 	visAttributesList["grease"] = visGrease;
 	visAttributesList["quartz"] = visWindow;
 	visAttributesList["silicon"] = visSensitive;
@@ -123,12 +157,12 @@ G4OpticalSurface* nDetMaterials::getUserOpticalSurface(const G4String &name){
 	if(!opt) // Surface was not found
 		std::cout << Display::ErrorStr("nDetDynamicMaterial") << "Optical surface named \"" << name << "\" was not found in list!\n" << Display::ResetStr();
 
-    return opt; // default
+  return opt; // default
 }
 
 G4VisAttributes* nDetMaterials::getUserVisAttributes(const G4String &name){
 	G4VisAttributes *visatt = NULL;
-	if(name == "mylar" || name == "teflon" || name == "esr" || name == "perfect")
+	if(name == "mylar" || name == "teflon" || name == "al2o3" || name == "esr" || name == "perfect" || "air")
 		visatt = visWrapping;
 	else
 		visatt = getVisualAttributes(name);
@@ -353,9 +387,23 @@ void nDetMaterials::defineMaterials(){
 	fF = nist.searchForElement("F");
 	fSi = nist.searchForElement("Si");
 	fAl = nist.searchForElement("Al");
+ 	fY = nist.searchForElement("Y");
+	fLa = nist.searchForElement("La");
+	fBr = nist.searchForElement("Br");
+	fGd = nist.searchForElement("Gd");
+	fGa = nist.searchForElement("Ga");
+	fCe = nist.searchForElement("Ce");
 
 	// Air
     fAir = nist.searchForMaterial("G4_AIR");
+		G4double airPhotonEnergy[2] = {2.*eV,3.*eV};
+		G4double airRefIndex[2] = {1.0003,1.0003};
+		G4double airAbsorption[2] = {1*m,1*m};
+		fAirMPT = new G4MaterialPropertiesTable();
+		fAirMPT->AddProperty("RINDEX",airPhotonEnergy,airRefIndex,2);
+		fAirMPT->AddProperty("ABSLENGTH",airPhotonEnergy,airAbsorption,2);
+		std::cout<<"Getting air absorption length "<<fAirMPT->GetProperty("RINDEX")<<std::endl;
+		fAir->SetMaterialPropertiesTable(fAirMPT);
 
 	// Lab vacuum
 	fVacuum = nist.searchForMaterial("G4_Galactic");
@@ -378,6 +426,30 @@ void nDetMaterials::defineMaterials(){
     fTeflonMPT->AddProperty("RINDEX", photonEnergy_teflon, refIndex_teflon, 9);
     fTeflonMPT->AddProperty("ABSLENGTH", photonEnergy_teflon, absorption_teflon, 9);
     fTeflon->SetMaterialPropertiesTable(fTeflonMPT);
+
+	/////////////////////////////////////////////////////////////////
+	// Aluminum Oxide (Al2O3) (COME BACK AND CHANGE THESE NUMBERS LATER)
+	/////////////////////////////////////////////////////////////////
+
+    fAl2O3 = new G4Material("Al2O3", 3.95*g/cm3, 2);
+
+	fAl2O3->AddElement(fAl, 2);
+	fAl2O3->AddElement(fO, 3);
+
+	// taken from Teflon above
+    G4double photonEnergy_al2o3[9] = {1.607*eV, 1.743*eV, 1.908*eV, 2.108*eV, 2.354*eV, 2.664*eV, 3.070*eV, 3.621*eV, 4.413*eV};
+    G4double reflectivity_al2o3[9] = {0.514, 0.583, 0.656, 0.727, 0.789, 0.836, 0.868, 0.887, 0.892};
+    G4double efficiency_al2o3[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    G4double absorption_al2o3[9] =  {0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm, 0.333*cm};
+
+    G4double refIndex_al2o3[9] = {1.77, 1.77, 1.77, 1.77, 1.77, 1.77, 1.77, 1.77, 1.77};
+    
+    fAl2O3MPT = new G4MaterialPropertiesTable();
+    fAl2O3MPT->AddProperty("REFLECTIVITY", photonEnergy_al2o3, reflectivity_al2o3, 9);
+    fAl2O3MPT->AddProperty("EFFICIENCY", photonEnergy_al2o3, efficiency_al2o3, 9);
+    fAl2O3MPT->AddProperty("RINDEX", photonEnergy_al2o3, refIndex_al2o3, 9);
+    fAl2O3MPT->AddProperty("ABSLENGTH", photonEnergy_al2o3, absorption_al2o3, 9);
+    fAl2O3->SetMaterialPropertiesTable(fAl2O3MPT);
 
 	/////////////////////////////////////////////////////////////////
 	// Silicone Optical Grease (C2H6OSi)n
@@ -462,7 +534,7 @@ void nDetMaterials::defineMaterials(){
 	// ACRYLIC (C5O2H8)n -- CRT
 	/////////////////////////////////////////////////////////////////
 
-    fAcrylic = nist.searchForMaterial("G4_PLEXIGLASS");
+    fAcrylic = nist.searchForMaterial("G4_GLASS_PLATE");
 
 	// Photon energy (eV)
 	G4double ENERGY_ACRYLIC[11] = {6.1992*eV, 4.95936*eV, 4.1328*eV, 3.5424*eV, 3.0996*eV, 2.7552*eV, 2.47968*eV, 2.25426*eV, 2.0664*eV, 1.90745*eV, 1.7712*eV};
@@ -482,6 +554,8 @@ void nDetMaterials::defineMaterials(){
 	G4double abslength[25] = {0, 0, 1.02102, 1.28345, 1.8604, 2.44271, 3.20801, 4.15751, 5.55214, 6.99127, 13.0334, 19.3961, 27.6547, 
 	                          32.87, 34.1447, 35.5173, 34.1447, 32.87, 32.87, 34.1447, 34.1447, 35.5173, 35.5173, 34.1447, 33.7719};
 	
+	for(int i=0;i<(sizeof(abslength)/sizeof(abslength[0]));i++)
+		abslength[i] *=10.;
 	MPT_Acrylic->AddProperty("ABSLENGTH", energy2, abslength, 25);
 
 	fAcrylic->SetMaterialPropertiesTable(MPT_Acrylic);
@@ -517,6 +591,12 @@ void nDetMaterials::defineMaterials(){
     //fTeflonOpSurf->SetType(dielectric_metal);
     fTeflonOpSurf->SetType(dielectric_dielectric);
     fTeflonOpSurf->SetMaterialPropertiesTable(fTeflonMPT);
+
+	// Aluminum Oxide (Al2O3) (COME BACK AND CHANGE THESE NUMBERS LATER)
+	fAl2O3OpSurf = new G4OpticalSurface("Al2O3Surface", glisur, ground, dielectric_metal, 0.1);
+	fAl2O3OpSurf->SetFinish(ground);
+	fAl2O3OpSurf->SetType(dielectric_metal);
+	fAl2O3OpSurf->SetMaterialPropertiesTable(fAl2O3MPT);
 
     // Silicon
     fSiliconOpSurf = new G4OpticalSurface("SiPMSurface");
@@ -582,6 +662,19 @@ void nDetMaterials::defineMaterials(){
 	fGreaseOpSurf->SetModel(unified); // Defaults to Lambertian reflection (i.e. rough surface) --CRT
 	fGreaseOpSurf->SetMaterialPropertiesTable(fGreaseMPT);	
 
+	fAirOpSurf = new G4OpticalSurface("AirSurface");
+	//fAirOpSurf->SetType;
+	//fAirOpSurf->SetFinish(polished);
+	//fAirOpSurf->SetModel(glisur);
+	fAirOpSurf->SetMaterialPropertiesTable(fAirMPT);
+
+		fAluminumOpSurf = new G4OpticalSurface("PerfectReflector");
+	fAluminumOpSurf->SetType(dielectric_metal);
+	fAluminumOpSurf->SetFinish(polished);
+	fAluminumOpSurf->SetModel(glisur);
+	fAluminumOpSurf->SetMaterialPropertiesTable(fAluminumMPT);
+	
+
 	isInitialized = true;
 }
 
@@ -591,6 +684,12 @@ void nDetMaterials::defineScintillators(){
 		delete fEJ276;
 		delete fEJ200MPT;
 		delete fEJ276MPT;
+		delete fYSO;
+		delete fYSOMPT;
+		delete fLaBr3;
+		delete fLaBr3MPT;
+		delete fCeBr3;
+		delete fCeBr3MPT;
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -709,10 +808,346 @@ void nDetMaterials::defineScintillators(){
     fEJ276MPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_EJ276, 36)->SetSpline(true);
 
 	fEJ276->SetMaterialPropertiesTable(fEJ276MPT);
+
+	/////////////////////////////////////////////////////////////////
+	// YSO Y2SiO5
+	/////////////////////////////////////////////////////////////////
+
+    fYSO = new G4Material("YSO", 4.5*g/cm3, 3);
+    fYSO->AddElement(fY, 0.25);
+    fYSO->AddElement(fSi, 0.125);
+	fYSO->AddElement(fO, 0.625);
+
+	G4double photonEnergy_YSO[44] = {2.004*eV, 2.058*eV, 2.112*eV, 2.166*eV, 2.220*eV, 2.274*eV, 2.328*eV, 2.382*eV, 2.436*eV, 2.490*eV, 
+		                               2.517*eV, 2.552*eV, 2.585*eV, 2.613*eV, 2.635*eV, 2.656*eV, 2.686*eV, 2.720*eV, 2.749*eV, 2.772*eV, 
+		                               2.791*eV, 2.809*eV, 2.826*eV, 2.842*eV, 2.861*eV, 2.884*eV, 2.919*eV, 2.946*eV, 2.954*eV, 2.961*eV, 
+		                               2.967*eV, 2.974*eV, 2.981*eV, 2.987*eV, 2.994*eV, 3.001*eV, 3.009*eV, 3.018*eV, 3.029*eV, 3.041*eV, 
+		                               3.056*eV, 3.083*eV, 3.137*eV, 3.191*eV};
+
+	G4double ScintilFast_YSO[44] = {0.000, 0.001, 0.001, 0.002, 0.003, 0.006, 0.010, 0.018, 0.033, 0.060, 
+		                              0.084, 0.122, 0.175, 0.234, 0.294, 0.356, 0.416, 0.473, 0.533, 0.594, 
+		                              0.657, 0.720, 0.784, 0.846, 0.903, 0.962, 1.000, 0.917, 0.857, 0.798, 
+		                              0.732, 0.669, 0.604, 0.542, 0.480, 0.422, 0.359, 0.297, 0.237, 0.170, 
+		                              0.105, 0.028, 0.004, 0.000};
+
+	//G4double photonEnergy_YSO[13] = {16.8179*keV, 23.0707*keV, 30.8922*keV, 50.0014*keV, 59.1033*keV, 80.4609*keV, 122.4170*keV, 280.3698*keV, 504.5552*keV, 659.8267*keV, 830.5057*keV, 1188.7809*keV, 1316.9683*keV};
+
+	//G4double ScintilFast_YSO[13] = {0.0482746, 0.0585062, 0.0648312, 0.0774812, 0.0748768, 0.0707841, 0.0776672, 0.0854804, 0.0878988, 0.0888289, 0.089387, 0.0880848, 0.0878988}; //This should be the efficiency curve..?
+
+	//G4double electronYield_YSO[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
+
+	G4double photonEnergy_YSO_2[2] = {16.8179*keV, 23.0707*keV};
+	G4double RefIndex_YSO[2] = {1.80, 1.80}; //Data taken from https://www.advatech-uk.co.uk/yso_ce.html 
+	G4double Absorption_YSO[2] = {2.57*cm, 2.57*cm}; // this is found in: Large size LSO:Ce and YSO:Ce scintillators for 50 MeV range /spl gamma/-ray detector
+
+    fYSOMPT = new G4MaterialPropertiesTable();
+    fYSOMPT->AddProperty("RINDEX", photonEnergy_YSO_2, RefIndex_YSO, 2);
+    fYSOMPT->AddProperty("ABSLENGTH", photonEnergy_YSO_2, Absorption_YSO, 2);
+    fYSOMPT->AddProperty("FASTCOMPONENT", photonEnergy_YSO, ScintilFast_YSO, 13);
+
+    fYSOMPT->AddConstProperty("SCINTILLATIONYIELD", 24000/MeV); // Photon yield as found in paper above for 137Cs
+    fYSOMPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+    fYSOMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
+    fYSOMPT->AddConstProperty("FASTTIMECONSTANT", 50.0*ns);
+    fYSOMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
 	
+	G4double particleEnergy_YSO[130];
+	G4double electronYield_YSO[130];
+	G4double protonYield_YSO[130];
+	G4double ionYield_YSO[130];
+	std::ifstream fin[3];
+	fin[0].open("lightYieldYSO_electron.dat");
+	fin[1].open("lightYieldYSO_proton.dat");
+	fin[2].open("lightYieldYSO_024.dat");
+	if(!fin[0].good())
+		std::cout<<"!!!!! ERROR LOADING LIGHT YIELD FILES !!!!!!"<<std::endl;
+	else
+		std::cout<<"Able to load light yield data for YSO"<<std::endl;
+	double en, light;
+	for(size_t i=0;i<130;i++){
+		fin[0]>>en>>light;
+		electronYield_YSO[i] = light*pEF;
+		particleEnergy_YSO[i] = en*MeV;
+		fin[1]>>en>>light;
+		protonYield_YSO[i] = light*pEF;
+		fin[2]>>en>>light;
+		ionYield_YSO[i] = light;
+	}
+
+	// G4double electronYield_YSO[36];
+	// G4double protonYield_YSO[36];
+	// G4double ionYield_YSO[36];
+
+	// Produce the scaled light-yield for YSO (scaled down from EJ200 by 14%). This will need to be adjusted for YSO as it has a different light yield than EJ276.
+	// for(size_t i = 0; i < 36; i++){
+	// 	electronYield_YSO[i] = 0.86 * electronYield[i];
+	// 	protonYield_YSO[i] = 0.86 * protonYield[i];
+	// 	ionYield_YSO[i] = 0.86 * ionYield[i];
+	// }
+    fYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy_YSO, electronYield_YSO, 130)->SetSpline(true);
+    fYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
+    fYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_YSO, ionYield_YSO, 130)->SetSpline(true);
+
+	fYSO->SetMaterialPropertiesTable(fYSOMPT);
+	
+	/////////////////////////////////////////////////////////////////
+	// LaBr3 
+	/////////////////////////////////////////////////////////////////
+
+    fLaBr3 = new G4Material("LaBr3", 5.08*g/cm3, 2);
+    fLaBr3->AddElement(fLa, 0.25);
+    fLaBr3->AddElement(fBr, 0.75);
+
+	G4double photonEnergy_LaBr3[44] = {2.004*eV, 2.058*eV, 2.112*eV, 2.166*eV, 2.220*eV, 2.274*eV, 2.328*eV, 2.382*eV, 2.436*eV, 2.490*eV, 
+		                               2.517*eV, 2.552*eV, 2.585*eV, 2.613*eV, 2.635*eV, 2.656*eV, 2.686*eV, 2.720*eV, 2.749*eV, 2.772*eV, 
+		                               2.791*eV, 2.809*eV, 2.826*eV, 2.842*eV, 2.861*eV, 2.884*eV, 2.919*eV, 2.946*eV, 2.954*eV, 2.961*eV, 
+		                               2.967*eV, 2.974*eV, 2.981*eV, 2.987*eV, 2.994*eV, 3.001*eV, 3.009*eV, 3.018*eV, 3.029*eV, 3.041*eV, 
+		                               3.056*eV, 3.083*eV, 3.137*eV, 3.191*eV};
+
+	G4double ScintilFast_LaBr3[44] = {0.000, 0.001, 0.001, 0.002, 0.003, 0.006, 0.010, 0.018, 0.033, 0.060, 
+		                              0.084, 0.122, 0.175, 0.234, 0.294, 0.356, 0.416, 0.473, 0.533, 0.594, 
+		                              0.657, 0.720, 0.784, 0.846, 0.903, 0.962, 1.000, 0.917, 0.857, 0.798, 
+		                              0.732, 0.669, 0.604, 0.542, 0.480, 0.422, 0.359, 0.297, 0.237, 0.170, 
+		                              0.105, 0.028, 0.004, 0.000};
+                                  
+	G4double photonEnergy_LaBr3_2[2] = {2.004*eV, 3.191*eV};
+	G4double RefIndex_LaBr3[2] = {1.90, 1.90};
+	G4double Absorption_LaBr3[2] = {1.881*cm, 1.881*cm};
+
+	fLaBr3MPT = new G4MaterialPropertiesTable();
+	fLaBr3MPT->AddProperty("RINDEX", photonEnergy_LaBr3_2, RefIndex_LaBr3, 2);
+	fLaBr3MPT->AddProperty("ABSLENGTH", photonEnergy_LaBr3_2, Absorption_LaBr3, 2);
+	fLaBr3MPT->AddProperty("FASTCOMPONENT", photonEnergy_LaBr3, ScintilFast_LaBr3, 44);
+
+	fLaBr3MPT->AddConstProperty("SCINTILLATIONYIELD", 630000/MeV); 
+	fLaBr3MPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+	//fLaBr3MPT->AddConstProperty("RISETIMECONSTANT", 0.9*ns); Geant4 10.1 TODO
+	fLaBr3MPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 0.9*ns);
+	fLaBr3MPT->AddConstProperty("FASTTIMECONSTANT", 2.1*ns);
+	fLaBr3MPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
+
+	std::cout << "nDetConstruction: Photon yield is set to " << lightYieldScale << "x scale\n";
+
+  //light yield - data taken form V.V. Verbinski et al, Nucl. Instrum. & Meth. 65 (1968) 8-25
+	G4double particleEnergy_LaBr3[36] = {1E-3, 0.10*MeV, 0.13*MeV, 0.17*MeV, 0.20*MeV, 0.24*MeV, 0.30*MeV, 0.34*MeV, 0.40*MeV, 
+		                           0.48*MeV, 0.60*MeV, 0.72*MeV, 0.84*MeV, 1.00*MeV, 1.30*MeV, 1.70*MeV, 2.00*MeV, 2.40*MeV, 
+		                           3.00*MeV, 3.40*MeV, 4.00*MeV, 4.80*MeV, 6.00*MeV, 7.20*MeV, 8.40*MeV, 10.00*MeV, 11.00*MeV, 
+		                           12.00*MeV, 13.00*MeV, 14.00*MeV, 15.00*MeV, 16.00*MeV, 17.00*MeV, 18.00*MeV, 19.00*MeV, 20.00*MeV};
+		                           
+	G4double electronYield_LaBr3[36] = {0.0E+00*pEF, 1.0E+03*pEF, 1.3E+03*pEF, 1.7E+03*pEF, 2.0E+03*pEF, 2.4E+03*pEF, 3.0E+03*pEF, 3.4E+03*pEF, 4.0E+03*pEF, 
+		                          4.8E+03*pEF, 6.0E+03*pEF, 7.2E+03*pEF, 8.4E+03*pEF, 1.0E+04*pEF, 1.3E+04*pEF, 1.7E+04*pEF, 2.0E+04*pEF, 2.4E+04*pEF, 
+		                          3.0E+04*pEF, 3.4E+04*pEF, 4.0E+04*pEF, 4.8E+04*pEF, 6.0E+04*pEF, 7.2E+04*pEF, 8.4E+04*pEF, 1.0E+05*pEF, 1.1E+05*pEF, 
+		                          1.2E+05*pEF, 1.3E+05*pEF, 1.4E+05*pEF, 1.5E+05*pEF, 1.6E+05*pEF, 1.7E+05*pEF, 1.8E+05*pEF, 1.9E+05*pEF, 2.0E+05*pEF};
+
+	fLaBr3MPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy_LaBr3, electronYield_LaBr3, 36)->SetSpline(true);
+	G4double protonYield_LaBr3[36] = {0.6*pSF, 67.1*pSF, 88.6*pSF, 120.7*pSF, 146.5*pSF, 183.8*pSF, 246.0*pSF, 290.0*pSF, 365.0*pSF, 
+		                        483.0*pSF, 678.0*pSF, 910.0*pSF, 1175.0*pSF, 1562.0*pSF, 2385.0*pSF, 3660.0*pSF, 4725.0*pSF, 6250.0*pSF, 
+		                        8660.0*pSF, 10420.0*pSF, 13270.0*pSF, 17180.0*pSF, 23100.0*pSF, 29500.0*pSF, 36200.0*pSF, 45500.0*pSF, 51826.7*pSF, 
+		                        58313.7*pSF, 65047.2*pSF, 72027.4*pSF, 79254.2*pSF, 86727.6*pSF, 94447.6*pSF, 102414.2*pSF, 110627.4*pSF, 119087.2*pSF};
+
+	// fLaBr3MPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy_LaBr3, protonYield_LaBr3, 36)->SetSpline(true);
+
+	G4double ionYield_LaBr3[36] = {0.2*pEF, 10.4*pEF, 12.7*pEF, 15.7*pEF, 17.9*pEF, 20.8*pEF, 25.1*pEF, 27.9*pEF, 31.9*pEF, 
+		                     36.8*pEF, 43.6*pEF, 50.2*pEF, 56.9*pEF, 65.7*pEF, 81.3*pEF, 101.6*pEF, 116.5*pEF, 136.3*pEF, 
+		                     166.2*pEF, 187.1*pEF, 218.6*pEF, 260.5*pEF, 323.5*pEF, 387.5*pEF, 451.5*pEF, 539.9*pEF, 595.5*pEF, 
+		                     651.8*pEF, 708.7*pEF, 766.2*pEF, 824.2*pEF, 882.9*pEF, 942.2*pEF, 1002.1*pEF, 1062.6*pEF, 1123.7*pEF}; 
+                         
+	// fLaBr3MPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy_LaBr3, ionYield_LaBr3, 36)->SetSpline(true);
+
+	fLaBr3->SetMaterialPropertiesTable(fLaBr3MPT);
+
+
+	/////////////////////////////////////////////////////////////////
+	// YAP YAlO3
+	/////////////////////////////////////////////////////////////////
+
+  fYAP = new G4Material("YAP", 5.35*g/cm3, 3);
+  fYAP->AddElement(fY, 0.2);
+  fYAP->AddElement(fAl, 0.2);
+	fYAP->AddElement(fO, 0.6);
+
+	G4double photonEnergy_YAP[44] = {2.004*eV, 2.058*eV, 2.112*eV, 2.166*eV, 2.220*eV, 2.274*eV, 2.328*eV, 2.382*eV, 2.436*eV, 2.490*eV, 
+		                               2.517*eV, 2.552*eV, 2.585*eV, 2.613*eV, 2.635*eV, 2.656*eV, 2.686*eV, 2.720*eV, 2.749*eV, 2.772*eV, 
+		                               2.791*eV, 2.809*eV, 2.826*eV, 2.842*eV, 2.861*eV, 2.884*eV, 2.919*eV, 2.946*eV, 2.954*eV, 2.961*eV, 
+		                               2.967*eV, 2.974*eV, 2.981*eV, 2.987*eV, 2.994*eV, 3.001*eV, 3.009*eV, 3.018*eV, 3.029*eV, 3.041*eV, 
+		                               3.056*eV, 3.083*eV, 3.137*eV, 3.191*eV};
+
+	G4double ScintilFast_YAP[44] = {0.000, 0.001, 0.001, 0.002, 0.003, 0.006, 0.010, 0.018, 0.033, 0.060, 
+		                              0.084, 0.122, 0.175, 0.234, 0.294, 0.356, 0.416, 0.473, 0.533, 0.594, 
+		                              0.657, 0.720, 0.784, 0.846, 0.903, 0.962, 1.000, 0.917, 0.857, 0.798, 
+		                              0.732, 0.669, 0.604, 0.542, 0.480, 0.422, 0.359, 0.297, 0.237, 0.170, 
+		                              0.105, 0.028, 0.004, 0.000};
+
+	//G4double photonEnergy_YAP[13] = {16.8179*keV, 23.0707*keV, 30.8922*keV, 50.0014*keV, 59.1033*keV, 80.4609*keV, 122.4170*keV, 280.3698*keV, 504.5552*keV, 659.8267*keV, 830.5057*keV, 1188.7809*keV, 1316.9683*keV};
+
+	//G4double ScintilFast_YAP[13] = {0.0482746, 0.0585062, 0.0648312, 0.0774812, 0.0748768, 0.0707841, 0.0776672, 0.0854804, 0.0878988, 0.0888289, 0.089387, 0.0880848, 0.0878988}; //This should be the efficiency curve..?
+
+	//G4double electronYield_YAP[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
+
+	G4double photonEnergy_YAP2[2] = {16.8179*keV, 23.0707*keV};
+	G4double RefIndex_YAP[2] = {1.94,1.94}; 
+	G4double Absorption_YAP[2] = {2.7*cm, 2.7*cm}; 
+
+	fYAPMPT = new G4MaterialPropertiesTable();
+	fYAPMPT->AddProperty("RINDEX", photonEnergy_YAP2, RefIndex_YAP, 2);
+	fYAPMPT->AddProperty("ABSLENGTH", photonEnergy_YAP2, Absorption_YAP, 2);
+	fYAPMPT->AddProperty("FASTCOMPONENT", photonEnergy_YAP, ScintilFast_YAP, 44);
+
+	fYAPMPT->AddConstProperty("SCINTILLATIONYIELD", 26000/MeV); 
+	fYAPMPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+	fYAPMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
+	fYAPMPT->AddConstProperty("FASTTIMECONSTANT", 50.0*ns);
+	fYAPMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
+
+	G4double electronYield_YAP[36];
+	G4double protonYield_YAP[36];
+	G4double ionYield_YAP[36];
+
+	// Produce the scaled light-yield for YAP (scaled down from EJ200 by 14%). This will need to be adjusted for YAP as it has a different light yield than EJ276.
+	for(size_t i = 0; i < 36; i++){
+		electronYield_YAP[i] = 0.86 * electronYield[i];
+		protonYield_YAP[i] = 0.86 * protonYield[i];
+		ionYield_YAP[i] = 0.86 * ionYield[i];
+	}
+
+	fYAPMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy, electronYield_YAP, 36)->SetSpline(true);
+	fYAPMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
+	fYAPMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_YAP, 36)->SetSpline(true);
+	fYAPMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
+
+	fYAP->SetMaterialPropertiesTable(fYAPMPT);
+
+	/////////////////////////////////////////////////////////////////
+	// GAGG Gd3Al2Ga3O12
+	/////////////////////////////////////////////////////////////////
+
+  fGAGG = new G4Material("GAGG", 6.63*g/cm3, 4);
+  fGAGG->AddElement(fGd, 0.15);
+  fGAGG->AddElement(fAl, 0.1);
+  fGAGG->AddElement(fGa, 0.15);
+	fGAGG->AddElement(fO, 0.6);
+
+	G4double photonEnergy_GAGG[24] = {2.657150587*eV,2.602196113*eV,2.546601968*eV,2.515488356*eV,2.493333596*eV,2.468871385*eV,2.444884509*eV,2.418773247*eV,2.398282404*eV,2.370667847*eV,2.35098064*eV,2.32682673*eV,2.286884568*eV,2.237186055*eV,2.183269296*eV,2.135911364*eV,2.077142785*eV,2.058265389*eV,2.008969264*eV,1.953517553*eV,1.913896916*eV,1.868114944*eV,1.818611898*eV,1.775832214*eV};
+
+	G4double ScintilFast_GAGG[24] = {0.004895105,0.097202797,0.298601399,0.55034965,0.713986014,0.858741259,0.951048951,0.990909091,0.999300699,0.999300699,0.988811189,0.96993007,0.902797203,0.781118881,0.648951049,0.520979021,0.361538462,0.327972028,0.258741259,0.204195804,0.174825175,0.137062937,0.101398601,0.084615385};
+
+	//G4double photonEnergy_GAGG[13] = {16.8179*keV, 23.0707*keV, 30.8922*keV, 50.0014*keV, 59.1033*keV, 80.4609*keV, 122.4170*keV, 280.3698*keV, 504.5552*keV, 659.8267*keV, 830.5057*keV, 1188.7809*keV, 1316.9683*keV};
+
+	//G4double ScintilFast_GAGG[13] = {0.0482746, 0.0585062, 0.0648312, 0.0774812, 0.0748768, 0.0707841, 0.0776672, 0.0854804, 0.0878988, 0.0888289, 0.089387, 0.0880848, 0.0878988}; //This should be the efficiency curve..?
+
+	//G4double electronYield_GAGG[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
+
+	G4double photonEnergy_GAGG2[2] = {16.8179*keV, 23.0707*keV};
+	G4double RefIndex_GAGG[2] = {1.9,1.9}; 
+	G4double Absorption_GAGG[2] = {2.7*cm, 2.7*cm}; 
+
+	fGAGGMPT = new G4MaterialPropertiesTable();
+	fGAGGMPT->AddProperty("RINDEX", photonEnergy_GAGG2, RefIndex_GAGG, 2);
+	fGAGGMPT->AddProperty("ABSLENGTH", photonEnergy_GAGG2, Absorption_GAGG, 2);
+	fGAGGMPT->AddProperty("FASTCOMPONENT", photonEnergy_GAGG, ScintilFast_GAGG, 24);
+
+	fGAGGMPT->AddConstProperty("SCINTILLATIONYIELD", 30000/MeV); 
+	fGAGGMPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+	fGAGGMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
+	fGAGGMPT->AddConstProperty("FASTTIMECONSTANT", 50.0*ns);
+	fGAGGMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
+
+	G4double electronYield_GAGG[36];
+	G4double protonYield_GAGG[36];
+	G4double ionYield_GAGG[36];
+
+	// Produce the scaled light-yield for GAGG (scaled down from EJ200 by 14%). This will need to be adjusted for GAGG as it has a different light yield than EJ276.
+	for(size_t i = 0; i < 36; i++){
+		electronYield_GAGG[i] = 0.86 * electronYield[i];
+		protonYield_GAGG[i] = 0.86 * protonYield[i];
+		ionYield_GAGG[i] = 0.86 * ionYield[i];
+	}
+
+	fGAGGMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy, electronYield_GAGG, 36)->SetSpline(true);
+	fGAGGMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_GAGG, 36)->SetSpline(true);
+	fGAGGMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_GAGG, 36)->SetSpline(true);
+
+	fGAGG->SetMaterialPropertiesTable(fGAGGMPT);
+
+	/////////////////////////////////////////////////////////////////
+	// Cerium Bromide CeBr3
+	/////////////////////////////////////////////////////////////////
+
+    fCeBr3 = new G4Material("CeBr3", 5.2*g/cm3, 2);
+    fCeBr3->AddElement(fCe, 0.25);
+    fCeBr3->AddElement(fBr, 0.75);
+
+
+	// taken from LaBr3
+	G4double photonEnergy_CeBr3[44] = {2.004*eV, 2.058*eV, 2.112*eV, 2.166*eV, 2.220*eV, 2.274*eV, 2.328*eV, 2.382*eV, 2.436*eV, 2.490*eV, 
+		                               2.517*eV, 2.552*eV, 2.585*eV, 2.613*eV, 2.635*eV, 2.656*eV, 2.686*eV, 2.720*eV, 2.749*eV, 2.772*eV, 
+		                               2.791*eV, 2.809*eV, 2.826*eV, 2.842*eV, 2.861*eV, 2.884*eV, 2.919*eV, 2.946*eV, 2.954*eV, 2.961*eV, 
+		                               2.967*eV, 2.974*eV, 2.981*eV, 2.987*eV, 2.994*eV, 3.001*eV, 3.009*eV, 3.018*eV, 3.029*eV, 3.041*eV, 
+		                               3.056*eV, 3.083*eV, 3.137*eV, 3.191*eV};
+
+	// taken from LaBr3
+	G4double ScintilFast_CeBr3[44] = {0.000, 0.001, 0.001, 0.002, 0.003, 0.006, 0.010, 0.018, 0.033, 0.060, 
+		                              0.084, 0.122, 0.175, 0.234, 0.294, 0.356, 0.416, 0.473, 0.533, 0.594, 
+		                              0.657, 0.720, 0.784, 0.846, 0.903, 0.962, 1.000, 0.917, 0.857, 0.798, 
+		                              0.732, 0.669, 0.604, 0.542, 0.480, 0.422, 0.359, 0.297, 0.237, 0.170, 
+		                              0.105, 0.028, 0.004, 0.000};
+
+
+	G4double photonEnergy_CeBr3_2[2] = {2.004*eV, 3.191*eV};
+	G4double RefIndex_CeBr3[2] = {2.09, 2.09}; //Data taken from https://www.advatech-uk.co.uk/cebr3.html
+	G4double Absorption_CeBr3[2] = {1.881*cm, 1.881*cm}; // taken from LaBr3
+
+	fCeBr3MPT = new G4MaterialPropertiesTable();
+	fCeBr3MPT->AddProperty("RINDEX", photonEnergy_CeBr3, RefIndex_CeBr3, 2);
+	fCeBr3MPT->AddProperty("ABSLENGTH", photonEnergy_CeBr3, Absorption_CeBr3, 2);
+	fCeBr3MPT->AddProperty("FASTCOMPONENT", photonEnergy_CeBr3, ScintilFast_CeBr3, 44);
+
+	fCeBr3MPT->AddConstProperty("SCINTILLATIONYIELD", 60000/MeV); //Data taken from https://www.advatech-uk.co.uk/cebr3.html
+	fCeBr3MPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+	fCeBr3MPT->AddConstProperty("FASTTIMECONSTANT", 19.0*ns);
+	fCeBr3MPT->AddConstProperty("YIELDRATIO",1);
+
+	// electron, proton, and ion yields taken from LaBr3
+	G4double particleEnergy_CeBr3[36] = {1E-3, 0.10*MeV, 0.13*MeV, 0.17*MeV, 0.20*MeV, 0.24*MeV, 0.30*MeV, 0.34*MeV, 0.40*MeV, 
+		                           0.48*MeV, 0.60*MeV, 0.72*MeV, 0.84*MeV, 1.00*MeV, 1.30*MeV, 1.70*MeV, 2.00*MeV, 2.40*MeV, 
+		                           3.00*MeV, 3.40*MeV, 4.00*MeV, 4.80*MeV, 6.00*MeV, 7.20*MeV, 8.40*MeV, 10.00*MeV, 11.00*MeV, 
+		                           12.00*MeV, 13.00*MeV, 14.00*MeV, 15.00*MeV, 16.00*MeV, 17.00*MeV, 18.00*MeV, 19.00*MeV, 20.00*MeV};
+		                           
+	G4double electronYield_CeBr3[36] = {0.0E+00*pEF, 1.0E+03*pEF, 1.3E+03*pEF, 1.7E+03*pEF, 2.0E+03*pEF, 2.4E+03*pEF, 3.0E+03*pEF, 3.4E+03*pEF, 4.0E+03*pEF, 
+		                          4.8E+03*pEF, 6.0E+03*pEF, 7.2E+03*pEF, 8.4E+03*pEF, 1.0E+04*pEF, 1.3E+04*pEF, 1.7E+04*pEF, 2.0E+04*pEF, 2.4E+04*pEF, 
+		                          3.0E+04*pEF, 3.4E+04*pEF, 4.0E+04*pEF, 4.8E+04*pEF, 6.0E+04*pEF, 7.2E+04*pEF, 8.4E+04*pEF, 1.0E+05*pEF, 1.1E+05*pEF, 
+		                          1.2E+05*pEF, 1.3E+05*pEF, 1.4E+05*pEF, 1.5E+05*pEF, 1.6E+05*pEF, 1.7E+05*pEF, 1.8E+05*pEF, 1.9E+05*pEF, 2.0E+05*pEF};
+	fCeBr3MPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy_CeBr3, electronYield_CeBr3, 36)->SetSpline(true);
+
+	G4double protonYield_CeBr3[36] = {0.6*pSF, 67.1*pSF, 88.6*pSF, 120.7*pSF, 146.5*pSF, 183.8*pSF, 246.0*pSF, 290.0*pSF, 365.0*pSF, 
+		                        483.0*pSF, 678.0*pSF, 910.0*pSF, 1175.0*pSF, 1562.0*pSF, 2385.0*pSF, 3660.0*pSF, 4725.0*pSF, 6250.0*pSF, 
+		                        8660.0*pSF, 10420.0*pSF, 13270.0*pSF, 17180.0*pSF, 23100.0*pSF, 29500.0*pSF, 36200.0*pSF, 45500.0*pSF, 51826.7*pSF, 
+		                        58313.7*pSF, 65047.2*pSF, 72027.4*pSF, 79254.2*pSF, 86727.6*pSF, 94447.6*pSF, 102414.2*pSF, 110627.4*pSF, 119087.2*pSF};
+	fCeBr3MPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy_CeBr3, protonYield_CeBr3, 36)->SetSpline(true);
+
+	G4double ionYield_CeBr3[36] = {0.2*pEF, 10.4*pEF, 12.7*pEF, 15.7*pEF, 17.9*pEF, 20.8*pEF, 25.1*pEF, 27.9*pEF, 31.9*pEF, 
+		                     36.8*pEF, 43.6*pEF, 50.2*pEF, 56.9*pEF, 65.7*pEF, 81.3*pEF, 101.6*pEF, 116.5*pEF, 136.3*pEF, 
+		                     166.2*pEF, 187.1*pEF, 218.6*pEF, 260.5*pEF, 323.5*pEF, 387.5*pEF, 451.5*pEF, 539.9*pEF, 595.5*pEF, 
+		                     651.8*pEF, 708.7*pEF, 766.2*pEF, 824.2*pEF, 882.9*pEF, 942.2*pEF, 1002.1*pEF, 1062.6*pEF, 1123.7*pEF};                   
+	fCeBr3MPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy_CeBr3, ionYield_CeBr3, 36)->SetSpline(true);
+	fCeBr3MPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_CeBr3, protonYield_CeBr3, 36)->SetSpline(true);
+	fCeBr3->SetMaterialPropertiesTable(fCeBr3MPT);
+
+
 	// Update the material dictionary
 	materialList["ej200"] = fEJ200;
 	materialList["ej276"] = fEJ276;
+ 	materialList["yso"] = fYSO;
+	materialList["labr3"] = fLaBr3;
+	materialList["yap"] = fYAP;
+	materialList["gagg"] = fGAGG;
+	materialList["cebr3"] = fCeBr3;
 	
 	scintsAreDefined = true;
 }
+

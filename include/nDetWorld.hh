@@ -78,6 +78,18 @@ class nDetWorld{
 	  */
 	void buildExpHall(nDetMaterials *materials);
 
+	/** Set Name for experimental setup to be constructed
+	 */
+	void SetExp(std::string const expName_){expName = expName_;}
+
+	/** Build the CERN hall structures
+	 */
+	void BuildCERNStructures();
+
+	/** Build the CERN IDS elements
+	 */
+	void BuildCERNElements();
+
 	/** Add a new Geant primitive object to the world
 	  * @param str Space-delimited input string with format specified in nDetWorldPrimitive::decodeArgs()
 	  * @return A pointer to the new object if construction was successful and return NULL if construction failed
@@ -124,6 +136,8 @@ class nDetWorld{
 
 	std::vector<nDetWorldObject*> objects; ///< Vector of objects to add to the experimental setup area
 	
+	std::string expName;
+
 	nDetWorldMessenger *messenger; ///< Pointer to the messenger used for this class
 };
 

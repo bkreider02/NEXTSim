@@ -17,16 +17,16 @@ class nDetDataPack{
   public:
 	/** Default constructor
 	  */
-	nDetDataPack() : evtData(NULL), outData(NULL), multData(NULL), debugData(NULL), traceData(NULL) { }
+	nDetDataPack() : evtData(NULL), outData(NULL), outImplantData(NULL), multData(NULL), debugData(NULL), traceData(NULL) { }
 
 	/** Data structure constructor
 	  */
-	nDetDataPack(nDetEventStructure *evt, nDetOutputStructure *out, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) : 
-	  evtData(evt), outData(out), multData(mult), debugData(debug), traceData(trace) { }
+	nDetDataPack(nDetEventStructure *evt, nDetOutputStructure *out, nDetImplantOutputStructure *outImp, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) : 
+	  evtData(evt), outData(out), outImplantData(outImp), multData(mult), debugData(debug), traceData(trace) { }
 
-	void setDataAddresses(nDetEventStructure *evt, nDetOutputStructure *out, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace);
+	void setDataAddresses(nDetEventStructure *evt, nDetOutputStructure *out, nDetImplantOutputStructure *outImp, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace);
 
-	void copyData(nDetEventStructure *evt, nDetOutputStructure *out, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) const ;
+	void copyData(nDetEventStructure *evt, nDetOutputStructure *out, nDetImplantOutputStructure *outImp, nDetMultiOutputStructure *mult, nDetDebugStructure *debug, nDetTraceStructure *trace) const ;
 
 	/** Return true if the current event is a good detection event, meaning that optical photons
 	  * were detected at the photo-sensitive surfaces of the detector, and return false otherwise
@@ -44,6 +44,7 @@ class nDetDataPack{
   private:
 	nDetEventStructure *evtData;
 	nDetOutputStructure *outData;
+	nDetImplantOutputStructure *outImplantData;
 	nDetMultiOutputStructure *multData;
 	nDetDebugStructure *debugData;
 	nDetTraceStructure *traceData;
