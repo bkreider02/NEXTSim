@@ -11,11 +11,20 @@
 
 bool greaseLayer::decodeArgs(){
 	// Expects a space-delimited string of the form:
-	//  "addGreaseLayer width(mm) height(mm) thickness(mm)"
+	// "addGreaseLayer width(mm) height(mm) thickness(mm) material"
 	x = strtod(args.at(0).c_str(), NULL);
 	y = strtod(args.at(1).c_str(), NULL);
-	if(nUserArgs >= 3)
+	if (nUserArgs >= 4) {
 		thickness = strtod(args.at(2).c_str(), NULL);
+		grMaterial = args.at(3).c_str();
+	}
+	if(nUserArgs >= 3) {
+		if (strtod(args.at(2).c_str(), NULL) > 0) {
+			thickness = strtod(args.at(2).c_str(), NULL);
+		}
+		else
+			grMaterial = args.at(2).c_str();
+	}
 	size = G4ThreeVector(x, y, thickness);
 	return true;
 }
@@ -25,11 +34,11 @@ void greaseLayer::construct(nDetDetector *obj){
 }
 
 void greaseLayer::construct(nDetImplant *obj){
-	obj->applyGreaseLayer(x, y, thickness);
+	obj->applyGreaseLayer(x, y, thickness, grMaterial);
 }
 
 std::string greaseLayer::syntaxStr() const {
-	return std::string("addGreaseLayer <width> <height> [thickness]");
+	return std::string("addGreaseLayer <width> <height> [thickness] [material]");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

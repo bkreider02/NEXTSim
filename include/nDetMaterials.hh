@@ -29,6 +29,8 @@ class nDetMaterials{
     G4Element* fH; ///< Hydrogen
     G4Element* fC; ///< Carbon
     G4Element* fO; ///< Oxygen
+	G4Element* fN; ///< Nitrogen
+	G4Element* fS; ///< Sulfur
     G4Element* fF; ///< Flourine
     G4Element* fSi; ///< Silicon
     G4Element* fAl; ///< Aluminum
@@ -38,6 +40,7 @@ class nDetMaterials{
 		G4Element* fGd; ///< Gadolinium
 		G4Element* fGa; ///< Gallium
 		G4Element* fCe; ///< Cerium
+		G4Element* fZr; ///< Zirconium
 
     G4Material* fAir; ///< Material corresponding to air
     G4Material* fVacuum; ///< Material corresponding to natural vacuum
@@ -46,6 +49,16 @@ class nDetMaterials{
     G4Material* fEJ200; ///< Material corresponding to EJ-200 scintillator
     G4Material* fEJ276; ///< Material corresponding to EJ-276 scintillator
     G4Material* fGrease; ///< Material corresponding to optical grease
+	//G4Material* fMercapto; ///< Material corresponding to Mercapto-ester
+	//G4Material* fTriallyl; ///< Material corresponding to Triallyl Isocyanurate
+	//G4Material* fTetrahydroff; ///< Material corresponding to Tetrahydrofurfuryl
+	//G4Material* fUrethaneAcrylate; ///< Material corresponding to aliphatic urethane acrylate
+	//G4Material* fAcrylate; ///< Material corresponding to acrylate	
+	//G4Material* fZrO2; ///< Material corresponding to zirconium dioxide
+	G4Material* fNOA61; ///< Material corresponding to NOA-61 (Norland optical adhesive)
+	G4Material* fNOA68; ///< Material corresponding to NOA-68 (Norland optical adhesive)
+	G4Material* fNOA136; ///< Material corresponding to NOA-136 (Norland optical adhesive)
+	G4Material* fNOA170; ///< Material corresponding to NOA-170 (Norland optical adhesive)	
     G4Material* fSiO2; ///< Material corresponding to quartz
     G4Material* fSilicon; ///< Material corresponding to silicon
     G4Material* fMylar; ///< Material corresponding to aluminized mylar
@@ -70,6 +83,16 @@ class nDetMaterials{
 		G4MaterialPropertiesTable* fLaBr3MPT; ///< MPT for LaBr3 scintillator
 		G4MaterialPropertiesTable* fCeBr3MPT; ///< MPT for CeBr3 scintillator
     G4MaterialPropertiesTable* fGreaseMPT; ///< Material properties table for optical grease
+	//G4MaterialPropertiesTable* fMercaptoMPT; ///< Material properties table for Mercapto-ester
+	//G4MaterialPropertiesTable* fTriallylMPT; ///< Material properties table for Triallyl Isocyanurate
+	//G4MaterialPropertiesTable* fTetrahydroffMPT; ///< Material properties table for Tetrahydrofurfuryl
+	//G4MaterialPropertiesTable* fUrethaneAcrylateMPT; ///< Material properties table for aliphatic urethane acrylate
+	//G4MaterialPropertiesTable* fZrO2MPT; ///< Material properties table for zirconium dioxide
+	//G4MaterialPropertiesTable* fAcrylateMPT; ///< Material properties table for acrylate	
+    G4MaterialPropertiesTable* fNOA61MPT; ///< Material properties table for NOA-61
+    G4MaterialPropertiesTable* fNOA68MPT; ///< Material properties table for NOA-68
+    G4MaterialPropertiesTable* fNOA136MPT; ///< Material properties table for NOA-136
+    G4MaterialPropertiesTable* fNOA170MPT; ///< Material properties table for NOA-170	
     G4MaterialPropertiesTable* fSiO2MPT; ///< Material properties table for quartz
     G4MaterialPropertiesTable* fSiliconMPT; ///< Material properties table for silicon
 		G4MaterialPropertiesTable* fMylarMPT; ///< Material properties table for aluminized mylar
@@ -85,6 +108,10 @@ class nDetMaterials{
     G4OpticalSurface* fEsrOpSurf; ///< Optical surface for 3M Enhanced Specular Reflector
 		G4OpticalSurface* fPerfectOpSurf; ///< Optical surface for a perfect reflector
 		G4OpticalSurface* fGreaseOpSurf; ///< Optical surface for optical grease
+		G4OpticalSurface* fNOA61OpSurf; ///< Optical surface for NOA-61
+		G4OpticalSurface* fNOA68OpSurf; ///< Optical surface for NOA-68
+		G4OpticalSurface* fNOA136OpSurf; ///< Optical surface for NOA-136
+		G4OpticalSurface* fNOA170OpSurf; ///< Optical surface for NOA-170
 		G4OpticalSurface* fAirOpSurf; ///< Optical surface for air
 		G4OpticalSurface* fAluminumOpSurf; ///< Optical surface for aluminum
 
@@ -92,7 +119,7 @@ class nDetMaterials{
 		G4VisAttributes *visAssembly; ///< Visual attributes for the mother assembly
 		G4VisAttributes *visSensitive; ///< Visual attributes for the photo-sensitive surface
 		G4VisAttributes *visWindow; ///< Visual attributes for the optical window
-		G4VisAttributes *visGrease; ///< Visual attributes for the optical grease
+		G4VisAttributes *visGrease; ///< Visual attributes for the optical grease	
 		G4VisAttributes *visWrapping; ///< Visual attributes for the inner/outer detector wrappint
 		G4VisAttributes *visScint; ///< Visual attributes for the scintillator material
 		G4VisAttributes *visShadow; ///< Visual attributes for the shadow object

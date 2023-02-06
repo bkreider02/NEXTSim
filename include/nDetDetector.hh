@@ -1041,8 +1041,9 @@ public:
 	  * @param x The width of the grease layer (in mm)
 	  * @param y The height of the grease layer (in mm)
 	  * @param thickness The thickness of the grease layer (in mm). If not specified, @a fGreaseThickness is used
+	  * @param material The grease material used in the layer. If not specified (or invalid option specified), regular optical grease is used
 	  */
-	void applyGreaseLayer(const G4double &x, const G4double &y, double thickness=0);
+	void applyGreaseLayer(const G4double &x, const G4double &y, double thickness=0, const G4String& material="");
 
 	/** Apply a straight light diffuser layer (quartz) to the current detector assembly using the current detector width and height
 	  */

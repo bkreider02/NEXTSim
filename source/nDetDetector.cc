@@ -944,21 +944,55 @@ G4CSGSolid *nDetImplant::getLightGuideVolume(const G4String &name, const G4doubl
 }
 
 void nDetImplant::applyGreaseLayer(){
-	std::cout<<"Layer size x "<<layerSizeX<<std::endl;
+	std::cout<<"Layer size x "<<layerSizeX;
 	this->applyGreaseLayer(layerSizeX, layerSizeY);
 }
 
-void nDetImplant::applyGreaseLayer(const G4double &x, const G4double &y, double thickness/*=0*/){
+void nDetImplant::applyGreaseLayer(const G4double &x, const G4double &y, double thickness/*=0*/, const G4String& material/*=""*/){
 	if(thickness <= 0)
 		thickness = fGreaseThickness;
 	if(thickness > 0){
 		G4CSGSolid *grease_solidV = getVolume("grease", x, y, thickness);
-		G4LogicalVolume *grease_logV = new G4LogicalVolume(grease_solidV, materials->fGrease, "grease_logV");
-		grease_logV->SetVisAttributes(materials->visGrease);
+		if (material != "") {
+			// determine which grease material the user has specified; default to regular optical grease
+			G4Material* greaseMaterial;
+			if (material == "noa61") {
+				greaseMaterial = materials->fNOA61;
+				std::cout << "; grease material NOA61" << std::endl;
+			}
+			else if (material == "noa68") {
+				greaseMaterial = materials->fNOA68;
+				std::cout << "; grease material NOA68" << std::endl;
+			}
+			else if (material == "noa136") {
+				greaseMaterial = materials->fNOA136;
+				std::cout << "; grease material NOA136" << std::endl;
+			}
+			else if (material == "noa170") {
+				greaseMaterial = materials->fNOA170;
+				std::cout << "; grease material NOA170" << std::endl;
+			}
+			else {
+				std::cout << "\"" << material <<"\n\" is not a valid grease option; defaulting to optical grease\n";
+				greaseMaterial = materials->fGrease;
+			}
+			G4LogicalVolume *grease_logV = new G4LogicalVolume(grease_solidV, greaseMaterial, "grease_logV");
+			grease_logV->SetVisAttributes(materials->visGrease);
 
-		// Add the optical grease to the assembly
-		//addMirroredComponents(grease_logV, offsetZ+thickness/2, "Grease"); 
-		G4PVPlacement *greaseLogical = addBackComponent(grease_logV, offsetZ+thickness/2, "Grease0"); 
+			// Add the optical grease to the assembly
+			//addMirroredComponents(grease_logV, offsetZ+thickness/2, "Grease"); 
+			G4PVPlacement *greaseLogical = addBackComponent(grease_logV, offsetZ+thickness/2, "Grease0"); 
+		}
+		else {
+			// use optical grease if material not specified
+			std::cout << "; default optical grease material" << std::endl;
+			G4LogicalVolume *grease_logV = new G4LogicalVolume(grease_solidV, materials->fGrease, "grease_logV");
+			grease_logV->SetVisAttributes(materials->visGrease);
+
+			// Add the optical grease to the assembly
+			//addMirroredComponents(grease_logV, offsetZ+thickness/2, "Grease"); 
+			G4PVPlacement *greaseLogical = addBackComponent(grease_logV, offsetZ+thickness/2, "Grease0"); 
+		}
 
 		// Offset the other layers to account for the layer of optical grease
 		layerSizeX = x;
@@ -1142,7 +1176,7 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 		wrapOpSurf = materials->getUserOpticalSurface(fWrapMat);
 	}
 	else {
-		wrappingMaterial = materials->getUserSurfaceMaterial(wrappingMaterialName);
+		wrapMat = materials->getUserSurfaceMaterial(wrappingMaterialName);
 		wrappingVisAtt = materials->getUserVisAttributes(wrappingMaterialName);
 		wrappingOpSurf = materials->getUserOpticalSurface(wrappingMaterialName);
 	}

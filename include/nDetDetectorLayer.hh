@@ -13,7 +13,7 @@ class nDetImplant;
 
 /** @class greaseLayer
   * @brief Optical grease component layer which is added to a detector assembly
-  * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
+  * @author Cory R. Thornsberry (cthornsb@vols.utk.edu) with changes by Ben T. Kreider (bkreider@vols.utk.edu)
   * @date July 18, 2019
   */
 
@@ -22,19 +22,20 @@ class greaseLayer : public nDetWorldObject {
 	/** User input constructor
 	  * @param arg_ Argument string from the input macro
 	  */
-	greaseLayer(const G4String &arg_) : nDetWorldObject(arg_, 2), x(0), y(0), thickness(0) { }
+	greaseLayer(const G4String &arg_) : nDetWorldObject(arg_, 2), x(0), y(0), thickness(0), grMaterial("") { }
 
 	/** Destructor
 	  */	
 	~greaseLayer(){ }
 	
 	/** Apply a grease layer to the current detector assembly using dimensions from a space-delimited input string
-	  * @note String syntax: <width> <height> [thickness]
+	  * @note String syntax: <width> <height> [thickness] [material]
 	  * | Parameter | Description |
 	  * |-----------|-------------|
 	  * | width     | The width of the grease layer (in mm)
 	  * | height    | The height of the grease layer (in mm)
 	  * | thickness | The thickness of the grease layer (in mm). If not specified, @a fGreaseThickness is used
+	  * | material  | The material used to make the grease layer. If not specified, regular optical grease is used
 	  */
 	virtual bool decodeArgs();
 
@@ -56,7 +57,8 @@ class greaseLayer : public nDetWorldObject {
   private:
 	G4double x; ///< Width of the diffuser (in mm)
 	G4double y; ///< Height of the diffuser (in mm)
-	G4double thickness; ///< Thickness of the diffuser (in mm)	
+	G4double thickness; ///< Thickness of the diffuser (in mm)
+	G4String grMaterial; ///< Type of grease material	
 };
 
 /** @class diffuserLayer

@@ -137,7 +137,7 @@ void nDetConstructionMessenger::addAllCommands(){
 	addGuidance("Load segmented PMT anode gain matrix file");
 	
 	addCommand(new G4UIcmdWithAString("/nDet/implant/addGreaseLayer", this));
-	addGuidance("Add a layer of optical grease (all units in mm). SYNTAX: addGreaseLayer <width> <height> [thickness]");	
+	addGuidance("Add a layer of optical grease (all units in mm). SYNTAX: addGreaseLayer <width> <height> [thickness] [material]");	
 
 	addCommand(new G4UIcmdWithAString("/nDet/implant/addDiffuserLayer", this));
 	addGuidance("Add a straight diffuser to the assembly (all units in mm). SYNTAX: addDiffuserLayer <width> <height> <thickness> [material=G4_SILICON_DIOXIDE]");	
