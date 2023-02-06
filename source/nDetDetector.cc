@@ -697,7 +697,6 @@ void nDetImplant::addPhoswichLayer(const G4String &input) {
 	addLayer(new phoswichLayer(input));
 }
 
-// GO THROUGH AND CHANGE ALL THESE FUNCTIONS AS NECESSARY
 void nDetImplant::construct(){
 	// Update the size of the assembly in the event it has changed
 	UpdateSize(); 

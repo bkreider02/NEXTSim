@@ -76,16 +76,18 @@ G4VPhysicalVolume* nDetConstruction::ConstructDetector(){
 	for(auto det : userDetectors){
 		currentDetector = det;
 		// Build the detector
+
 		det->construct();
 		// Place all detectors.
 		det->placeDetector(expHall->getLogicalVolume());
 	}
 
-	for(auto imp : userImplants){
-		currentImplant = imp;
-		imp->construct();
-		imp->placeImplant(expHall->getLogicalVolume());
-	}
+	//for(auto imp : userImplants){
+	//	currentImplant = imp;
+	//
+	//	imp->construct();
+	//	imp->placeImplant(expHall->getLogicalVolume());
+	//}
 	
 	return expHall->getPhysicalVolume();
 }
