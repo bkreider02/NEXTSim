@@ -68,8 +68,8 @@
 /nDet/implant/setRotation 0 270 0
 /nDet/implant/addGeometry module
 
-#/nDet/implant/addGreaseLayer 50.8 50.8 0.2 noa61
-/nDet/implant/addPhoswich 24 24 2.0 50.8 50.8 0.03 yso air
+/nDet/implant/addGreaseLayer 50.8 50.8 0.02 noa61
+/nDet/implant/addPhoswich 24 24 1.0 50.8 50.8 0.03 yso perfect
 /nDet/implant/addDiffuserLayer 50 50 2.0
 #/nDet/implant/addLightGuide 50 50 50 50 5 
 #/nDet/segLightGuide/thickness 10
@@ -86,7 +86,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename phoswichBack2Diff2AirGap.root
+/nDet/output/filename phoswichBack1Diff2NOA61Perfect.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -146,4 +146,4 @@
 # RUN CONTROL #
 ###############
 
-#/run/beamOn 100000
+/run/beamOn 100000

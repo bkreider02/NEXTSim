@@ -957,19 +957,15 @@ void nDetImplant::applyGreaseLayer(const G4double &x, const G4double &y, double 
 			G4Material* greaseMaterial;
 			if (material == "noa61") {
 				greaseMaterial = materials->fNOA61;
-				std::cout << "; grease material NOA61" << std::endl;
 			}
 			else if (material == "noa68") {
 				greaseMaterial = materials->fNOA68;
-				std::cout << "; grease material NOA68" << std::endl;
 			}
 			else if (material == "noa136") {
 				greaseMaterial = materials->fNOA136;
-				std::cout << "; grease material NOA136" << std::endl;
 			}
 			else if (material == "noa170") {
 				greaseMaterial = materials->fNOA170;
-				std::cout << "; grease material NOA170" << std::endl;
 			}
 			else {
 				std::cout << "\"" << material <<"\n\" is not a valid grease option; defaulting to optical grease\n";
@@ -984,7 +980,6 @@ void nDetImplant::applyGreaseLayer(const G4double &x, const G4double &y, double 
 		}
 		else {
 			// use optical grease if material not specified
-			std::cout << "; default optical grease material" << std::endl;
 			G4LogicalVolume *grease_logV = new G4LogicalVolume(grease_solidV, materials->fGrease, "grease_logV");
 			grease_logV->SetVisAttributes(materials->visGrease);
 
