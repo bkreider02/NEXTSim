@@ -659,6 +659,14 @@ void nDetMaterials::defineMaterials(){
 
 	*/
 
+
+	/*********************************************
+	 NOTE: the NOA grease options are implemented
+	  with the same material properties as ordinary
+	  optical grease; only the index of refraction
+	  is changed.
+	 *********************************************/
+
 	/////////////////////////////////////////////////////////////////
 	// NOA-61 (Norland optical adhesive)
 	/////////////////////////////////////////////////////////////////

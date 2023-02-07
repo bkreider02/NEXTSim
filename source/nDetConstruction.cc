@@ -93,11 +93,11 @@ G4VPhysicalVolume* nDetConstruction::ConstructDetector(){
 }
 
 G4VPhysicalVolume* nDetConstruction::ConstructImplant(){
-	if(!materials.materialsAreDefined())
-		materials.initialize();
+	//if(!materials.materialsAreDefined())
+	//	materials.initialize();
 
 	// Build experiment hall.
-	expHall->buildExpHall(&materials);
+	//expHall->buildExpHall(&materials);
 
 	// Place all detectors.
 	for(auto imp : userImplants){
@@ -108,13 +108,13 @@ G4VPhysicalVolume* nDetConstruction::ConstructImplant(){
 		// Place the detector into the world.
 		imp->placeImplant(expHall->getLogicalVolume());
 	}
-	for(auto det : userDetectors){
-		currentDetector = det;
-		// Build the detector
-		det->construct();
-		// Place all detectors.
-		det->placeDetector(expHall->getLogicalVolume());
-	}
+	//for(auto det : userDetectors){
+	//	currentDetector = det;
+	//	// Build the detector
+	//	det->construct();
+	//	// Place all detectors.
+	//	det->placeDetector(expHall->getLogicalVolume());
+	//}
 
 	return expHall->getPhysicalVolume();
 }
