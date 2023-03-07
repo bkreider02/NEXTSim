@@ -1142,7 +1142,6 @@ void nDetImplant::applySegmentedLightGuide(G4int Xseg, G4int Yseg, G4double spac
 }
 
 void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4double fWidth, G4double fHeight, G4double fWrapping, G4String fSegMaterial, G4String fWrapMat) {
-	// START HERE
 
 	// RECALCULATE THE SEGMENT DIMENSIONS
 	const G4double cellWidth = (fWidth-(fXseg-1)*fWrapping)/fXseg;
@@ -1150,11 +1149,6 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 	
 	int Ncol = fXseg;
 	int Nrow = fYseg;
-
-	// COPY NUMBERS
-	// Update the detector's copy numbers
-	//firstSegmentCopyNum = scintCopyNum; 
-	//lastSegmentCopyNum = firstSegmentCopyNum; //startCopyNum+col*row;
 
     G4Material* phoswichMaterial = materials->getUserDetectorMaterial(fSegMaterial);
 	G4VisAttributes* phoswichVisAtt = materials->getUserVisAttributes(fSegMaterial);
@@ -1187,7 +1181,6 @@ void nDetImplant::applyPhoswich(G4int fXseg, G4int fYseg, G4double fThick, G4dou
 	G4LogicalVolume *mylarVertLayer_logV = NULL;
 	G4LogicalVolume *mylarHorizLayer_logV = NULL;
 
-	// DO NOT ADD FRONT, ETC. WRAPPING
 	// Build the wrapping.
 	G4PVPlacement *wrapping_physV = NULL;
 	G4PVPlacement* wrappingFacePhys = NULL;

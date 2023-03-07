@@ -27,7 +27,11 @@ class centerOfMass{
 	/** Default constructor
 	  */
 	centerOfMass() : Ncol(1), Nrow(1), Npts(0), NnotDetected(0), totalMass(0), t0(std::numeric_limits<double>::max()), tSum(0), lambdaSum(0),
-	                 activeWidth(0), activeHeight(0), pixelWidth(0), pixelHeight(0), center(0, 0, 0), response() { }
+	                 activeWidth(0), activeHeight(0), pixelWidth(0), pixelHeight(0), center(0, 0, 0), response() { 
+						std::vector<pmtResponse> init(8);
+						std::vector< std::vector<pmtResponse> > v(8,init);
+						pixelResponse = v;
+					 }
 
 	/** Destructor
 	  */
@@ -134,6 +138,10 @@ class centerOfMass{
 	/** Get a const pointer to the array containing the four Anger Logic output responses
 	  */
 	const pmtResponse *getConstAnodeResponse() const { return (const pmtResponse*)anodeResponse; }
+
+	/** Get a pointer to the 8x8 array containing the energies of the pmt pixels
+	  */
+	std::vector< std::vector<pmtResponse> > getPixelResponse(){ return pixelResponse; }
 	
 	/** Get the four Anger Logic currents {V1, V2, V3, V4}
 	  * @param array Array of at least 4 doubles
@@ -275,6 +283,8 @@ class centerOfMass{
 	pmtResponse response; ///< Light pulse response of the dynode
 	
 	pmtResponse anodeResponse[4]; // Light pulse response of the four Anger Logic readouts
+
+	std::vector< std::vector<pmtResponse> > pixelResponse; // Light pulse response of each pixel in the Anger Logic network; to be used only for 8x8 PMTs
 	
 	std::vector<std::vector<double> > gainMatrix; ///< Matrix containing the gain of each PSPMT anode (in percent)
 	std::vector<std::vector<int> > countMatrix; ///< Matrix containing the number of photon counts of each PSPMT anode

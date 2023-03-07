@@ -1433,6 +1433,7 @@ void nDetMaterials::defineScintillators(){
 		                     651.8*pEF, 708.7*pEF, 766.2*pEF, 824.2*pEF, 882.9*pEF, 942.2*pEF, 1002.1*pEF, 1062.6*pEF, 1123.7*pEF};                   
 	fCeBr3MPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy_CeBr3, ionYield_CeBr3, 36)->SetSpline(true);
 	fCeBr3MPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_CeBr3, protonYield_CeBr3, 36)->SetSpline(true);
+	fCeBr3MPT->AddProperty("GAMMASCINTILLATIONYIELD", particleEnergy_CeBr3, electronYield_CeBr3, 36)->SetSpline(true);
 	fCeBr3->SetMaterialPropertiesTable(fCeBr3MPT);
 
 

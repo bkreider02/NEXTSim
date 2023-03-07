@@ -266,6 +266,7 @@ class nDetDebugStructure : public TObject {
 	std::vector<double> nScatterAngle; ///< Angle between successive scatters of the primary particle (in degrees)
 	std::vector<double> nPathLength; ///< Path length of primary particle between successive scatter events (in mm)
 	std::vector<double> nScatterTime; ///< Global time of each primary particle scatter event (in ns)
+	double initialE; ///< Initial energy of the primary particle for each event (in MeV)
 	std::vector<double> impartedE; ///< Energy imparted by the primary particle for each scatter event (in MeV)
 	std::vector<short> segmentCol; ///< Scintillator segment column for each primary particle scatter event (for modular detectors)
 	std::vector<short> segmentRow; ///< Scintillator segment row for each primary particle scatter event (for modular detectors)
@@ -283,6 +284,7 @@ class nDetDebugStructure : public TObject {
 	double pulseMax[2]; ///< Maximum of the left and right light pulses (in ADC channels)
 	double pulseQDC[2]; ///< Integral of the left and right light pulses
 	double anodeQDC[2][4]; ///< Anger logic currents for the four readouts of the left and right PSPmts
+	double pixelQDC[8][8]; ///< QDC for each pixel of the 8x8 PMT
 	double photonDetComX[2]; ///< Left and right PMT photon center-of-mass along the X-axis weighted by the anode gain and quantum efficiency (in mm)
 	double photonDetComY[2]; ///< Left and right PMT photon center-of-mass along the Y-axis weighted by the anode gain and quantum efficiency (in mm)
 	double reconDetComX[2]; ///< Left and right PMT photon center-of-mass along the X-axis computed using Anger Logic reconstruction
@@ -380,6 +382,7 @@ class nDetMultiOutputStructure : public TObject {
 	std::vector<double> nScatterAngle; ///< Angle between successive scatters of the primary particle (in degrees)
 	std::vector<double> nPathLength; ///< Path length of primary particle between successive scatter events (in mm)
 	std::vector<double> nScatterTime; ///< Global time of each primary particle scatter event (in ns)
+	double initialE; ///< Initial energy of the primary particle for each event (in MeV)
 	std::vector<double> impartedE; ///< Energy imparted by the primary particle for each scatter event (in MeV)
 	//std::vector<short> segmentCol; ///< Scintillator segment column for each primary particle scatter event (for modular detectors)
 	//std::vector<short> segmentRow; ///< Scintillator segment row for each primary particle scatter event (for modular detectors)

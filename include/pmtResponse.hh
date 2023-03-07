@@ -151,6 +151,7 @@ public:
 	  */
 	unsigned short getMaximumIndex() const { return maxIndex; }
 
+
 	/** Get a pointer to the digitized pulse array
 	  */
 	unsigned short *getDigitizedPulse(){ return pulseArray.data(); }
@@ -175,6 +176,10 @@ public:
 	/** Return true if the digitized pulse is to be printed and return false otherwise
 	  */
 	bool getPrintTrace() const { return printTrace; }
+
+	/** Return the photon count
+	  */
+	bool getPhotonCount() const { return photonCount; }
 
 	/** Get the period of the ADC clock (in ns)
 	  */
@@ -414,6 +419,10 @@ public:
 	  */
 	static double calculateP3(const short &x0, unsigned short *y, double *p, double &xmax);
 
+	/** Increment the photon count
+	  */
+	void incrementCount() { photonCount++; }
+
 private:
 	double cfdPar[7]; ///< Cfd fitting parameters.	
 
@@ -458,6 +467,8 @@ private:
 	photonResponseType functionType; ///< Integer indicating the single photon response function to use to build the light response pulse
 
 	std::vector<photonArrivalTime> arrivalTimes; ///< Vector of all optical photon arrival times and their individual single-photon response gains
+
+	int photonCount = 0; ///< number of photons included in the response
 	
 	/** Evaluate the single-photon-response function for a given time and time offset
 	  * @param t The time to along the pulse at which to evaluate the single-photon-response function (in ns)

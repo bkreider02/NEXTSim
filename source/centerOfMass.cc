@@ -21,6 +21,13 @@ centerOfMass centerOfMass::clone() const {
 	retval.response = response.clone();
 	for(size_t i = 0; i < 4; i++)
 		retval.anodeResponse[i] = anodeResponse[i].clone();
+	if (getNumColumns() == 8 && getNumRows() == 8) {
+		for (size_t i = 0; i < 8; i++) {
+			for (size_t j = 0; j < 8; j++) {
+				retval.pixelResponse[i][j] = pixelResponse[i][j].clone();
+			}
+		}
+	}
 	retval.gainMatrix = gainMatrix;
 	retval.countMatrix = countMatrix;
 	return retval;
@@ -42,7 +49,6 @@ double centerOfMass::getCenterZ() const {
 	return (totalMass > 0 ? (1/totalMass)*center.getZ() : 0);
 }
 
-// CHANGE THIS ; FUNCTION DOES NOT WORK RIGHT FOR PMT WITH GAPS
 bool centerOfMass::getCenterSegment(G4ThreeVector &pos, short &col, short &row) const {
 
 	if (pmtHasGaps) {
@@ -177,7 +183,7 @@ double centerOfMass::setActiveAreaHeight(const double &height_){
 }
 
 void centerOfMass::setSegmentedPmt(const nDetDetectorParams *params){
-	if(params->GetNumPmtColumns() <= 0 || params->GetNumPmtRows() <= 0)
+	if(getNumColumns() <= 0 || getNumRows() <= 0)
 		return;
 
 	Ncol = params->GetNumPmtColumns();
@@ -296,7 +302,20 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 					anodeCurrent[i] += gain*mass*current[i];
 				}
 				for(size_t i = 0; i < 4; i++){
-					anodeResponse[i].addPhoton(time, 0, gain*mass*(current[i]));
+					anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
+				}
+
+				if (getNumRows() == 8 && getNumColumns() == 8) { // only record pixel response for 8x8 pmts
+
+					for (size_t i = 0; i < 8; i++) {
+						for (size_t j = 0; j < 8; j++) {
+							if (i == xpos && j == ypos) {
+								pixelResponse[i][j].addPhoton(time, wavelength, gain*mass);
+							}
+							//else
+							//	pixelResponse[i][j].addPhoton(time, 0, 0); // ignore pixels that aren't hit
+						}
+					}
 				}
 			}
 			

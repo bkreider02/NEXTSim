@@ -225,6 +225,8 @@ void pmtResponse::addPhoton(const double &arrival, const double &wavelength/*=0*
 	// Check if this is the first photon
 	if(arrival < minimumArrivalTime)
 		minimumArrivalTime = arrival;
+	
+	incrementCount();
 }
 
 double pmtResponse::sample(const double &time) const {
@@ -264,6 +266,7 @@ void pmtResponse::digitize(const double &baseline_, const double &jitter_){
 		value += baseline_*adcBins;
 		if(jitter_ != 0) 
 			value += (-jitter_ + 2*G4UniformRand()*jitter_)*adcBins;
+		
 		if(value <= adcBins-1) // Pulse is not saturated.
 			pulseArray[i] = (unsigned short)value;
 		else{ // Pulse is saturated.
@@ -302,6 +305,14 @@ double pmtResponse::integratePulse(){
 
 /// Integrate the baseline corrected trace for QDC in the range [maxIndex-start_, maxIndex+stop_] and return the result.
 double pmtResponse::integratePulseFromMaximum(const short &start_, const short &stop_){
+	// Find the maximum ADC value and the maximum bin.
+	unsigned short maxADC = 0;
+	for(size_t i = 0; i < pulseLength; i++){
+		if((pulseArray[i] - baseline > maxADC) && (pulseArray[i] != 0)){ 
+			maxADC = pulseArray[i] - baseline;
+			maxIndex = i;
+		}
+	}
 	size_t low = (maxIndex > start_ ? maxIndex-start_ : 0);
 	return this->integratePulse(low, maxIndex+stop_);
 }

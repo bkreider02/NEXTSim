@@ -551,7 +551,27 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 		anodeResponseI[i].digitize();
 		debugData.anodeQDC[0][i] = anodeResponseI[i].integratePulseFromMaximum();
 		anodeQDC[i] = debugData.anodeQDC[0][i];
-	}	
+	}
+
+	std::vector< std::vector<pmtResponse> > pixelResponseI = cmI->getPixelResponse();
+	double pixelQDC[8][8];
+
+	// initialize to zero
+	for (size_t i = 0; i < 8; i++)
+		for (size_t j = 0; j < 8; j++)
+			pixelQDC[i][j] = 0;
+
+	if (params.GetNumPmtRows() == 8 && params.GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
+		for (size_t i = 0; i < 8; i++) {
+			for (size_t j = 0; j < 8; j++) {
+				if (pixelResponseI[i][j].getPhotonCount() != 0) { // don't bother with pixels that aren't hit
+					pixelResponseI[i][j].digitize();
+					debugData.pixelQDC[i][j] = pixelResponseI[i][j].integratePulseFromMaximum();
+					pixelQDC[i][j] = debugData.pixelQDC[i][j];
+				}
+			}
+		}
+	}
 	
 	// Compute the anode positions.
 	//debugData.reconDetComX[0] = -((anodeQDC[0]+anodeQDC[1])-(anodeQDC[2]+anodeQDC[3]))/(anodeQDC[0]+anodeQDC[1]+anodeQDC[2]+anodeQDC[3]);

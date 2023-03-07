@@ -316,6 +316,7 @@ void nDetMultiOutputStructure::Zero(){
 	nScatterAngle.clear();
 	nPathLength.clear();
 	nScatterTime.clear();
+	initialE = 0;
 	impartedE.clear();
 	//segmentCol.clear();
 	//segmentRow.clear();
@@ -393,6 +394,7 @@ void nDetDebugStructure::Zero(){
 	nScatterAngle.clear();
 	nPathLength.clear();
 	nScatterTime.clear();
+	initialE = 0;
 	impartedE.clear();
 	segmentCol.clear();
 	segmentRow.clear();
@@ -417,6 +419,11 @@ void nDetDebugStructure::Zero(){
 		for(size_t j = 0; j < 4; j++){
 			anodeQDC[i][j] = 0;
 			anodePhase[i][j] = 0;
+		}
+	}
+	for (size_t i = 0; i < 8; i++) {
+		for (size_t j = 0; j < 8; j++) {
+			pixelQDC[i][j] = 0;
 		}
 	}
 	mult = 0;
