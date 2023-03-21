@@ -174,6 +174,7 @@ void nDetConstruction::ClearImplantGeometry(){
 }
 
 void nDetConstruction::UpdateGeometry(){
+
 	// Define new one
 	G4RunManager::GetRunManager()->DefineWorldVolume(ConstructDetector());
 	G4RunManager::GetRunManager()->DefineWorldVolume(ConstructImplant());

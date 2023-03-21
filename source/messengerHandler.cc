@@ -27,7 +27,7 @@ messengerHandler::~messengerHandler(){
 
 void messengerHandler::SetNewValue(G4UIcommand* command, G4String newValue){
 	fUserCmdList.push_back(command->GetCommandPath() + " " + newValue);
-	this->SetNewChildValue(command, newValue); 
+	this->SetNewChildValue(command, newValue);
 }
 
 bool messengerHandler::searchForString(const std::string &str, std::vector<cmdSearchPair> &matches) const {

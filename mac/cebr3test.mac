@@ -76,7 +76,7 @@
 /nDet/implant/setSegmentedLightGuide 24 24 5.0 50.8 50.8 50.8 50.8 G4_Pyrex_Glass
 #/nDet/implant/addDiffuserLayer 50 50 0.5
 
-# Update the detector.
+
 /nDet/implant/update
 
 
@@ -86,7 +86,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename PIXELRESPONSEtesting.root
+/nDet/output/filename PIXELRESPONSEtestingGammaRange.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -110,8 +110,9 @@
 /nDet/output/trace/setBitRange 16
 /nDet/output/trace/setGain 1000
 /nDet/output/trace/setCfdFraction 0.5
-/nDet/output/trace/setIntegralLow 5
-/nDet/output/trace/setIntegralHigh 10
+/nDet/output/trace/setIntegralLow 10
+/nDet/output/trace/setIntegralHigh 50
+
 
 ################
 # SOURCE SETUP #
@@ -120,7 +121,7 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 252Cf
 
-/nDet/source/type alpha 5
+#/nDet/source/type alpha 5
 /nDet/source/type gamma 1
 #/nDet/source/range 1 5 0
 /nDet/source/setGaussianEnergy 1 1
@@ -149,4 +150,4 @@
 # RUN CONTROL #
 ###############
 
-/run/beamOn 10000
+/run/beamOn 5000000

@@ -13,23 +13,26 @@ const double coeff = 1.23984193E-3; // hc = Mev * nm
 // class centerOfMass
 ///////////////////////////////////////////////////////////////////////////////
 
-centerOfMass::~centerOfMass(){
-}
+centerOfMass::~centerOfMass(){ }
 
 centerOfMass centerOfMass::clone() const {
 	centerOfMass retval;
 	retval.response = response.clone();
-	for(size_t i = 0; i < 4; i++)
-		retval.anodeResponse[i] = anodeResponse[i].clone();
-	if (getNumColumns() == 8 && getNumRows() == 8) {
+	for(size_t i = 0; i < 4; i++) {
+		retval.anodeResponse[i] = response.clone();
+	}
+
+	if (Ncol == 8 && Nrow == 8) {
 		for (size_t i = 0; i < 8; i++) {
 			for (size_t j = 0; j < 8; j++) {
-				retval.pixelResponse[i][j] = pixelResponse[i][j].clone();
+				retval.pixelResponse[8*i+j] = response.clone();
 			}
 		}
 	}
+
 	retval.gainMatrix = gainMatrix;
 	retval.countMatrix = countMatrix;
+
 	return retval;
 }
 
@@ -265,10 +268,16 @@ void centerOfMass::clear(){
 	center = G4ThreeVector();
 	t0 = std::numeric_limits<double>::max();	
 	response.clear();
-	for(size_t i = 0; i < 4; i++){
+	for (size_t i = 0; i < 4; i++) {
 		anodeCurrent[i] = 0;
 		anodeResponse[i].clear();
 	}
+	for (size_t i = 0; i < 8; i++) {
+		for (size_t j = 0; j < 8; j++) {
+			pixelResponse[8*i+j].clear();
+		}
+	}
+	
 	countMatrix.clear();
 	for(short i = 0; i < Ncol; i++){
 		countMatrix.push_back(std::vector<int>(Nrow, 0));
@@ -305,17 +314,8 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 					anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
 				}
 
-				if (getNumRows() == 8 && getNumColumns() == 8) { // only record pixel response for 8x8 pmts
-
-					for (size_t i = 0; i < 8; i++) {
-						for (size_t j = 0; j < 8; j++) {
-							if (i == xpos && j == ypos) {
-								pixelResponse[i][j].addPhoton(time, wavelength, gain*mass);
-							}
-							//else
-							//	pixelResponse[i][j].addPhoton(time, 0, 0); // ignore pixels that aren't hit
-						}
-					}
+				if (Nrow == 8 && Ncol == 8) { // only record pixel response for 8x8 pmts
+					pixelResponse[8*ypos+xpos].addPhoton(time, wavelength, gain*mass);
 				}
 			}
 			

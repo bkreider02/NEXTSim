@@ -72,6 +72,7 @@ class spectralResponse{
 	void clear();
 };
 
+
 /** @class pmtResponse
   * @brief Class used to simulate the light response due to detection of multiple optical photons.
   * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
@@ -122,9 +123,33 @@ public:
 	  */
 	pmtResponse clone() const ;
 
+	/** Get the risetime of the light pulse (in ns)
+	  */
+	double getRisetime() const { return risetime; }
+
+	/** Get the falltime of the light pulse (in ns)
+	  */
+	double getFalltime() const { return falltime; }
+
+	/** Get the time spread of the light pulse (in ns)
+	  */
+	double getTimeSpread() const { return timeSpread; }
+
+	/** Get the trace delay of the light pulse (in ns)
+	  */
+	double getTraceDelay() const { return traceDelay; }	
+
 	/** Get the length of the light pulse (in ADC clock ticks)
 	  */
 	size_t getPulseLength() const { return pulseLength; }
+
+	/** Get the bit range
+	  */
+	size_t getBitRange() const { return adcBins; }
+
+	/** Get the ADC bins
+	  */
+	size_t getAdcBins() const { return adcBins; }
 
 	/** Get the maximum value of the pulse (in ADC channels)
 	  */
@@ -134,14 +159,42 @@ public:
 	  */
 	double getBaseline() const { return baseline; }
 
+	/** Get the baseline fraction of the pulse
+	  */
+	double getBaselineFraction() const { return baselineFraction; }
+
+	/** Get the baseline jitter fraction of the pulse
+	  */
+	double getBaselineJitterFraction() const { return baselineJitterFraction; }
+
 	/** Get the pulse phase at the maximum (in ns)
 	  */
 	double getMaximumTime() const { return maximumTime; }
+
+	/** Get the gain of the response
+	  */
+	double getGain() const { return gain; }
 
 	/** Get the fast trigger from the pmt signal
 	  */
 	bool getTrigger() const {return isTriggered; }
 	
+	/** Get the upper limit of pulse integration
+	  */
+	double getPulseIntegralHigh() const { return pulseIntegralHigh; }
+
+	/** Get the lower limit of pulse integration
+	  */
+	double getPulseIntegralLow() const { return pulseIntegralLow; }
+
+	/** Get the pulse function type
+	  */
+	photonResponseType getFunctionType() const { return functionType; }
+
+	/** Get the PolyCFD fraction parameter (F)
+	  */
+	double getCfdFraction() const { return polyCfdFraction; }
+
 	/** Get a pointer to the array of Poly CFD parameters
 	  * @return Pointer to an array of 7 doubles 
 	  */
@@ -179,7 +232,7 @@ public:
 
 	/** Return the photon count
 	  */
-	bool getPhotonCount() const { return photonCount; }
+	int getPhotonCount() const { return photonCount; }
 
 	/** Get the period of the ADC clock (in ns)
 	  */
@@ -241,6 +294,11 @@ public:
 	  */
 	void setBitRange(const size_t &len);
 
+	/** Set the ADC bins
+	  * @param b The number of ADC bins
+	  */
+	void setAdcBins(const unsigned int &b);
+
 	/** Set the single photon response function type. The available function types with their usage of the fall time and rise time 
 	  * parameters (set by setFalltime() and setRisetime() respectively) are described in the table below
 	  *
@@ -263,6 +321,16 @@ public:
 	  * @param percentage The maximum amplitude of noise above or below the true pulse baseline (percentage of the total ADC dynamic range)
 	  */	
 	void setBaselineJitterPercentage(const double &percentage){ baselineJitterFraction = percentage/100; }
+
+	/** Set the height of the digitized pulse baseline
+	  * @param fraction The amplitude of the pulse baseline (percentage of the total ADC dynamic range)
+	  */	
+	void setBaselineFraction(const double &fraction){ baselineFraction = fraction; }
+
+	/** Set the noise in the digitized pulse baseline
+	  * @param fraction The maximum amplitude of noise above or below the true pulse baseline (percentage of the total ADC dynamic range)
+	  */	
+	void setBaselineJitterFraction(const double &fraction){ baselineJitterFraction = fraction; }
 
 	/** Set the PolyCFD fraction parameter (F)
 	  * @param frac The fraction of the baseline corrected pulse height where the PolyCFD crossing point will be extracted
@@ -419,10 +487,6 @@ public:
 	  */
 	static double calculateP3(const short &x0, unsigned short *y, double *p, double &xmax);
 
-	/** Increment the photon count
-	  */
-	void incrementCount() { photonCount++; }
-
 private:
 	double cfdPar[7]; ///< Cfd fitting parameters.	
 
@@ -468,7 +532,7 @@ private:
 
 	std::vector<photonArrivalTime> arrivalTimes; ///< Vector of all optical photon arrival times and their individual single-photon response gains
 
-	int photonCount = 0; ///< number of photons included in the response
+	int photonCount; ///< number of photons included in the response
 	
 	/** Evaluate the single-photon-response function for a given time and time offset
 	  * @param t The time to along the pulse at which to evaluate the single-photon-response function (in ns)

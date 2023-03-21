@@ -424,6 +424,7 @@ void nDetDebugStructure::Zero(){
 	for (size_t i = 0; i < 8; i++) {
 		for (size_t j = 0; j < 8; j++) {
 			pixelQDC[i][j] = 0;
+			photonsPerPixel[i][j] = 0;
 		}
 	}
 	mult = 0;

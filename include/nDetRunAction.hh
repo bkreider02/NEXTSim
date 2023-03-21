@@ -11,6 +11,8 @@
 #include "nDetDataPack.hh"
 #include "centerOfMass.hh"
 
+#include <vector>
+
 class G4Timer;
 class G4Run;
 
@@ -109,6 +111,10 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	void EndOfRunAction(const G4Run* aRun);
 
+	/** Initialize the pmtResponse objects in the center of mass (called in BeginOfRunAction())
+	  */
+	void initializePmtResponses();
+
 	/** Get a pointer to the particle source object
 	  */
 	nDetParticleSource *getParticleSource(){ return source; }
@@ -185,23 +191,32 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	pmtResponse *getPmtResponseImplant(const size_t &index=0){ return (index < userImplants.size() ? userImplants.at(index).getCenterOfMass()->getPmtResponse() : NULL); }
 
-	/** Get a pointer to the array of left PMT anode response objects of one of the defined detectors
+	/** Get vector of left PMT anode response objects of one of the defined detectors
 	  * @param index The index of the detector in the list of defined detectors
-	  * @return The pointer to the array of anode responses if @a index corresponds to a defined detector and return NULL otherwise
+	  * @return The vector of anode responses if @a index corresponds to a defined detector and return NULL otherwise
 	  */
-	pmtResponse *getAnodeResponseLeft(const size_t &index=0){ return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassL()->getAnodeResponse() : NULL); }
+	std::vector<pmtResponse> *getAnodeResponseLeft(int eventID, const size_t &index=0){ 
+		//return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassL()->getAnodeResponse() : NULL); 
+		return userDetectors.at(index).getCenterOfMassL()->getAnodeResponse();
+	}
 
-	/** Get a pointer to the array of right PMT anode response objects of one of the defined detectors
+	/** Get vector of right PMT anode response objects of one of the defined detectors
 	  * @param index The index of the detector in the list of defined detectors
-	  * @return The pointer to the array of anode responses if @a index corresponds to a defined detector and return NULL otherwise
+	  * @return The vector of anode responses if @a index corresponds to a defined detector and return NULL otherwise
 	  */
-	pmtResponse *getAnodeResponseRight(const size_t &index=0){ return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassR()->getAnodeResponse() : NULL); }	
+	std::vector<pmtResponse> *getAnodeResponseRight(int eventID, const size_t &index=0){
+		//return (index < userDetectors.size() ? userDetectors.at(index).getCenterOfMassR()->getAnodeResponse() : NULL);
+		return userDetectors.at(index).getCenterOfMassR()->getAnodeResponse();
+	}	
 
-	/** Get a pointer to the array of left PMT anode response objects of one of the defined detectors
+	/** Get vector of left PMT anode response objects of one of the defined detectors
 	  * @param index The index of the detector in the list of defined detectors
-	  * @return The pointer to the array of anode responses if @a index corresponds to a defined detector and return NULL otherwise
+	  * @return The vector of anode responses if @a index corresponds to a defined detector and return NULL otherwise
 	  */
-	pmtResponse *getAnodeResponseImplant(const size_t &index=0){ return (index < userImplants.size() ? userImplants.at(index).getCenterOfMass()->getAnodeResponse() : NULL); }
+	std::vector<pmtResponse> *getAnodeResponseImplant(int eventID, const size_t &index=0){
+		//return (index < userImplants.size() ? userImplants.at(index).getCenterOfMass()->getAnodeResponse() : NULL);
+		return userImplants.at(index).getCenterOfMass()->getAnodeResponse();
+	}
 
 	/** Get the total number of optical photons which have been produced during this run
 	  */
@@ -215,6 +230,24 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	std::vector<nDetImplant> getUserImplants() {
 		return userImplants;
+	}
+
+	/** Get the starting implant
+	  */
+	nDetImplant *getStartImplant() {
+		return startImplant;
+	}
+
+	/** Get the detector parameters
+	  */
+	nDetDetectorParams getDetectorParameters() {
+		return params;
+	}
+
+	/** Get a pointer to the singleton detector construction object
+	  */
+	nDetConstruction* getDetectorConstruction() {
+		return detector;
 	}
 
 	/** Copy the list of defined detectors and set the start detector (if one exists)
@@ -260,6 +293,18 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	void finalizeNeutron(const G4Step *step);
 
+	/** Copy the pmtResponse parameters specified in the macro from the responses contained in nDetConstruction
+		to the ones contained in nDetImplant (need to do it for nDetDetector in the future as well).
+	
+	NOTE: this function was added because the centerOfMass and pmtResponse objects are cloned (using clone())
+		before the response parameters are set. This is a very messy way of solving the problem, and it may 
+		need to be changed in the future.
+	
+	* @param dest pointer to pmtResponse object whose parameters will be copied
+	* @param src  pointer to pmtResponse object to which the parameters will be copied
+	*/
+	void copyResponseParameters(pmtResponse *dest, pmtResponse *src);
+
   private:
 	G4Timer* timer; ///< Timer used to measure the total time for a run (in seconds)
 	
@@ -300,6 +345,8 @@ class nDetRunAction : public G4UserRunAction
 	bool endImplant=0;
 	bool endDetector=0;
 
+	long numberOfEvents; ///< Number of events to be processed
+
 	std::vector<nDetDetector> userDetectors; ///< Vector of detectors added by the user
 	std::vector<nDetImplant> userImplants; ///< Vector of detectors added by the user
 
@@ -328,7 +375,7 @@ class nDetRunAction : public G4UserRunAction
 	bool processStartDetector(nDetDetector* det, double &startTime);
 
 		/** Process a single event for a single start detector
-	  * @param det Pointer to the nDetDetector to process
+	  * @param imp Pointer to the nDetImplant to process
 	  * @param startTime Time-of-flight of the start detector event
 	  * @return True if the detector has detected optical photons and return false otherwise
 	  */

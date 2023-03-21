@@ -208,93 +208,260 @@ void nDetConstructionMessenger::SetNewChildValue(G4UIcommand* command, G4String 
 	else{ // Digitizer command
 		pmtResponse *prL = fDetector->GetPmtResponseL();
 		pmtResponse *prR = fDetector->GetPmtResponseR();
+		pmtResponse *prI = fDetector->GetPmtResponse();
+		std::vector<pmtResponse> *anodeR = fDetector->GetCenterOfMass()->getAnodeResponse();
+		std::vector<pmtResponse> *pixelR = fDetector->GetCenterOfMass()->getPixelResponse();
 		index = index - 11;
 		if(index == 0){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setRisetime(val);
 			prR->setRisetime(val);
+			prI->setRisetime(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setRisetime(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setRisetime(val);
+				}
+			}
 		}
 		else if(index == 1){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setFalltime(val);
 			prR->setFalltime(val);
+			prI->setFalltime(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setFalltime(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setFalltime(val);
+				}
+			}
 		}
 		else if(index == 2){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setGain(val);
 			prR->setGain(val);
+			prI->setGain(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setGain(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setGain(val);
+				}
+			}
 		}
 		else if(index == 3){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setBaselinePercentage(val);
 			prR->setBaselinePercentage(val);
+			prI->setBaselinePercentage(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setBaselinePercentage(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setBaselinePercentage(val);
+				}
+			}
 		}
 		else if(index == 4){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setBaselineJitterPercentage(val);
 			prR->setBaselineJitterPercentage(val);
+			prI->setBaselineJitterPercentage(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setBaselineJitterPercentage(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setBaselineJitterPercentage(val);
+				}
+			}
 		}
 		else if(index == 5){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setPolyCfdFraction(val);
 			prR->setPolyCfdFraction(val);
+			prI->setPolyCfdFraction(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setPolyCfdFraction(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setPolyCfdFraction(val);
+				}
+			}
 		}
 		else if(index == 6){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setTraceDelay(val);
 			prR->setTraceDelay(val);
+			prI->setTraceDelay(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setTraceDelay(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setTraceDelay(val);
+				}
+			}
 		}
 		else if(index == 7){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setPulseLengthInNanoSeconds(val);
 			prR->setPulseLengthInNanoSeconds(val);
+			prI->setPulseLengthInNanoSeconds(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setPulseLengthInNanoSeconds(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setPulseLengthInNanoSeconds(val);
+				}
+			}
 		}
 		else if(index == 8){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setTransitTimeSpread(val);
 			prR->setTransitTimeSpread(val);
+			prI->setTransitTimeSpread(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setTransitTimeSpread(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setTransitTimeSpread(val);
+				}
+			}
 		}
 		else if(index == 9){
 			G4int val = command->ConvertToInt(newValue);
 			prL->setPulseIntegralLow(val);
+			prR->setPulseIntegralLow(val);
+			prI->setPulseIntegralLow(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setPulseIntegralLow(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setPulseIntegralLow(val);
+				}
+			}
 		}
 		else if(index == 10){
 			G4int val = command->ConvertToInt(newValue);
 			prL->setPulseIntegralHigh(val);
 			prR->setPulseIntegralHigh(val);
+			prI->setPulseIntegralHigh(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setPulseIntegralHigh(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setPulseIntegralHigh(val);
+				}
+			}
 		}
 		else if(index == 11){
 			G4int val = command->ConvertToInt(newValue);
 			prL->setBitRange(val);
 			prR->setBitRange(val);
+			prI->setBitRange(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setBitRange(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setBitRange(val);
+				}
+			}
 		}
 		else if(index == 12){
 			if(newValue == "expo" || newValue == "0"){
 				prL->setFunctionType(pmtResponse::EXPO);
 				prR->setFunctionType(pmtResponse::EXPO);
+				prI->setFunctionType(pmtResponse::EXPO);
+				for (int i = 0; i < 4; i++) {
+					anodeR->at(i).setFunctionType(pmtResponse::EXPO);
+				}
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						pixelR->at(8*i+j).setFunctionType(pmtResponse::EXPO);
+					}
+				}
 			}
 			else if(newValue == "vandle" || newValue == "1"){
 				prL->setFunctionType(pmtResponse::VANDLE);
 				prR->setFunctionType(pmtResponse::VANDLE);
+				prI->setFunctionType(pmtResponse::VANDLE);
+				for (int i = 0; i < 4; i++) {
+					anodeR->at(i).setFunctionType(pmtResponse::VANDLE);
+				}
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						pixelR->at(8*i+j).setFunctionType(pmtResponse::VANDLE);
+					}
+				}
 			}
 			else if(newValue == "gauss" || newValue == "0"){
 				prL->setFunctionType(pmtResponse::GAUSS);
 				prR->setFunctionType(pmtResponse::GAUSS);
+				prI->setFunctionType(pmtResponse::GAUSS);
+				for (int i = 0; i < 4; i++) {
+					anodeR->at(i).setFunctionType(pmtResponse::GAUSS);
+				}
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						pixelR->at(8*i+j).setFunctionType(pmtResponse::GAUSS);
+					}
+				}
 			}
 		}
 		else if(index == 13){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setAdcClockInNanoseconds(val);
 			prR->setAdcClockInNanoseconds(val);
+			prI->setAdcClockInNanoseconds(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setAdcClockInNanoseconds(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setAdcClockInNanoseconds(val);
+				}
+			}
+	
 		}
 		else if(index == 14){
 			G4double val = command->ConvertToDouble(newValue);
 			prL->setAdcClockFrequency(val);
 			prR->setAdcClockFrequency(val);
+			prI->setAdcClockFrequency(val);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setAdcClockFrequency(val);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setAdcClockFrequency(val);
+				}
+			}
 		}
 		else if(index == 15){
 			prL->setPrintTrace((newValue == "true") ? true : false);
 			prR->setPrintTrace((newValue == "true") ? true : false);
+			prI->setPrintTrace((newValue == "true") ? true : false);
+			for (int i = 0; i < 4; i++) {
+				anodeR->at(i).setPrintTrace((newValue == "true") ? true : false);
+			}
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					pixelR->at(8*i+j).setPrintTrace((newValue == "true") ? true : false);
+				}
+			}
 		}
 		else if(index == 16){
 			prL->print(); // Only show the left side, because they're both the same

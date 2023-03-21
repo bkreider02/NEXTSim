@@ -15,6 +15,7 @@
 #include "nDetMasterOutputFile.hh"
 #include "nDetDetector.hh"
 #include "termColors.hh"
+#include "G4RunManager.hh"
 
 #include <random>
 
@@ -140,6 +141,8 @@ void nDetRunAction::BeginOfRunAction(const G4Run* aRun)
 	// Update the source. Only need to do this once since it's a singleton
 	source->UpdateAll();
 
+	initializePmtResponses();
+
 	G4cout << "nDetRunAction::BeginOfRunAction()->"<< G4endl;
 	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl; 
 	
@@ -187,6 +190,7 @@ void nDetRunAction::BeginOfRunAction(const G4Run* aRun)
 		for(size_t index = 0; index < container->size(); index++){ // Set options per thread
 			container->getActionManager(index)->getRunAction()->setOutputDebug(outputFile->getOutputDebug());
 			container->getActionManager(index)->getRunAction()->setOutputTraces(outputFile->getOutputTraces());
+			container->getActionManager(index)->getRunAction()->initializePmtResponses();
 		}
 		outputFile->setMultiDetectorMode(false);
 	}
@@ -196,6 +200,7 @@ void nDetRunAction::BeginOfRunAction(const G4Run* aRun)
 
 	// Set the total number of events
 	outputFile->setTotalEvents(aRun->GetNumberOfEventToBeProcessed());
+	numberOfEvents = aRun->GetNumberOfEventToBeProcessed();
 }
 
 void nDetRunAction::EndOfRunAction(const G4Run* aRun)
@@ -206,13 +211,35 @@ void nDetRunAction::EndOfRunAction(const G4Run* aRun)
 	G4cout << "number of event = " << aRun->GetNumberOfEvent() << " " << *timer << G4endl;
 }
 
+void nDetRunAction::initializePmtResponses() {
+	centerOfMass *cmI = startImplant->getCenterOfMass();
+	pmtResponse *pmtI = cmI->getPmtResponse();
+	copyResponseParameters(pmtI,detector->GetCenterOfMass()->getPmtResponse());
+
+	std::vector<pmtResponse> *anodeResponseI = cmI->getAnodeResponse();
+	std::vector<pmtResponse> *tempA = detector->GetCenterOfMass()->getAnodeResponse();
+	for(size_t i = 0; i < 4; i++){
+		copyResponseParameters(&anodeResponseI->at(i),&tempA->at(i));
+	}
+
+	std::vector<pmtResponse> *pixelResponseI = cmI->getPixelResponse();
+	std::vector<pmtResponse> *tempP = detector->GetCenterOfMass()->getPixelResponse();
+	if (detector->GetDetectorParameters().GetNumPmtRows() == 8 && detector->GetDetectorParameters().GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
+		for (size_t i = 0; i < 8; i++) {
+			for (size_t j = 0; j < 8; j++) {
+				copyResponseParameters(&pixelResponseI->at(8*i+j),&tempP->at(8*i+j));
+			}
+		}
+	}
+}
+
 void nDetRunAction::updateDetector(nDetConstruction *construction){
 	// Clear all currently defined detectors
 	userDetectors.clear();
 	userImplants.clear();
 
 	// Copy the list of detectors
-	construction->GetCopiesOfDetectors(userDetectors);	
+	construction->GetCopiesOfDetectors(userDetectors);
 	construction->GetCopiesOfImplants(userImplants);	
 	
 	// Search for a start detector. Currently only one start is supported, break after finding the first one
@@ -458,6 +485,7 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	// Get pointers to the CoM calculators
 	params = detector->GetDetectorParameters();
 	centerOfMass *cmI = imp->getCenterOfMass();
+
 	//std::cout<<"!!! Process !!! "<<detector->GetCenterOfMass()->getNumColumns()<<" "<<cmI->getNumColumns()<<std::endl;
 	cmI->setSegmentedPmt(&params);
 	cmI->loadGainMatrix("hamamatsuH12700A_LA0967.dat");
@@ -543,31 +571,39 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	}
 	
 	// Get the digitizer response of the anodes.
-	pmtResponse *anodeResponseI = cmI->getAnodeResponse();
+	std::vector<pmtResponse> *anodeResponseI = cmI->getAnodeResponse();
 
 	// Digitize anode waveforms and integrate.
 	double anodeQDC[4]={0};
 	for(size_t i = 0; i < 4; i++){
-		anodeResponseI[i].digitize();
-		debugData.anodeQDC[0][i] = anodeResponseI[i].integratePulseFromMaximum();
+		anodeResponseI->at(i).digitize();
+		debugData.anodeQDC[0][i] = anodeResponseI->at(i).integratePulseFromMaximum();
 		anodeQDC[i] = debugData.anodeQDC[0][i];
 	}
 
-	std::vector< std::vector<pmtResponse> > pixelResponseI = cmI->getPixelResponse();
+	std::vector<pmtResponse> *pixelResponseI = cmI->getPixelResponse();
 	double pixelQDC[8][8];
+	double photonsPerPixel[8][8];
 
 	// initialize to zero
 	for (size_t i = 0; i < 8; i++)
-		for (size_t j = 0; j < 8; j++)
+		for (size_t j = 0; j < 8; j++) {
 			pixelQDC[i][j] = 0;
+			photonsPerPixel[i][j] = 0;
+		}
 
-	if (params.GetNumPmtRows() == 8 && params.GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
+	if (detector->GetDetectorParameters().GetNumPmtRows() == 8 && detector->GetDetectorParameters().GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
 		for (size_t i = 0; i < 8; i++) {
 			for (size_t j = 0; j < 8; j++) {
-				if (pixelResponseI[i][j].getPhotonCount() != 0) { // don't bother with pixels that aren't hit
-					pixelResponseI[i][j].digitize();
-					debugData.pixelQDC[i][j] = pixelResponseI[i][j].integratePulseFromMaximum();
+				if (pixelResponseI->at(8*i+j).getPhotonCount() != 0) { // don't bother with pixels that aren't hit
+					// get number of photons
+					debugData.photonsPerPixel[i][j] = pixelResponseI->at(8*i+j).getPhotonCount();
+
+					pixelResponseI->at(8*i+j).digitize();
+					debugData.pixelQDC[i][j] = pixelResponseI->at(8*i+j).integratePulseFromMaximum();
+
 					pixelQDC[i][j] = debugData.pixelQDC[i][j];
+					photonsPerPixel[i][j] = debugData.photonsPerPixel[i][j];
 				}
 			}
 		}
@@ -642,6 +678,24 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 
 	return true;
 }
+
+
+void nDetRunAction::copyResponseParameters(pmtResponse *dest, pmtResponse *src) {
+	dest->setRisetime(src->getRisetime());
+	dest->setFalltime(src->getFalltime());
+	dest->setTransitTimeSpread(src->getTimeSpread());
+	dest->setGain(src->getGain());
+	dest->setBaselineFraction(src->getBaselineFraction());
+	dest->setBaselineJitterFraction(src->getBaselineJitterFraction());
+	dest->setTraceDelay(src->getTraceDelay());
+	dest->setPulseLength(src->getPulseLength());
+	dest->setAdcBins(src->getBitRange());
+	dest->setPolyCfdFraction(src->getCfdFraction());
+	dest->setPulseIntegralLow(src->getPulseIntegralLow());
+	dest->setPulseIntegralHigh(src->getPulseIntegralHigh());
+	dest->setFunctionType(src->getFunctionType());
+}
+
 
 bool nDetRunAction::processStartDetector(nDetDetector* det, double &startTime){
 	if(!processDetector(det)) // No detected photons, do not process
@@ -787,6 +841,7 @@ bool nDetRunAction::AddDetectedPhoton(const G4Step *step, const double &mass/*=1
 	centerOfMass *hitDetPmtL;
 	centerOfMass *hitDetPmtR;
 	centerOfMass *hitDetPmtI;
+
 	for(std::vector<nDetDetector>::iterator iter = userDetectors.begin(); iter != userDetectors.end(); iter++){
 		if(iter->checkPmtCopyNumber(copyNum, isLeft)){
 			foundMatch = true;
@@ -794,6 +849,10 @@ bool nDetRunAction::AddDetectedPhoton(const G4Step *step, const double &mass/*=1
 			detRot = iter->getRotation();
 			hitDetPmtL = iter->getCenterOfMassL();
 			hitDetPmtR = iter->getCenterOfMassR();
+			hitDetPmtL->setNumColumns(iter->GetNumPmtColumns());
+			hitDetPmtL->setNumRows(iter->GetNumPmtRows());
+			hitDetPmtR->setNumColumns(iter->GetNumPmtColumns());
+			hitDetPmtR->setNumRows(iter->GetNumPmtRows());
 			break;
 		}
 	}
@@ -803,6 +862,8 @@ bool nDetRunAction::AddDetectedPhoton(const G4Step *step, const double &mass/*=1
 			detPos = iter->getPosition();
 			detRot = iter->getRotation();
 			hitDetPmtI = iter->getCenterOfMass();
+			hitDetPmtI->setNumColumns(iter->GetNumPmtColumns());
+			hitDetPmtI->setNumRows(iter->GetNumPmtRows());
 			break;
 		}
 	}
@@ -832,7 +893,6 @@ bool nDetRunAction::AddDetectedPhoton(const G4Step *step, const double &mass/*=1
 	}
 	return false;
 }
-
 
 bool nDetRunAction::scatterEvent(){
 	if(primaryTracks.size() <= 1)

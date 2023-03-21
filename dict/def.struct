@@ -158,6 +158,7 @@ double	pulseMax[2]	Maximum of the left and right light pulses (in ADC channels)
 double	pulseQDC[2]	Integral of the left and right light pulses
 double	anodeQDC[2][4]	Anger logic currents for the four readouts of the left and right PSPmts
 double  pixelQDC[8][8]  QDC for each pixel of an 8x8 PMT
+int     photonsPerPixel[8][8]   number of photons which hit each pixel for a given event
 double	photonDetCenterOfMassX[2]	Left and right PMT photon center-of-mass along the X-axis weighted by the anode gain and quantum efficiency (in mm)
 double	photonDetCenterOfMassY[2]	Left and right PMT photon center-of-mass along the Y-axis weighted by the anode gain and quantum efficiency (in mm)
 double	reconstructedCenterX[2]	Left and right PMT photon center-of-mass along the X-axis computed using Anger Logic reconstruction

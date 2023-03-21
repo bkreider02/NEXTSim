@@ -124,19 +124,37 @@ void spectralResponse::clear(){
 // class pmtResponse
 ///////////////////////////////////////////////////////////////////////////////
 
+
 pmtResponse::pmtResponse() : risetime(4.0), falltime(20.0), timeSpread(0), traceDelay(50), gain(1E4), maximum(-9999), baseline(-9999),
                              baselineFraction(0), baselineJitterFraction(0), polyCfdFraction(0.5), adcClockTick(4), tLatch(0), pulseIntegralLow(5), pulseIntegralHigh(10),
                              maxIndex(0), adcBins(4096), pulseLength(100), isDigitized(false), isTriggered(false), useSpectralResponse(false), pulseIsSaturated(false),
-                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO) {
+                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO), photonCount(0) {
 	this->setPulseLength(pulseLength);
 }
 
-pmtResponse::pmtResponse(const double &risetime_, const double &falltime_) : risetime(risetime_), falltime(falltime_), timeSpread(0), traceDelay(50), gain(1E4), maximum(-9999), baseline(-9999),
-                                                                             baselineFraction(0), baselineJitterFraction(0), polyCfdFraction(0.5), adcClockTick(4), tLatch(0), pulseIntegralLow(5), pulseIntegralHigh(10),
-                                                                             maxIndex(0), adcBins(4096), pulseLength(100), isDigitized(false), isTriggered(false), useSpectralResponse(false), pulseIsSaturated(false),
-                                                                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO) {
+/*
+pmtResponse::pmtResponse() : risetime(2.0), falltime(20.0), timeSpread(0.35), traceDelay(60), gain(1E4), maximum(-9999), baseline(-9999),
+                             baselineFraction(0.075), baselineJitterFraction(0.0015), polyCfdFraction(0.5), adcClockTick(4), tLatch(0), pulseIntegralLow(10), pulseIntegralHigh(50),
+                             maxIndex(0), adcBins(65536), pulseLength(100), isDigitized(false), isTriggered(false), useSpectralResponse(false), pulseIsSaturated(false),
+                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO), photonCount(0) {
+	this->setPulseLength(pulseLength);
+}*/
+
+
+pmtResponse::pmtResponse(const double &risetime_, const double &falltime_) : risetime(risetime_), falltime(falltime_), timeSpread(0.35), traceDelay(50), gain(1E4), maximum(-9999), baseline(-9999),
+                             baselineFraction(0), baselineJitterFraction(0), polyCfdFraction(0.5), adcClockTick(4), tLatch(0), pulseIntegralLow(5), pulseIntegralHigh(10),
+                             maxIndex(0), adcBins(4096), pulseLength(100), isDigitized(false), isTriggered(false), useSpectralResponse(false), pulseIsSaturated(false),
+                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO), photonCount(0) {
 	this->setPulseLength(pulseLength);
 }
+
+/*
+pmtResponse::pmtResponse(const double &risetime_, const double &falltime_) : risetime(risetime_), falltime(falltime_), timeSpread(0.35), traceDelay(60), gain(1E4), maximum(-9999), baseline(-9999),
+                             baselineFraction(0.075), baselineJitterFraction(0.0015), polyCfdFraction(0.5), adcClockTick(4), tLatch(0), pulseIntegralLow(10), pulseIntegralHigh(50),
+                             maxIndex(0), adcBins(65536), pulseLength(100), isDigitized(false), isTriggered(false), useSpectralResponse(false), pulseIsSaturated(false),
+                             printTrace(false), pulseArray(), spec(), minimumArrivalTime(0), functionType(EXPO), photonCount(0) {
+	this->setPulseLength(pulseLength);
+}*/
 
 pmtResponse::~pmtResponse(){
 }
@@ -202,12 +220,21 @@ void pmtResponse::setBitRange(const size_t &len){
 	adcBins = (unsigned int)std::pow(2, len);
 }
 
+/// Set ADC bins
+void pmtResponse::setAdcBins(const unsigned int &b) {
+	adcBins = b;
+}
+
 /// Load PMT spectral response from root file.
 bool pmtResponse::loadSpectralResponse(const char *fname){
 	return (useSpectralResponse = spec.load(fname));
 }
 
 void pmtResponse::addPhoton(const double &arrival, const double &wavelength/*=0*/, const double &gain_/*=1*/){
+	
+	// increment photon count
+	photonCount++;
+
 	double efficiency = 1;
 	if(useSpectralResponse){ // Compute the quantum efficiency of the PMT for this wavelength.
 		efficiency = spec.eval(wavelength)/100;
@@ -225,14 +252,13 @@ void pmtResponse::addPhoton(const double &arrival, const double &wavelength/*=0*
 	// Check if this is the first photon
 	if(arrival < minimumArrivalTime)
 		minimumArrivalTime = arrival;
-	
-	incrementCount();
 }
 
 double pmtResponse::sample(const double &time) const {
 	double retval = 0;
 	for(auto arrival : arrivalTimes)
 		retval += arrival.gain * func(time, arrival.dt);
+
 	return retval;
 }
 
@@ -261,6 +287,7 @@ void pmtResponse::digitize(const double &baseline_, const double &jitter_){
 	double time = tLatch + adcClockTick/2;
 	for(size_t i = 0; i < pulseLength; i++){
 		bin = (unsigned int)floor(sample(time)); // Sample the total light response spectrum
+
 		if(bin >= adcBins) bin = adcBins-1;
 		value = bin;
 		value += baseline_*adcBins;
@@ -284,7 +311,9 @@ void pmtResponse::digitize(){
 
 /// Integrate the baseline corrected trace for QDC in the range [start_, stop_] and return the result.
 double pmtResponse::integratePulse(const size_t &start_, const size_t &stop_){
-	if(pulseLength == 0 || pulseArray.empty()) return -9999;
+	if(pulseLength == 0 || pulseArray.empty()) {
+		return -9999;
+	}
 	size_t stop = (stop_ > pulseLength ? pulseLength : stop_);
 
 	// Check for start index greater than stop index.
@@ -294,6 +323,7 @@ double pmtResponse::integratePulse(const size_t &start_, const size_t &stop_){
 	for(size_t i = start_+1; i < stop; i++){ // Integrate using trapezoidal rule.
 		qdc += 0.5*(pulseArray[i-1] + pulseArray[i]) - baseline;
 	}
+
 	if(qdc>50) isTriggered = true;
 	return qdc;
 }
@@ -305,16 +335,36 @@ double pmtResponse::integratePulse(){
 
 /// Integrate the baseline corrected trace for QDC in the range [maxIndex-start_, maxIndex+stop_] and return the result.
 double pmtResponse::integratePulseFromMaximum(const short &start_, const short &stop_){
+
+	// Find the baseline.
+	double tempbaseline = 0.0;
+	size_t sample_size = floor(traceDelay/adcClockTick);
+	sample_size = (sample_size <= pulseLength ? 15:pulseLength);
+	for(size_t i = 0; i < sample_size; i++){
+		tempbaseline += pulseArray[i];
+	}
+	tempbaseline = tempbaseline/sample_size;
+	baseline = double(tempbaseline);
+
 	// Find the maximum ADC value and the maximum bin.
 	unsigned short maxADC = 0;
-	for(size_t i = 0; i < pulseLength; i++){
+
+	for(size_t i = 0; i < pulseArray.size(); i++){
 		if((pulseArray[i] - baseline > maxADC) && (pulseArray[i] != 0)){ 
 			maxADC = pulseArray[i] - baseline;
 			maxIndex = i;
 		}
 	}
+
 	size_t low = (maxIndex > start_ ? maxIndex-start_ : 0);
-	return this->integratePulse(low, maxIndex+stop_);
+	size_t high = (maxIndex+stop_ < pulseArray.size()-1 ? maxIndex+stop_ : pulseArray.size()-1);
+
+	if (pulseArray[maxIndex] == 0 || maxIndex == 0) {
+		return 0;
+	}
+	else {
+		return this->integratePulse(low,high);
+	}
 }
 
 /// Integrate the baseline corrected trace for QDC in the range [maxIndex-pulseIntegralLow, maxIndex+pulseIntegralHigh] and return the result.
@@ -429,6 +479,8 @@ void pmtResponse::clear(){
 	arrivalTimes.clear();
 
 	maxIndex = 0;
+
+	photonCount = 0;
 	
 	isDigitized = false;
 	isTriggered = false;
