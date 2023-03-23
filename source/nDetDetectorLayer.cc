@@ -179,6 +179,34 @@ std::string phoswichLayer::syntaxStr() const{
 	return std::string("<# x seg> <# y seg> <z thickness> <x width> <y height> <wrapping thickness> <material>");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// class boxLayer
+///////////////////////////////////////////////////////////////////////////////
+
+boxLayer::boxLayer(const G4String &arg_) : nDetWorldObject(arg_,3), fBoxMaterial(""), fBoxThickness(0.), fBoxGap(0.) 
+{}
+
+boxLayer::~boxLayer(){
+	G4cout<<"Deleting boxLayer"<<G4endl;
+}
+
+bool boxLayer::decodeArgs(){
+	fBoxMaterial = args.at(0);
+	fBoxThickness = strtod(args.at(1).c_str(),NULL)*mm;
+	fBoxGap = strtod(args.at(2).c_str(),NULL)*mm;
+}
+
+void boxLayer::construct(nDetDetector *obj){
+	G4cout<<"Placing box on nDetDetector which is not defined"<<G4endl;
+}
+
+void boxLayer::construct(nDetImplant *obj){
+	obj->buildBox(fBoxMaterial, fBoxThickness, fBoxGap);
+}
+
+std::string boxLayer::syntaxStr() const{
+	return std::string("<material name> <box thickness> <box gap thickness>");
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // class gdmlLightGuideLayer

@@ -211,6 +211,27 @@ class phoswichLayer : public nDetWorldObject {
 		G4String fWrapMat; ///< String indicating what material should be used to wrap the phoswich scintillator
 };
 
+/* @class boxLayer
+ * @brief box which is added to a detector assembly
+ * @author Ben T. Kreider (bkreider@vols.utk.edu)
+ * @date March 23, 2023
+*/
+class boxLayer : public nDetWorldObject {
+	public:
+		boxLayer(const G4String &arg_);
+		~boxLayer();
+
+		virtual bool decodeArgs();
+		virtual void construct(nDetDetector *obj);
+		virtual void construct(nDetImplant *obj);
+		virtual std::string syntaxStr() const;
+		virtual void placeObject(G4LogicalVolume*,nDetMaterials*) {}
+	private:
+		G4String fBoxMaterial; ///< String indicating the material of added box
+		double fBoxThickness; ///< Thickness of added box in mm
+		double fBoxGap; ///< Thickness of gap between box and implant in mm
+};
+
 /** @class gdmlLightGuideLayer
   * @brief GDML model component which is added to a detector assembly
   * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
