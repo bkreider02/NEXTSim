@@ -645,6 +645,17 @@ void nDetImplant::buildAllLayers(){
 	}	
 }
 
+void nDetImplant::buildBox() {
+	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+boxGap+boxThickness, fDetectorHeight/2+fWrappingThickness+boxGap+boxThickness, fDetectorLength/2);
+	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+boxGap, fDetectorHeight/2+fWrappingThickness+boxGap, fDetectorLength/2);
+
+	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
+	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
+
+	G4PVPlacement *box_physV = NULL;
+	box_physV = addToDetectorBody(box_logV, "Box");
+}
+
 void nDetImplant::placeImplant(G4LogicalVolume *parent){
 	assembly_physV = new G4PVPlacement(&detectorRotation, detectorPosition, assembly_logV, "Assembly", parent, 0, 0, false);
 	assembly_physV->SetCopyNo(parentCopyNum);
@@ -709,19 +720,10 @@ void nDetImplant::addBox(const G4String &input) {
 	unsigned int Nargs = split_str(input, args);
 
 	std::string boxMaterialName = args.at(0);
-	G4Material *boxMaterial = materials->getMaterial(boxMaterialName);
+	boxMaterial = materials->getMaterial(boxMaterialName);
 
 	boxThickness = strtod(args.at(1).c_str(),NULL)*mm;
 	boxGap = strtod(args.at(2).c_str(),NULL)*mm;
-
-	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+boxGap+boxThickness, fDetectorHeight/2+fWrappingThickness+boxGap+boxThickness, fDetectorLength/2);
-	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+boxGap, fDetectorHeight/2+fWrappingThickness+boxGap, fDetectorLength/2);
-
-	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
-	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
-
-	G4PVPlacement *box_physV = NULL;
-	box_physV = addToDetectorBody(box_logV, "Box");
 }
 
 void nDetImplant::construct(){
@@ -755,6 +757,10 @@ void nDetImplant::construct(){
 
 	// Attach PMT 
 	constructPSPmt();
+
+	// Add a box around the outside if specified
+	if (boxAdded)
+		buildBox();
 }
 
 G4LogicalVolume *nDetImplant::constructAssembly(){

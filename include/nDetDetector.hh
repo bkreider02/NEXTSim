@@ -869,6 +869,10 @@ public:
 	/** Add all layers added by addLayer() to the detector construction
 	  */
 	void buildAllLayers();
+
+	/** Add a box around the implant with dimensions and material specified by the user
+	  */
+	void buildBox();
 	
 	/** Place this detector assembly into a parent logical volume
 	  * @param Pointer to the logical volume of the parent assembly
@@ -1117,6 +1121,7 @@ protected:
 	bool checkOverlaps; ///< Flag indicating that Geant should check for overlaps between all placed objects
 
 	bool boxAdded; ///< Flag indicating that a box has been added around the implant (and thus the assembly volume should be increased)
+	G4Material* boxMaterial; ///< Material of added box
 	double boxThickness; ///< Thickness of added box in mm
 	double boxGap; ///< Thickness of gap between box and implant in mm
 
