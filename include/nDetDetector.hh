@@ -781,14 +781,14 @@ public:
 	nDetImplant() : nDetDetectorParams(),
 	                 assembly_logV(NULL), assembly_physV(NULL), layerSizeX(0), layerSizeY(0), offsetZ(0),
 	                 parentCopyNum(0), firstSegmentCopyNum(0), lastSegmentCopyNum(0),
-	                 checkOverlaps(false) { }
+	                 checkOverlaps(false), boxAdded(false) { }
 	
 	/** Detector parameter copier constructor
 	  */
 	nDetImplant(const nDetDetectorParams* params) : nDetDetectorParams((*params)),
 	                                                 assembly_logV(NULL), assembly_physV(NULL), layerSizeX(0), layerSizeY(0), offsetZ(0),
 	                                                 parentCopyNum(0), firstSegmentCopyNum(0), lastSegmentCopyNum(0),
-	                                                 checkOverlaps(false) { }
+	                                                 checkOverlaps(false), boxAdded(false) { }
 	
 	/** Detector constructor
 	  * @param detector Pointer to a nDetConstruction object where the current detector is defined
@@ -1115,6 +1115,10 @@ protected:
 	G4int lastSegmentCopyNum; ///< Copy number of the last scintillator segment
 
 	bool checkOverlaps; ///< Flag indicating that Geant should check for overlaps between all placed objects
+
+	bool boxAdded; ///< Flag indicating that a box has been added around the implant (and thus the assembly volume should be increased)
+	double boxThickness; ///< Thickness of added box in mm
+	double boxGap; ///< Thickness of gap between box and implant in mm
 
 	centerOfMass cmI; ///< Center-of-mass calculator for the PMT
 

@@ -702,17 +702,20 @@ void nDetImplant::addBox(const G4String &input) {
 	// Expects a space-delimited string of the form:
 	//  "addBox <material> <thickness> <gap size>"
 	// (dimensions are in mm)
+
+	boxAdded = true;
+
 	std::vector<std::string> args;
 	unsigned int Nargs = split_str(input, args);
 
 	std::string boxMaterialName = args.at(0);
 	G4Material *boxMaterial = materials->getMaterial(boxMaterialName);
 
-	double thickness = strtod(args.at(1).c_str(),NULL)*mm;
-	double gapSize = strtod(args.at(2).c_str(),NULL)*mm;
+	boxThickness = strtod(args.at(1).c_str(),NULL)*mm;
+	boxGap = strtod(args.at(2).c_str(),NULL)*mm;
 
-	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+gapSize+thickness, fDetectorHeight/2+fWrappingThickness+gapSize+thickness, fDetectorLength/2);
-	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+gapSize, fDetectorHeight/2+fWrappingThickness+gapSize, fDetectorLength/2);
+	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+boxGap+boxThickness, fDetectorHeight/2+fWrappingThickness+boxGap+boxThickness, fDetectorLength/2);
+	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+boxGap, fDetectorHeight/2+fWrappingThickness+boxGap, fDetectorLength/2);
 
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
@@ -722,6 +725,9 @@ void nDetImplant::addBox(const G4String &input) {
 }
 
 void nDetImplant::construct(){
+	// TEMPORARY COUT
+	std::cout << "constructing implant..." << std::endl;
+	
 	// Update the size of the assembly in the event it has changed
 	UpdateSize(); 
 
@@ -776,6 +782,12 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 		assemblyWidth = std::max(assemblyWidth, (*iter)->getSizeX());
 		assemblyHeight = std::max(assemblyHeight, (*iter)->getSizeY());
 		assemblyLength += (*iter)->getSizeZ();
+	}
+
+	// account for box if one has been added
+	if (boxAdded) {
+		assemblyWidth += 2*boxGap + 2*boxThickness;
+		assemblyHeight += 2*boxGap + 2*boxThickness;
 	}
 
 	// Build the assembly box
