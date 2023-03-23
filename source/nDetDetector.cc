@@ -697,6 +697,30 @@ void nDetImplant::addPhoswichLayer(const G4String &input) {
 	addLayer(new phoswichLayer(input));
 }
 
+// MAY ALSO NEED TO ADD FRONT AND BACK
+void nDetImplant::addBox(const G4String &input) {
+	// Expects a space-delimited string of the form:
+	//  "addBox <material> <thickness> <gap size>"
+	// (dimensions are in mm)
+	std::vector<std::string> args;
+	unsigned int Nargs = split_str(input, args);
+
+	std::string boxMaterialName = args.at(0);
+	G4Material *boxMaterial = materials->getMaterial(boxMaterialName);
+
+	double thickness = strtod(args.at(1).c_str(),NULL)*mm;
+	double gapSize = strtod(args.at(2).c_str(),NULL)*mm;
+
+	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+gapSize+thickness, fDetectorHeight/2+fWrappingThickness+gapSize+thickness, fDetectorLength/2);
+	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+gapSize, fDetectorHeight/2+fWrappingThickness+gapSize, fDetectorLength/2);
+
+	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
+	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
+
+	G4PVPlacement *box_physV = NULL;
+	box_physV = addToDetectorBody(box_logV, "Box");
+}
+
 void nDetImplant::construct(){
 	// Update the size of the assembly in the event it has changed
 	UpdateSize(); 

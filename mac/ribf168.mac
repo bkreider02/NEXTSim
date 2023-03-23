@@ -69,6 +69,7 @@
 #/nDet/segLightGuide/thickness 10
 /nDet/implant/setSegmentedLightGuide 24 24 5 50.8 50.8 45 45 G4_Pyrex_Glass
 
+#/nDet/implant/addBox 
 
 # Update the detector.
 /nDet/implant/update

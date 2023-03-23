@@ -169,7 +169,11 @@ class nDetConstruction : public G4VUserDetectorConstruction{
 
 	void AddSegmentedLightGuide(const G4String &input);
 
+	// Add a phoswich scintillator to the detector
 	void AddPhoswich(const G4String &input);
+
+	// Add a box around the implant
+	void AddBox(const G4String &input);
 	
 	/** Add an array of detectors in a cylindrical setup
 	  * @note String syntax: <geom> <r0> <startTheta> <stopTheta> <Ndet> <br>

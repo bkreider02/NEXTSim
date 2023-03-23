@@ -163,6 +163,9 @@ void nDetConstructionMessenger::addAllCommands(){
 	addCommand(new G4UIcmdWithAString("/nDet/implant/addPhoswich",this));
 	addGuidance("Adds a second scintillator to form a phoswich. \n SYNTAX: <# x seg> <# y seg> <z thickness> <x width> <y height> <mylar thickness> <phoswich material> <wrapping material>");
 
+	addCommand(new G4UIcmdWithAString("/nDet/implant/addBox", this));
+	addGuidance("Add a box around the implant detector (should be called right before /update). Dimensions in mm. \n SYNTAX: <material> <thickness> <gap>");
+
 	// addCommand(new G4UIcmdWithABool("/nDet/implant/setReconLogic",this));
 	// addGuidance("Sets the logic used for calculating the reconstructed position, 0 = anger logic, 1 = sipm logic");
 
@@ -511,7 +514,11 @@ void nDetConstructionMessenger::SetNewChildValue(G4UIcommand* command, G4String 
 			fDetector->AddPhoswich(newValue);
 		}
 
-		else if(index == 30){
+		else if(index == 30) {
+			fDetector->AddBox(newValue);
+		}
+
+		else if(index == 31){
 			bool val = command->ConvertToBool(newValue);
 			std::cout<<"Setting Construction Recon Logic to "<<val<<std::endl;
 			// fDetector->setReconLogic(val);

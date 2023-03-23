@@ -212,6 +212,9 @@ void nDetRunAction::EndOfRunAction(const G4Run* aRun)
 }
 
 void nDetRunAction::initializePmtResponses() {
+	// NEED TO DO THIS FOR DETECTORS AS WELL
+	// PROBABLY SHOULD HAVE TWO ARRAYS IN THE ROOT TREE
+
 	centerOfMass *cmI = startImplant->getCenterOfMass();
 	pmtResponse *pmtI = cmI->getPmtResponse();
 	copyResponseParameters(pmtI,detector->GetCenterOfMass()->getPmtResponse());

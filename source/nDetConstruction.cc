@@ -393,6 +393,13 @@ void nDetConstruction::AddPhoswich(const G4String & input) {
 		Display::ErrorPrint("Cannot add phoswich scintillator before a detector is defined!", "nDetConstruction");
 }
 
+void nDetConstruction::AddBox(const G4String &input) {
+	if (currentImplant)
+		currentImplant->addBox(input);
+	else
+		Display::ErrorPrint("Cannot add a box before a detector is defined!", "nDetConstruction");
+}
+
 void nDetConstruction::AddDetectorArray(const G4String &input){
 	// Expects a space-delimited string of the form:
 	//  "addDiffuserLayer width(mm) height(mm) thickness(mm) material"

@@ -954,6 +954,12 @@ public:
 	 */
 	void addPhoswichLayer(const G4String &input);
 
+	/** Add a box around the implant detector; material, thickness, and size of gap are specified
+	  * @note this should be done immediately before updating the implant, as it may not have the
+	  *  correct length otherwise
+	  */
+	void addBox(const G4String &input);
+
 	/** Build the assembly volume for the current detector
 	  * @param boundingBox The returned X, Y, and Z size of the assembly volume for the current detector
 	  * @return A pointer to the logical volume of the assembly of the current detector
