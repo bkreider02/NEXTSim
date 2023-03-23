@@ -784,12 +784,6 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 		assemblyLength += (*iter)->getSizeZ();
 	}
 
-	// account for box if one has been added
-	if (boxAdded) {
-		assemblyWidth += 2*boxGap + 2*boxThickness;
-		assemblyHeight += 2*boxGap + 2*boxThickness;
-	}
-
 	// Build the assembly box
 	G4Box *assembly = new G4Box("assembly", assemblyWidth/2, assemblyHeight/2, assemblyLength/2);
 	assembly_logV = new G4LogicalVolume(assembly, materials->fAir, "assembly_logV");
