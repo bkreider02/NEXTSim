@@ -654,8 +654,9 @@ void nDetImplant::buildBox(const G4String &boxMaterialName, double boxThickness,
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
 
-	G4PVPlacement *box_physV = NULL;
-	box_physV = addToDetectorBody(box_logV, "Box");
+	box_logV->SetVisAttributes(scintVisAtt);
+
+	addToDetectorBody(box_logV,"Box");
 }
 
 void nDetImplant::placeImplant(G4LogicalVolume *parent){
