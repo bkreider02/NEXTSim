@@ -652,7 +652,7 @@ void nDetImplant::buildBox() {
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
 
-	box_logV->SetVisAttributes(materials->visGrease);
+	box_logV->SetVisAttributes(materials->visWrapping);
 
 	addToDetectorBody(box_logV,"Box");
 }
