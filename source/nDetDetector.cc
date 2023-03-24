@@ -645,9 +645,7 @@ void nDetImplant::buildAllLayers(){
 	}	
 }
 
-void nDetImplant::buildBox(const G4String &boxMaterialName, double boxThickness, double boxGap) {
-	G4Material *boxMaterial = materials->getMaterial(boxMaterialName);
-
+void nDetImplant::buildBox() {
 	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+boxGap+boxThickness, fDetectorHeight/2+fWrappingThickness+boxGap+boxThickness, fDetectorLength/2+fGreaseThickness/2+fWindowThickness/2+fSensitiveThickness/2);
 	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+boxGap, fDetectorHeight/2+fWrappingThickness+boxGap, fDetectorLength/2+fGreaseThickness/2+fWindowThickness/2+fSensitiveThickness/2);
 
@@ -714,17 +712,15 @@ void nDetImplant::addPhoswichLayer(const G4String &input) {
 // MAY ALSO NEED TO ADD FRONT AND BACK
 void nDetImplant::addBox(const G4String &input) {
 	// Expects a space-delimited string of the form:
-	//  "addBox <material> <thickness> <gap size>"
+	//  "addBox <material name> <thickness> <gap size>"
 	// (dimensions are in mm)
-
-	boxAdded = true;
-
 	std::vector<std::string> args;
 	unsigned int Nargs = split_str(input, args);
+	boxMaterial = materials->getMaterial(args.at(0));
 	boxThickness = strtod(args.at(1).c_str(),NULL)*mm;
 	boxGap = strtod(args.at(2).c_str(),NULL)*mm;
 
-	addLayer(new boxLayer(input));
+	boxAdded = true;
 }
 
 void nDetImplant::construct(){
@@ -755,6 +751,10 @@ void nDetImplant::construct(){
 
 	// Attach PMT 
 	constructPSPmt();
+
+	if (boxAdded) {
+		buildBox();
+	}
 }
 
 G4LogicalVolume *nDetImplant::constructAssembly(){
