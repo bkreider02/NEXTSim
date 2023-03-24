@@ -743,6 +743,11 @@ void nDetImplant::construct(){
 	wrappingOpSurf = materials->getUserOpticalSurface(wrappingMaterialName);
 	wrappingOuterOpSurf = materials->fMylarOpSurf;
 
+	// build box first if one has been added
+	if (boxAdded) {
+		buildBox();
+	}
+
 	// Build the geometry
 	buildDetector();
 
@@ -751,10 +756,6 @@ void nDetImplant::construct(){
 
 	// Attach PMT 
 	constructPSPmt();
-
-	if (boxAdded) {
-		buildBox();
-	}
 }
 
 G4LogicalVolume *nDetImplant::constructAssembly(){
@@ -786,8 +787,8 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 
 	// Account for the a box around the implant if one has been added
 	if (boxAdded) {
-		assemblyWidth += 2*(boxGap+boxThickness);
-		assemblyHeight += 2*(boxGap+boxThickness);
+		assemblyWidth = std::max(assemblyWidth,fDetectorWidth+2*(fWrappingThickness+boxGap+boxThickness));
+		assemblyHeight = std::max(assemblyHeight,fDetectorHeight+2*(fWrappingThickness+boxGap+boxThickness));
 	}
 
 	// Build the assembly box
