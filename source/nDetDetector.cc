@@ -298,9 +298,9 @@ void nDetDetector::construct(){
 
 G4LogicalVolume *nDetDetector::constructAssembly(){
 	// Calculate the dimensions of the detector
-	G4double assemblyWidth = maxBodySize.getX() + 2*fWrappingThickness;
-	G4double assemblyHeight = maxBodySize.getY() + 2*fWrappingThickness;
-	G4double assemblyLength = maxBodySize.getZ();
+	assemblyWidth = maxBodySize.getX() + 2*fWrappingThickness;
+	assemblyHeight = maxBodySize.getY() + 2*fWrappingThickness;
+	assemblyLength = maxBodySize.getZ();
 
 	// Account for the size of the PSPMT
 	assemblyWidth = std::max(assemblyWidth, pmtWidth);
@@ -646,13 +646,13 @@ void nDetImplant::buildAllLayers(){
 }
 
 void nDetImplant::buildBox() {
-	G4Box *outerEdge = new G4Box("outerEdge", fDetectorWidth/2+fWrappingThickness+boxGap+boxThickness, fDetectorHeight/2+fWrappingThickness+boxGap+boxThickness, fDetectorLength/2+fGreaseThickness/2+fWindowThickness/2+fSensitiveThickness/2);
-	G4Box *innerEdge = new G4Box("innerEdge", fDetectorWidth/2+fWrappingThickness+boxGap, fDetectorHeight/2+fWrappingThickness+boxGap, fDetectorLength/2+fGreaseThickness/2+fWindowThickness/2+fSensitiveThickness/2);
+	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, assemblyLength/2);
+	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, assemblyLength/2);
 
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
 
-	box_logV->SetVisAttributes(wrappingVisAtt);
+	box_logV->SetVisAttributes(materials->visGrease);
 
 	addToDetectorBody(box_logV,"Box");
 }
@@ -760,9 +760,9 @@ void nDetImplant::construct(){
 G4LogicalVolume *nDetImplant::constructAssembly(){
 
 	// Calculate the dimensions of the detector
-	G4double assemblyWidth = maxBodySize.getX() + 2*fWrappingThickness;
-	G4double assemblyHeight = maxBodySize.getY() + 2*fWrappingThickness;
-	G4double assemblyLength = maxBodySize.getZ();
+	assemblyWidth = maxBodySize.getX() + 2*fWrappingThickness;
+	assemblyHeight = maxBodySize.getY() + 2*fWrappingThickness;
+	assemblyLength = maxBodySize.getZ();
 
 	// Account for the size of the PSPMT
 	assemblyWidth = std::max(assemblyWidth, pmtWidth);
@@ -782,6 +782,12 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 		assemblyWidth = std::max(assemblyWidth, (*iter)->getSizeX());
 		assemblyHeight = std::max(assemblyHeight, (*iter)->getSizeY());
 		assemblyLength += (*iter)->getSizeZ();
+	}
+
+	// Account for the a box around the implant if one has been added
+	if (boxAdded) {
+		assemblyWidth += 2*(boxGap+boxThickness);
+		assemblyHeight += 2*(boxGap+boxThickness);
 	}
 
 	// Build the assembly box

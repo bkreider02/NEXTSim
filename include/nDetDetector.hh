@@ -31,7 +31,7 @@ public:
 	  */
 	nDetDetectorParams() : pmtWidth(30), pmtHeight(30), fWrappingThickness(0), fGreaseThickness(0.1), fWindowThickness(0.1), fSensitiveThickness(1), 
 	                   fDetectorLength(600), fDetectorHeight(30), fDetectorWidth(30), fTrapezoidLength(0), fTrapezoidAngle(60), fDiffuserLength(0), fSegmentWidth(0), fSegmentHeight(0),
-	                   fNumColumns(1), fNumRows(1), fNumColumnsPmt(-1), fNumRowsPmt(-1), scintCopyNum(1), 
+	                   fNumColumns(1), fNumRows(1), fNumColumnsPmt(-1), fNumRowsPmt(-1), assemblyLength(0), assemblyHeight(0), assemblyWidth(0), scintCopyNum(1), 
 	                   fPolishedInterface(true), fSquarePMTs(true), isStart(false), 
 	                   detectorMaterialName("ej200"), wrappingMaterialName("mylar"),
 	                   constantWidth(true), constantHeight(true),
@@ -349,6 +349,10 @@ protected:
 	G4String geomType; ///< Integer value indicating the of the detector geometry
 
 	G4ThreeVector maxBodySize; ///< The maximum size of the detector body
+
+	G4double assemblyLength; ///< Length of assembly volume
+	G4double assemblyHeight; ///< Height of assembly volume
+	G4double assemblyWidth; ///< Width of assembly volume
 
 	G4Material* scintMaterial; ///< Pointer to the detector scintillator material
 	G4Material* wrappingMaterial; ///< Pointer to the detector wrapping material
