@@ -651,6 +651,7 @@ void nDetImplant::buildBox() {
 
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
+	box_logV->SetVisAttributes(materials->visWrapping);
 
 	/*
 	// upper and lower edges of box
