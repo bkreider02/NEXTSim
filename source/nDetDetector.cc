@@ -667,11 +667,11 @@ void nDetImplant::buildBox() {
 	// sides of box
 	G4Box *leftSide = new G4Box("leftSide", boxThickness/2, assemblyHeight/2-boxThickness, assemblyLength/2);
 	G4Box *rightSide = new G4Box("rightSide", boxThickness/2, assemblyHeight/2-boxThickness, assemblyLength/2);
-	G4LogicalVolume *boxLeft_logV = new G4LogicalVolume(upperSide, boxMaterial, "boxLeft_logV");
-	G4LogicalVolume *boxRight_logV = new G4LogicalVolume(lowerSide, boxMaterial, "boxRight_logV");
+	G4LogicalVolume *boxLeft_logV = new G4LogicalVolume(leftSide, boxMaterial, "boxLeft_logV");
+	G4LogicalVolume *boxRight_logV = new G4LogicalVolume(rightSide, boxMaterial, "boxRight_logV");
 	boxLeft_logV->SetVisAttributes(materials->visWrapping);
 	boxRight_logV->SetVisAttributes(materials->visWrapping);
-	G4VPhysicalVolume *boxLeft_phys = new G4PVPlacement(0,G4ThreeVector((assemblyWidth-boxThickness)/2,0,0),boxLeft_logV,"left box edge",assembly_logV,false, 0, checkOverlaps);
+	G4VPhysicalVolume *boxLeft_phys = new G4PVPlacement(0,G4ThreeVector(-(assemblyWidth-boxThickness)/2,0,0),boxLeft_logV,"left box edge",assembly_logV,false, 0, checkOverlaps);
 	G4VPhysicalVolume *boxRight_phys = new G4PVPlacement(0,G4ThreeVector((assemblyWidth-boxThickness)/2,0,0),boxRight_logV,"right box edge",assembly_logV,false, 0, checkOverlaps);
 }
 
