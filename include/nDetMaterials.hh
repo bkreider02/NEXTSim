@@ -49,16 +49,11 @@ class nDetMaterials{
     G4Material* fEJ200; ///< Material corresponding to EJ-200 scintillator
     G4Material* fEJ276; ///< Material corresponding to EJ-276 scintillator
     G4Material* fGrease; ///< Material corresponding to optical grease
-	//G4Material* fMercapto; ///< Material corresponding to Mercapto-ester
-	//G4Material* fTriallyl; ///< Material corresponding to Triallyl Isocyanurate
-	//G4Material* fTetrahydroff; ///< Material corresponding to Tetrahydrofurfuryl
-	//G4Material* fUrethaneAcrylate; ///< Material corresponding to aliphatic urethane acrylate
-	//G4Material* fAcrylate; ///< Material corresponding to acrylate	
-	//G4Material* fZrO2; ///< Material corresponding to zirconium dioxide
 	G4Material* fNOA61; ///< Material corresponding to NOA-61 (Norland optical adhesive)
 	G4Material* fNOA68; ///< Material corresponding to NOA-68 (Norland optical adhesive)
 	G4Material* fNOA136; ///< Material corresponding to NOA-136 (Norland optical adhesive)
 	G4Material* fNOA170; ///< Material corresponding to NOA-170 (Norland optical adhesive)	
+	G4Material* fABS; ///< Material corresponding to ABS plastic
     G4Material* fSiO2; ///< Material corresponding to quartz
     G4Material* fSilicon; ///< Material corresponding to silicon
     G4Material* fMylar; ///< Material corresponding to aluminized mylar
@@ -92,7 +87,8 @@ class nDetMaterials{
     G4MaterialPropertiesTable* fNOA61MPT; ///< Material properties table for NOA-61
     G4MaterialPropertiesTable* fNOA68MPT; ///< Material properties table for NOA-68
     G4MaterialPropertiesTable* fNOA136MPT; ///< Material properties table for NOA-136
-    G4MaterialPropertiesTable* fNOA170MPT; ///< Material properties table for NOA-170	
+    G4MaterialPropertiesTable* fNOA170MPT; ///< Material properties table for NOA-170
+	G4MaterialPropertiesTable* fABSMPT; /// Material properties table for ABS plastic
     G4MaterialPropertiesTable* fSiO2MPT; ///< Material properties table for quartz
     G4MaterialPropertiesTable* fSiliconMPT; ///< Material properties table for silicon
 		G4MaterialPropertiesTable* fMylarMPT; ///< Material properties table for aluminized mylar
@@ -112,6 +108,7 @@ class nDetMaterials{
 		G4OpticalSurface* fNOA68OpSurf; ///< Optical surface for NOA-68
 		G4OpticalSurface* fNOA136OpSurf; ///< Optical surface for NOA-136
 		G4OpticalSurface* fNOA170OpSurf; ///< Optical surface for NOA-170
+		G4OpticalSurface* fABSOpSurf; ///< Optical surface for ABS plastic
 		G4OpticalSurface* fAirOpSurf; ///< Optical surface for air
 		G4OpticalSurface* fAluminumOpSurf; ///< Optical surface for aluminum
 

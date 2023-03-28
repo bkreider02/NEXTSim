@@ -27,6 +27,7 @@ nDetMaterials::~nDetMaterials(){
 		delete fNOA68OpSurf;
 		delete fNOA136OpSurf;
 		delete fNOA170OpSurf;
+		delete fABSOpSurf;
 		delete fMylarOpSurf;
 		delete fEsrOpSurf;
 		delete fAluminum;
@@ -43,21 +44,17 @@ nDetMaterials::~nDetMaterials(){
 		delete fNOA68;
 		delete fNOA136;
 		delete fNOA170;		
+		delete fABS;
 		delete fAl2O3;
 		
 		// Material properties tables
 		delete fPerfectMPT;
 		delete fGreaseMPT;
-		//delete fMercaptoMPT;
-		//delete fTriallylMPT;
-		//delete fTetrahydroffMPT;
-		//delete fUrethaneAcrylateMPT;
-		//delete fAcrylateMPT;
-		//delete fZrO2MPT;
 		delete fNOA61MPT;
 		delete fNOA68MPT;
 		delete fNOA136MPT;
 		delete fNOA170MPT;
+		delete fABSMPT;
 		delete fAl2O3MPT;
 		delete fEsrMPT;
 
@@ -122,6 +119,7 @@ void nDetMaterials::initialize(){
 	materialList["noa68"] = fNOA68;
 	materialList["noa136"] = fNOA136;
 	materialList["noa170"] = fNOA170;	
+	materialList["abs"] = fABS;
  	materialList["yso"] = fYSO;
 	materialList["labr3"] = fLaBr3;
 	materialList["yap"] = fYAP;
@@ -149,6 +147,7 @@ void nDetMaterials::initialize(){
 	opticalSurfaceList["noa68"] = fNOA68OpSurf;
 	opticalSurfaceList["noa136"] = fNOA136OpSurf;
 	opticalSurfaceList["noa170"] = fNOA170OpSurf;
+	opticalSurfaceList["abs"] = fABSOpSurf;
 
 	opticalSurfaceList["air"] = fAirOpSurf;
 	opticalSurfaceList["aluminum"] = fAluminumOpSurf;
@@ -535,131 +534,6 @@ void nDetMaterials::defineMaterials(){
     fGreaseMPT->AddProperty("ABSLENGTH", greasePhotonEnergy, absorptionGrease, 3);
     fGrease->SetMaterialPropertiesTable(fGreaseMPT);
 
-	/*
-
-	/////////////////////////////////////////////////////////////////
-	// Mercapto-ester (C4H8O2S2)
-	/////////////////////////////////////////////////////////////////
-
-    fMercapto = new G4Material("Mercapto-ester", 1.29*g/cm3, 4);
-
-    fMercapto->AddElement(fC, 4);
-    fMercapto->AddElement(fH, 8);
-    fMercapto->AddElement(fO, 2);
-    fMercapto->AddElement(fS, 2);
-
-    G4double mercaptoPhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexMercapto[3] = {1.465, 1.465, 1.465};
-    G4double absorptionMercapto[3] = {195*mm, 195*mm, 195*mm};
-
-	fMercaptoMPT = new G4MaterialPropertiesTable();
-    fMercaptoMPT->AddProperty("RINDEX", mercaptoPhotonEnergy, refIndexMercapto, 3);
-    fMercaptoMPT->AddProperty("ABSLENGTH", mercaptoPhotonEnergy, absorptionMercapto, 3);
-	fMercapto->SetMaterialPropertiesTable(fMercaptoMPT);
-
-	/////////////////////////////////////////////////////////////////
-	// Triallyl Isocyanurate (C12H15N3O3)
-	/////////////////////////////////////////////////////////////////
-
-    fTriallyl = new G4Material("Triallyl Isocyanurate", 1.29*g/cm3, 4);
-
-    fTriallyl->AddElement(fC, 12);
-    fTriallyl->AddElement(fH, 15);
-    fTriallyl->AddElement(fN, 3);
-    fTriallyl->AddElement(fO, 3);
-
-    G4double triallylPhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexTriallyl[3] = {1.465, 1.465, 1.465};
-    G4double absorptionTriallyl[3] = {195*mm, 195*mm, 195*mm};
-
-	fTriallylMPT = new G4MaterialPropertiesTable();
-    fTriallylMPT->AddProperty("RINDEX", triallylPhotonEnergy, refIndexTriallyl, 3);
-    fTriallylMPT->AddProperty("ABSLENGTH", triallylPhotonEnergy, absorptionTriallyl, 3);
-	fTriallyl->SetMaterialPropertiesTable(fTriallylMPT);
-
-
-	/////////////////////////////////////////////////////////////////
-	// Tetrahydrofurfuryl (C5H10O2)
-	/////////////////////////////////////////////////////////////////
-
-    fTetrahydroff = new G4Material("Tetrahydrofurfuryl", 1.29*g/cm3, 3);
-
-    fTetrahydroff->AddElement(fC, 5);
-    fTetrahydroff->AddElement(fH, 10);
-    fTetrahydroff->AddElement(fO, 2);
-
-    G4double tetrahydroffPhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexTetrahydroff[3] = {1.465, 1.465, 1.465};
-    G4double absorptionTetrahydroff[3] = {195*mm, 195*mm, 195*mm};
-
-	fTetrahydroffMPT = new G4MaterialPropertiesTable();
-    fTetrahydroffMPT->AddProperty("RINDEX", tetrahydroffPhotonEnergy, refIndexTetrahydroff, 3);
-    fTetrahydroffMPT->AddProperty("ABSLENGTH", tetrahydroffPhotonEnergy, absorptionTetrahydroff, 3);
-	fTetrahydroff->SetMaterialPropertiesTable(fTetrahydroffMPT);
-
-
-	/////////////////////////////////////////////////////////////////
-	// Aliphatic Urethane Acrylate (C6H11NO4)
-	/////////////////////////////////////////////////////////////////
-
-    fUrethaneAcrylate = new G4Material("Aliphatic Urethane Acrylate", 1.29*g/cm3, 4);
-
-    fUrethaneAcrylate->AddElement(fC, 6);
-    fUrethaneAcrylate->AddElement(fH, 11);
-    fUrethaneAcrylate->AddElement(fN, 1);
-    fUrethaneAcrylate->AddElement(fO, 4);
-
-    G4double urethaneAcrylatePhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexUrethaneAcrylate[3] = {1.465, 1.465, 1.465};
-    G4double absorptionUrethaneAcrylate[3] = {195*mm, 195*mm, 195*mm};
-
-	fUrethaneAcrylateMPT = new G4MaterialPropertiesTable();
-    fUrethaneAcrylateMPT->AddProperty("RINDEX", urethaneAcrylatePhotonEnergy, refIndexUrethaneAcrylate, 3);
-    fUrethaneAcrylateMPT->AddProperty("ABSLENGTH", urethaneAcrylatePhotonEnergy, absorptionUrethaneAcrylate, 3);
-	fUrethaneAcrylate->SetMaterialPropertiesTable(fUrethaneAcrylateMPT);
-
-
-	/////////////////////////////////////////////////////////////////
-	// Acrylate (C3H3O2)
-	/////////////////////////////////////////////////////////////////
-
-    fAcrylate = new G4Material("Acrylate", 1.29*g/cm3, 3);
-
-    fAcrylate->AddElement(fC, 3);
-    fAcrylate->AddElement(fH, 3);
-    fAcrylate->AddElement(fO, 2);
-
-    G4double acrylatePhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexAcrylate[3] = {1.465, 1.465, 1.465};
-    G4double absorptionAcrylate[3] = {195*mm, 195*mm, 195*mm};
-
-	fAcrylateMPT = new G4MaterialPropertiesTable();
-    fAcrylateMPT->AddProperty("RINDEX", acrylatePhotonEnergy, refIndexAcrylate, 3);
-    fAcrylateMPT->AddProperty("ABSLENGTH", acrylatePhotonEnergy, absorptionAcrylate, 3);
-	fAcrylate->SetMaterialPropertiesTable(fAcrylateMPT);
-
-
-	/////////////////////////////////////////////////////////////////
-	// ZrO2 (zirconium dioxide)
-	/////////////////////////////////////////////////////////////////
-
-    fZrO2 = new G4Material("ZrO2", 5.68*g/cm3, 2);
-
-    fZrO2->AddElement(fZr, 1);
-    fZrO2->AddElement(fO, 2);
-
-    G4double ZrO2PhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
-    G4double refIndexZrO2[3] = {1.465, 1.465, 1.465};
-    G4double absorptionZrO2[3] = {195*mm, 195*mm, 195*mm};
-
-	fZrO2MPT = new G4MaterialPropertiesTable();
-    fZrO2MPT->AddProperty("RINDEX", ZrO2PhotonEnergy, refIndexZrO2, 3);
-    fZrO2MPT->AddProperty("ABSLENGTH", ZrO2PhotonEnergy, absorptionZrO2, 3);
-	fZrO2->SetMaterialPropertiesTable(fZrO2MPT);
-
-	*/
-
-
 	/*********************************************
 	 NOTE: the NOA grease options are implemented
 	  with the same material properties as ordinary
@@ -750,6 +624,25 @@ void nDetMaterials::defineMaterials(){
     fNOA170MPT->AddProperty("ABSLENGTH", NOA170PhotonEnergy, absorptionNOA170, 3);
     fNOA170->SetMaterialPropertiesTable(fNOA170MPT);
 
+
+	/////////////////////////////////////////////////////////////////
+	// ABS plastic ((C8H8)(C4H6)(C3H3N))
+	/////////////////////////////////////////////////////////////////
+
+	fABS = new G4Material("ABS Plastic", 1.07*g/cm3, 3);
+
+	fABS->AddElement(fC,15);
+	fABS->AddElement(fH,17);
+	fABS->AddElement(fN,1);
+
+    G4double ABSPhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
+    G4double refIndexABS[3] = {1.54, 1.54, 1.54};
+    G4double absorptionABS[3] = {195*mm, 195*mm, 195*mm};
+
+    fABSMPT = new G4MaterialPropertiesTable();
+    fABSMPT->AddProperty("RINDEX", ABSPhotonEnergy, refIndexABS, 3);
+    fABSMPT->AddProperty("ABSLENGTH", ABSPhotonEnergy, absorptionABS, 3);
+    fABS->SetMaterialPropertiesTable(fABSMPT);
 
 	/////////////////////////////////////////////////////////////////
 	// Quartz (SiO2)
@@ -957,6 +850,12 @@ void nDetMaterials::defineMaterials(){
 	fNOA170OpSurf->SetFinish(ground);
 	fNOA170OpSurf->SetModel(unified);
 	fNOA170OpSurf->SetMaterialPropertiesTable(fNOA170MPT);
+
+	fABSOpSurf = new G4OpticalSurface("ABSSurface");
+	fABSOpSurf->SetType(dielectric_dielectric);
+	fABSOpSurf->SetFinish(polished);
+	fABSOpSurf->SetModel(glisur);
+	fABSOpSurf->SetMaterialPropertiesTable(fABSMPT);
 
 	fAirOpSurf = new G4OpticalSurface("AirSurface");
 	//fAirOpSurf->SetType;

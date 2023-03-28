@@ -646,14 +646,13 @@ void nDetImplant::buildAllLayers(){
 }
 
 void nDetImplant::buildBox() {
-	/*
-	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, assemblyLength/2);
-	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, assemblyLength/2);
+	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, fDetectorLength/2+boxGap+boxThickness);
+	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, fDetectorLength/2+boxGap);
 
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
-	*/
 
+	/*
 	// upper and lower edges of box
 	G4Box *upperSide = new G4Box("upperSide", assemblyWidth/2, boxThickness/2, assemblyLength/2);
 	G4Box *lowerSide = new G4Box("lowerSide", assemblyWidth/2, boxThickness/2, assemblyLength/2);
@@ -673,6 +672,9 @@ void nDetImplant::buildBox() {
 	boxRight_logV->SetVisAttributes(materials->visWrapping);
 	G4VPhysicalVolume *boxLeft_phys = new G4PVPlacement(0,G4ThreeVector(-(assemblyWidth-boxThickness)/2,0,0),boxLeft_logV,"left box edge",assembly_logV,false, 0, checkOverlaps);
 	G4VPhysicalVolume *boxRight_phys = new G4PVPlacement(0,G4ThreeVector((assemblyWidth-boxThickness)/2,0,0),boxRight_logV,"right box edge",assembly_logV,false, 0, checkOverlaps);
+	*/
+
+	addToDetectorBody(box_logV,"implant box");
 }
 
 void nDetImplant::placeImplant(G4LogicalVolume *parent){
