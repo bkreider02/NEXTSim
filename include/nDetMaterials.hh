@@ -108,7 +108,6 @@ class nDetMaterials{
 		G4OpticalSurface* fNOA68OpSurf; ///< Optical surface for NOA-68
 		G4OpticalSurface* fNOA136OpSurf; ///< Optical surface for NOA-136
 		G4OpticalSurface* fNOA170OpSurf; ///< Optical surface for NOA-170
-		G4OpticalSurface* fABSOpSurf; ///< Optical surface for ABS plastic
 		G4OpticalSurface* fAirOpSurf; ///< Optical surface for air
 		G4OpticalSurface* fAluminumOpSurf; ///< Optical surface for aluminum
 

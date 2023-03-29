@@ -787,8 +787,8 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 
 	// Account for the a box around the implant if one has been added
 	if (boxAdded) {
-		assemblyWidth += boxGap+boxThickness;
-		assemblyHeight += boxGap+boxThickness;
+		assemblyWidth += 2*(boxGap+boxThickness);
+		assemblyHeight += 2*(boxGap+boxThickness);
 	}
 
 	// Build the assembly box

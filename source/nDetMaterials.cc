@@ -27,7 +27,6 @@ nDetMaterials::~nDetMaterials(){
 		delete fNOA68OpSurf;
 		delete fNOA136OpSurf;
 		delete fNOA170OpSurf;
-		delete fABSOpSurf;
 		delete fMylarOpSurf;
 		delete fEsrOpSurf;
 		delete fAluminum;
@@ -147,7 +146,6 @@ void nDetMaterials::initialize(){
 	opticalSurfaceList["noa68"] = fNOA68OpSurf;
 	opticalSurfaceList["noa136"] = fNOA136OpSurf;
 	opticalSurfaceList["noa170"] = fNOA170OpSurf;
-	opticalSurfaceList["abs"] = fABSOpSurf;
 
 	opticalSurfaceList["air"] = fAirOpSurf;
 	opticalSurfaceList["aluminum"] = fAluminumOpSurf;
@@ -850,12 +848,6 @@ void nDetMaterials::defineMaterials(){
 	fNOA170OpSurf->SetFinish(ground);
 	fNOA170OpSurf->SetModel(unified);
 	fNOA170OpSurf->SetMaterialPropertiesTable(fNOA170MPT);
-
-	fABSOpSurf = new G4OpticalSurface("ABSSurface");
-	fABSOpSurf->SetType(dielectric_dielectric);
-	fABSOpSurf->SetFinish(polished);
-	fABSOpSurf->SetModel(glisur);
-	fABSOpSurf->SetMaterialPropertiesTable(fABSMPT);
 
 	fAirOpSurf = new G4OpticalSurface("AirSurface");
 	//fAirOpSurf->SetType;
