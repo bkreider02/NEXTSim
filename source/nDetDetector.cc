@@ -646,20 +646,14 @@ void nDetImplant::buildAllLayers(){
 }
 
 void nDetImplant::buildBox() {
-
-	// calculate length of box
-	double boxLength = (offsetZ+boxGap+boxThickness)*2;
-
-	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, boxLength/2);
-	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, boxLength/2-boxThickness);
+	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, assemblyLength/2);
+	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, assemblyLength/2-boxThickness);
 
 	G4SubtractionSolid *boxBody = new G4SubtractionSolid("box",outerEdge,innerEdge);
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
 	box_logV->SetVisAttributes(materials->visWrapping);
 
-	double box_z_coordinate = (boxLength - boxThickness - boxGap)/2;
-
-	addToDetectorBody(box_logV,"implant box",G4ThreeVector(0,0,box_z_coordinate));
+	addToDetectorBody(box_logV,"implant box");
 }
 
 void nDetImplant::placeImplant(G4LogicalVolume *parent){
@@ -793,8 +787,8 @@ G4LogicalVolume *nDetImplant::constructAssembly(){
 
 	// Account for the a box around the implant if one has been added
 	if (boxAdded) {
-		assemblyWidth = std::max(assemblyWidth,fDetectorWidth+2*(fWrappingThickness+boxGap+boxThickness));
-		assemblyHeight = std::max(assemblyHeight,fDetectorHeight+2*(fWrappingThickness+boxGap+boxThickness));
+		assemblyWidth += boxGap+boxThickness;
+		assemblyHeight += boxGap+boxThickness;
 	}
 
 	// Build the assembly box
