@@ -648,17 +648,7 @@ void nDetImplant::buildAllLayers(){
 void nDetImplant::buildBox() {
 
 	// calculate length of box
-	double boxLength = fDetectorLength+2*boxGap+2*boxThickness+2*fGreaseThickness+fWindowThickness+fSensitiveThickness+fWrappingThickness*3/2;
-	
-	// Account for the additional component layers
-	for(std::vector<nDetWorldObject*>::iterator iter = userLayers.begin(); iter != userLayers.end(); iter++){
-		if(!(*iter)->decodeString()){
-			std::cout << " nDetImplant: Invalid number of arguments given to ::decodeString(). Expected " << (*iter)->getNumRequiredArgs() << " but received " << (*iter)->getNumSuppliedArgs() << ".\n";
-			std::cout << " nDetImplant:  SYNTAX: " << (*iter)->syntaxStr() << std::endl;
-			continue;
-		}
-		boxLength += (*iter)->getSizeZ();
-	}
+	double boxLength = (offsetZ+boxGap+boxThickness)*2;
 
 	G4Box *outerEdge = new G4Box("outerEdge", assemblyWidth/2, assemblyHeight/2, boxLength/2);
 	G4Box *innerEdge = new G4Box("innerEdge", assemblyWidth/2-boxThickness, assemblyHeight/2-boxThickness, boxLength/2-boxThickness);
@@ -667,7 +657,9 @@ void nDetImplant::buildBox() {
 	G4LogicalVolume *box_logV = new G4LogicalVolume(boxBody,boxMaterial,"box_logV");
 	box_logV->SetVisAttributes(materials->visWrapping);
 
-	addToDetectorBody(box_logV,"implant box");
+	double box_z_coordinate = (boxLength - boxThickness - boxGap)/2;
+
+	addToDetectorBody(box_logV,"implant box",G4ThreeVector(0,0,box_z_coordinate));
 }
 
 void nDetImplant::placeImplant(G4LogicalVolume *parent){
