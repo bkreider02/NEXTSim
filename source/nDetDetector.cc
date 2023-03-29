@@ -598,7 +598,7 @@ nDetImplant::nDetImplant(nDetConstruction *detector, nDetMaterials *matptr) : nD
 				assembly_logV(NULL), assembly_physV(NULL),
 				layerSizeX(0), layerSizeY(0), offsetZ(0),
 				parentCopyNum(0), firstSegmentCopyNum(0), lastSegmentCopyNum(0), 
-				checkOverlaps(true)
+				checkOverlaps(true), boxAdded(false)
 {
 	copyCenterOfMass(*detector->GetCenterOfMass()); //This has been adjusted
 	materials = matptr;
@@ -740,7 +740,7 @@ void nDetImplant::addBox(const G4String &input) {
 	boxMaterial = materials->getMaterial(args.at(0));
 	boxThickness = strtod(args.at(1).c_str(),NULL)*mm;
 	boxGap = strtod(args.at(2).c_str(),NULL)*mm;
-
+	
 	boxAdded = true;
 }
 
@@ -766,6 +766,7 @@ void nDetImplant::construct(){
 
 	// build box first if one has been added
 	if (boxAdded) {
+		std::cout << "Adding box with thickness " << boxThickness << " and gap of " << boxGap << " around implant." << std::endl;
 		buildBox();
 	}
 
