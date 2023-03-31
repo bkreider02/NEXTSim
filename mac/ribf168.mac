@@ -14,10 +14,9 @@
 
 # Set the output filename prefix
 /nDet/output/filename ribf168EfficencyTests.root
-/nDet/output/title ribf168 exp setup with ~16 Hagrid and Pspmt implant and 0.4 MeV gamma circle beam w 5 mm rad
-/nDet/output/debug false 
+/nDet/output/title ribf168 exp setup with ~16 Hagrid and Pspmt implant and 0.225 MeV gamma circle beam w 5 mm rad
+/nDet/output/debug false
 
-# Setup information about the PMT response
 /nDet/output/trace/setRisetime 2
 /nDet/output/trace/setFalltime 20
 /nDet/output/trace/setTimeSpread 0.35
@@ -51,8 +50,8 @@
 # Set the wrapping.
 /nDet/implant/setWrapping perfect
 
-# Load PSPMT gain matrix 
-# NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
+# Load PSPMT gain matrix
+# NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it wil$
 #/nDet/implant/setGainMatrix ~/opt/NEXTSim/gain/hamamatsuH12700A_LA0967.dat
 /nDet/implant/setGainMatrix hamamatsuH12700A_LA0967.dat
 # Load PSPMT spectral response function
@@ -65,11 +64,11 @@
 /nDet/implant/addGeometry module
 
 /nDet/implant/addDiffuserLayer 50 50 0.1
-#/nDet/implant/addLightGuide 50 50 50 50 5 
+#/nDet/implant/addLightGuide 50 50 50 50 5
 #/nDet/segLightGuide/thickness 10
 /nDet/implant/setSegmentedLightGuide 24 24 5 50.8 50.8 45 45 G4_Pyrex_Glass
 
-/nDet/implant/addBox abs 5.0 5.0
+/nDet/implant/addBox abs 1.5 1.5
 
 # Update the detector.
 /nDet/implant/update
@@ -89,7 +88,7 @@
 /nDet/implant/setWrapping aluminum
 
 ## Update the detector.
-/nDet/implant/addArray hagrid 5.7 0 180 16
+/nDet/implant/addArray hagrid 5.9 0 180 16
 /nDet/implant/update
 
 ################
@@ -99,7 +98,7 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 60Co
 
-/nDet/source/type gamma 0.4
+/nDet/source/type gamma 0.225
 /nDet/source/spot 5 mm
 /nDet/source/shape circle
 
@@ -110,4 +109,4 @@
 # RUN CONTROL #
 ###############
 
-#/run/beamOn 1000000
+/run/beamOn 1000000

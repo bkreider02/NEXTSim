@@ -214,23 +214,24 @@ void nDetRunAction::EndOfRunAction(const G4Run* aRun)
 void nDetRunAction::initializePmtResponses() {
 	// NEED TO DO THIS FOR DETECTORS AS WELL
 	// PROBABLY SHOULD HAVE TWO ARRAYS IN THE ROOT TREE
+	for (auto& imp : userImplants) {
+		centerOfMass *cmI = imp.getCenterOfMass();
+		pmtResponse *pmtI = cmI->getPmtResponse();
+		copyResponseParameters(pmtI,detector->GetCenterOfMass()->getPmtResponse());
 
-	centerOfMass *cmI = startImplant->getCenterOfMass();
-	pmtResponse *pmtI = cmI->getPmtResponse();
-	copyResponseParameters(pmtI,detector->GetCenterOfMass()->getPmtResponse());
+		std::vector<pmtResponse> *anodeResponseI = cmI->getAnodeResponse();
+		std::vector<pmtResponse> *tempA = detector->GetCenterOfMass()->getAnodeResponse();
+		for(size_t i = 0; i < 4; i++){
+			copyResponseParameters(&anodeResponseI->at(i),&tempA->at(i));
+		}
 
-	std::vector<pmtResponse> *anodeResponseI = cmI->getAnodeResponse();
-	std::vector<pmtResponse> *tempA = detector->GetCenterOfMass()->getAnodeResponse();
-	for(size_t i = 0; i < 4; i++){
-		copyResponseParameters(&anodeResponseI->at(i),&tempA->at(i));
-	}
-
-	std::vector<pmtResponse> *pixelResponseI = cmI->getPixelResponse();
-	std::vector<pmtResponse> *tempP = detector->GetCenterOfMass()->getPixelResponse();
-	if (detector->GetDetectorParameters().GetNumPmtRows() == 8 && detector->GetDetectorParameters().GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
-		for (size_t i = 0; i < 8; i++) {
-			for (size_t j = 0; j < 8; j++) {
-				copyResponseParameters(&pixelResponseI->at(8*i+j),&tempP->at(8*i+j));
+		std::vector<pmtResponse> *pixelResponseI = cmI->getPixelResponse();
+		std::vector<pmtResponse> *tempP = detector->GetCenterOfMass()->getPixelResponse();
+		if (detector->GetDetectorParameters().GetNumPmtRows() == 8 && detector->GetDetectorParameters().GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
+			for (size_t i = 0; i < 8; i++) {
+				for (size_t j = 0; j < 8; j++) {
+					copyResponseParameters(&pixelResponseI->at(8*i+j),&tempP->at(8*i+j));
+				}
 			}
 		}
 	}
