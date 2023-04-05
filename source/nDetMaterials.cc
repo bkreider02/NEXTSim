@@ -1075,7 +1075,7 @@ void nDetMaterials::defineScintillators(){
     fYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy_YSO, electronYield_YSO, 130)->SetSpline(true);
     fYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
     fYSOMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy_YSO, ionYield_YSO, 130)->SetSpline(true);
-    fYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
+	fYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
 
 	fYSO->SetMaterialPropertiesTable(fYSOMPT);
 	

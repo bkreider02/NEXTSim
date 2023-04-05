@@ -140,7 +140,8 @@ void nDetRunAction::BeginOfRunAction(const G4Run* aRun)
 
 	// Update the source. Only need to do this once since it's a singleton
 	source->UpdateAll();
-
+	
+	// initialize all pmt responses with correct output information
 	initializePmtResponses();
 
 	G4cout << "nDetRunAction::BeginOfRunAction()->"<< G4endl;

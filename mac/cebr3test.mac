@@ -25,7 +25,7 @@
 /nDet/implant/setDiffuserLength 1.5
 
 # Choose Scintillator
-/nDet/implant/setMaterial cebr3
+/nDet/implant/setMaterial cebr3	
 
 # PMT segmentation and gap thickness
 /nDet/implant/setPmtColumns 8
@@ -87,7 +87,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename image_for_report.root
+/nDet/output/filename newAngerLogicTest.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
