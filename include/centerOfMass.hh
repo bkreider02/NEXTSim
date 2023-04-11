@@ -298,12 +298,19 @@ class centerOfMass{
 	  */	
 	double getGain(const int &x, const int &y);
 	
-	/** Get a pointer to the Anger Logic current array for anode at position (x, y)
+	/** Get a pointer to the Anger Logic current array for anode at position (x, y); works for 8x8
 	  * @param x Anode column
 	  * @param y Anode row
 	  * @return Pointer to array containing Anger Logic currents for anode at position (x, y) if it exists, else NULL
 	  */	
-	double *getCurrent(const int &x, const int &y);
+	double *getCurrent8x8(const int &x, const int &y);
+
+	/** Get a pointer to the Anger Logic current array for anode at position (x, y); works for 16x16
+	  * @param x Anode column
+	  * @param y Anode row
+	  * @return Pointer to array containing Anger Logic currents for anode at position (x, y) if it exists, else NULL
+	  */	
+	double *getCurrent16x16(const int &x, const int &y);
 };
 
 #endif

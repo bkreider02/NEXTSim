@@ -6,6 +6,7 @@
 #include "nDetDetector.hh"
 #include "centerOfMass.hh"
 #include "vertilon.hh"
+#include "vertilon256.hh"
 
 const double coeff = 1.23984193E-3; // hc = Mev * nm
 
@@ -304,28 +305,53 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 			double gain = getGain(xpos, ypos);
 			increment(xpos, ypos);
 
-			// Add the anger logic currents to the anode outputs.
-			double *current = getCurrent(xpos, ypos);
-			if(current){
-				for(size_t i = 0; i < 4; i++){
-					anodeCurrent[i] += gain*mass*current[i];
-				}
-				for(size_t i = 0; i < 4; i++){
-					anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
-				}
-
-				if (Nrow == 8 && Ncol == 8) { // only record pixel response for 8x8 pmts
-					pixelResponse[8*ypos+xpos].addPhoton(time, wavelength, gain*mass);
+			if (Nrow == 16 && Ncol == 16) { // 16x16 pmt
+				// Add the anger logic currents to the anode outputs.
+				double *current = getCurrent16x16(xpos, ypos);
+				if(current){
+						for(size_t i = 0; i < 4; i++){
+							anodeCurrent[i] += gain*mass*current[i];
+						}
+						for(size_t i = 0; i < 4; i++){
+							anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
+						}
 				}
 			}
-			
+			else if (Nrow == 8 && Ncol == 8) { // 8x8 pmt
+				// Add the anger logic currents to the anode outputs.
+				double *current = getCurrent8x8(xpos, ypos);
+				if(current){
+					for(size_t i = 0; i < 4; i++){
+						anodeCurrent[i] += gain*mass*current[i];
+					}
+					for(size_t i = 0; i < 4; i++){
+						anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
+					}
+					
+					// pixel responses are recorded ONLY FOR 8x8!
+					pixelResponse[8*ypos+xpos].addPhoton(time, wavelength, gain*mass);
+				}
+			} 
+			else { // other pmt
+				// Add the anger logic currents to the anode outputs.
+				double *current = getCurrent8x8(xpos, ypos);
+				if(current){
+					for(size_t i = 0; i < 4; i++){
+						anodeCurrent[i] += gain*mass*current[i];
+					}
+					for(size_t i = 0; i < 4; i++){
+						anodeResponse[i].addPhoton(time, wavelength, gain*mass*(current[i]));
+					}
+				}
+			}
+
 			// Compute resistor network leakage current. This is unnecessary for symmetric leakage... CRT
 			/*const double leakage[3][3] = {{1E-3, 1E-2, 1E-3},
 			                              {1E-2, 1.00, 1E-2},
 			                              {1E-3, 1E-2, 1E-3}};
 			for(short anodeX = -1; anodeX <= 1; anodeX++){
 				for(short anodeY = -1; anodeY <= 1; anodeY++){
-					double *current = getCurrent(xpos+anodeX, ypos+anodeY);
+					double *current = getCurrent8x8(xpos+anodeX, ypos+anodeY);
 					if(current){ // Add the anger logic currents to the anode outputs.
 						for(size_t i = 0; i < 4; i++){
 							anodeCurrent[i] += gain*leakage[anodeX+1][anodeY+1]*current[3-i];
@@ -378,7 +404,12 @@ double centerOfMass::getGain(const int &x, const int &y){
 	return gainMatrix[x][y]/100;
 }
 
-double *centerOfMass::getCurrent(const int &x, const int &y){
+double *centerOfMass::getCurrent8x8(const int &x, const int &y){
 	if((x < 0 || x >= 8) || (y < 0 || y >= 8)) return NULL;
-	return vertilon::currents[x][y];
+	return vertilon::currents8x8[x][y];
+}
+
+double *centerOfMass::getCurrent16x16(const int &x, const int &y){
+	if((x < 0 || x >= 16) || (y < 0 || y >= 16)) return NULL;
+	return vertilon::currents16x16[x][y];
 }

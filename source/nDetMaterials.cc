@@ -33,12 +33,6 @@ nDetMaterials::~nDetMaterials(){
 		
 		// Materials
 		delete fGrease;
-		//delete fMercapto;
-		//delete fTriallyl;
-		//delete fTetrahydroff;
-		//delete fUrethaneAcrylate;
-		//delete fAcrylate;
-		//delete fZrO2;
 		delete fNOA61;
 		delete fNOA68;
 		delete fNOA136;

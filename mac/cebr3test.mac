@@ -28,9 +28,9 @@
 /nDet/implant/setMaterial cebr3	
 
 # PMT segmentation and gap thickness
-/nDet/implant/setPmtColumns 8
-/nDet/implant/setPmtRows 8
-#/nDet/implant/setPmtGapThickness 1.2
+/nDet/implant/setPmtColumns 16
+/nDet/implant/setPmtRows 16
+#/nDet/implant/setPmtGapThickness 0.1
 
 ##################
 # DETECTOR SETUP #
@@ -87,7 +87,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename newAngerLogicTest.root
+/nDet/output/filename newAngerLogicTest16x16.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
