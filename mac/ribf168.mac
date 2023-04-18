@@ -14,7 +14,7 @@
 
 # Set the output filename prefix
 /nDet/output/filename ribf168EfficencyTests.root
-/nDet/output/title ribf168 exp setup with ~16 Hagrid and Pspmt implant and 0.05 MeV gamma circle beam w 5 mm rad
+/nDet/output/title ribf168 exp setup with ~16 Hagrid and Pspmt implant and 0.5 MeV gamma circle beam w 5 mm rad
 /nDet/output/debug false
 
 /nDet/output/trace/setRisetime 2
@@ -98,7 +98,7 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 60Co
 
-/nDet/source/type gamma 0.05
+/nDet/source/type gamma 0.5
 /nDet/source/spot 5 mm
 /nDet/source/shape circle
 

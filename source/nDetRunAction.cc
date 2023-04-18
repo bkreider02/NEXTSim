@@ -493,8 +493,13 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 
 	//std::cout<<"!!! Process !!! "<<detector->GetCenterOfMass()->getNumColumns()<<" "<<cmI->getNumColumns()<<std::endl;
 	cmI->setSegmentedPmt(&params);
-	cmI->loadGainMatrix("hamamatsuH12700A_LA0967.dat");
-	
+	if (params.GetNumPmtRows() == 16 && params.GetNumPmtColumns() == 16) {
+		cmI->loadGainMatrix("hamamatsuH13700.dat");
+	}
+	else {
+		cmI->loadGainMatrix("hamamatsuH12700A_LA0967.dat");
+	}
+
 	debugData.nPhotons[0] += cmI->getNumDetected();
 	
 	// Compute the total number of detected photons

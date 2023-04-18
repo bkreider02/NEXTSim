@@ -1018,6 +1018,7 @@ void nDetMaterials::defineScintillators(){
 	//G4double electronYield_YSO[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
 
 	G4double photonEnergy_YSO_2[2] = {16.8179*keV, 23.0707*keV};
+
 	G4double RefIndex_YSO[2] = {1.80, 1.80}; //Data taken from https://www.advatech-uk.co.uk/yso_ce.html 
 	G4double Absorption_YSO[2] = {2.57*cm, 2.57*cm}; // this is found in: Large size LSO:Ce and YSO:Ce scintillators for 50 MeV range /spl gamma/-ray detector
 

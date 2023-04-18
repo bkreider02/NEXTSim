@@ -25,7 +25,7 @@
 /nDet/implant/setDiffuserLength 1.5
 
 # Choose Scintillator
-/nDet/implant/setMaterial cebr3	
+/nDet/implant/setMaterial yap
 
 # PMT segmentation and gap thickness
 /nDet/implant/setPmtColumns 16
@@ -70,10 +70,10 @@
 
 #/nDet/implant/addGreaseLayer 50.8 50.8 0.02 noa170
 #/nDet/implant/addPhoswich 24 24 2.0 50.8 50.8 0.03 yso air
-/nDet/implant/addDiffuserLayer 50 50 1.0
+#/nDet/implant/addDiffuserLayer 50 50 1.0
 #/nDet/implant/addLightGuide 50 50 50 50 5 
 #/nDet/segLightGuide/thickness 10
-/nDet/implant/setSegmentedLightGuide 24 24 5.0 50.8 50.8 50.8 50.8 G4_Pyrex_Glass
+#/nDet/implant/setSegmentedLightGuide 24 24 5.0 50.8 50.8 50.8 50.8 G4_Pyrex_Glass
 #/nDet/implant/addDiffuserLayer 50 50 0.5
 
 #/nDet/implant/addBox abs 1.5 1.5
@@ -87,7 +87,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename newAngerLogicTest16x16.root
+/nDet/output/filename quickAlphaRadiusTest.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
