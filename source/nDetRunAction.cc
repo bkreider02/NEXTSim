@@ -330,6 +330,18 @@ bool nDetRunAction::processDetector(nDetDetector* det){
 	debugData.photonDetComY[0] = centerL.getY(); debugData.photonDetComY[1] = centerR.getY(); 
 	//debugData.photonDetComZ[0] = centerL.getZ(); debugData.photonDetComZ[1] = centerR.getZ(); 
 
+	// TEMPORARY CHANGE
+	double pmtWidth = params.GetPmtWidth();
+	double pmtHeight = params.GetPmtHeight();
+	double pixelWidth = params.GetPmtPixelWidth();
+	double pixelHeight = params.GetPmtPixelHeight();
+	int col = (debugData.photonDetComX[0] + 0.5*pmtWidth)/pixelWidth;
+	int row = (debugData.photonDetComY[0] + 0.5*pmtHeight)/pixelHeight;
+	outData.photonComCol = col;
+	outData.photonComRow = row;
+	debugData.pmtX[0] = 0.5*pmtWidth+debugData.photonDetComX[0]-(col+0.5)*pixelWidth;
+	debugData.pmtY[0] = 0.5*pmtHeight+debugData.photonDetComY[0]-(row+0.5)*pixelHeight;
+
 	// Get photon arrival times at the PMTs
 	debugData.photonMinTime[0] = cmL->getMinArrivalTime();
 	debugData.photonAvgTime[0] = cmL->getAvgArrivalTime();

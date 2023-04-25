@@ -286,6 +286,8 @@ class nDetDebugStructure : public TObject {
 	double anodeQDC[2][4]; ///< Anger logic currents for the four readouts of the left and right PSPmts
 	double pixelQDC[8][8]; ///< QDC for each pixel of the 8x8 PMT
 	int photonsPerPixel[8][8]; ///< number of photons which hit each pixel for a given event
+	double pmtX[2]; ///< Photon-Com X transformed into the coordinate system of the pmt pixel
+	double pmtY[2]; ///< Photon-Com Y transformed into the coordinate system of the pmt pixel
 	double photonDetComX[2]; ///< Left and right PMT photon center-of-mass along the X-axis weighted by the anode gain and quantum efficiency (in mm)
 	double photonDetComY[2]; ///< Left and right PMT photon center-of-mass along the Y-axis weighted by the anode gain and quantum efficiency (in mm)
 	double reconDetComX[2]; ///< Left and right PMT photon center-of-mass along the X-axis computed using Anger Logic reconstruction

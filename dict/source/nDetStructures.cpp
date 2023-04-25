@@ -416,6 +416,8 @@ void nDetDebugStructure::Zero(){
 		reconDetComY[i] = 0;
 		centerOfMassColumn[i] = 0;
 		centerOfMassRow[i] = 0;
+		pmtX[0] = 0;
+		pmtY[0] = 0;
 		for(size_t j = 0; j < 4; j++){
 			anodeQDC[i][j] = 0;
 			anodePhase[i][j] = 0;

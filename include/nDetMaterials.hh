@@ -41,6 +41,7 @@ class nDetMaterials{
 		G4Element* fGa; ///< Gallium
 		G4Element* fCe; ///< Cerium
 		G4Element* fZr; ///< Zirconium
+		G4Element* fLu; ///< Lutetium
 
     G4Material* fAir; ///< Material corresponding to air
     G4Material* fVacuum; ///< Material corresponding to natural vacuum
@@ -60,6 +61,7 @@ class nDetMaterials{
     G4Material* fAcrylic; ///< Material corresponding to acrylic
 		G4Material* fAluminum; ///< Material corresponding to aluminum
  		G4Material* fYSO; ///< Material corresponding to yttrium orthosilicate
+		G4Material* fLYSO; ///< Material corresponding to lutetium-yttrium oxyorthosilicate
 		G4Material* fYAP; ///< yttrium aluminum perovskite
 		G4Material* fGAGG; ///< Gadolinium Aluminum Gallium Garnet (Gd3Al2Ga3O12)
 		G4Material* fLaBr3; ///< Lanthinum Bromide 
@@ -73,6 +75,7 @@ class nDetMaterials{
     G4MaterialPropertiesTable* fEJ200MPT; ///< Material properties table for EJ-200 scintillator
     G4MaterialPropertiesTable* fEJ276MPT; ///< Material properties table for EJ-276 scintillator
 		G4MaterialPropertiesTable* fYSOMPT; ///< Material properties table for YSO scintillator
+		G4MaterialPropertiesTable* fLYSOMPT; ///< Material properties table for LYSO scintillator
 		G4MaterialPropertiesTable* fYAPMPT; ///< MPT for YAP scintillator
 		G4MaterialPropertiesTable* fGAGGMPT; ///< MPT for GAGG scintillator
 		G4MaterialPropertiesTable* fLaBr3MPT; ///< MPT for LaBr3 scintillator

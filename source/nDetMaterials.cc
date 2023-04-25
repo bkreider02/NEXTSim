@@ -66,7 +66,9 @@ nDetMaterials::~nDetMaterials(){
 		delete fEJ200MPT;
 		delete fEJ276MPT;
 		delete fYSO;
+		delete fLYSO;
 		delete fYSOMPT;
+		delete fLYSOMPT;
 		delete fLaBr3;
 		delete fLaBr3MPT;
 		delete fYAP;
@@ -100,6 +102,7 @@ void nDetMaterials::initialize(){
 	elementList["Ga"] = fGa;
 	elementList["Ce"] = fCe;
 	elementList["Zr"] = fZr;
+	elementList["Lu"] = fLu;
 	
 	materialList["air"] = fAir;
 	materialList["vacuum"] = fVacuum;
@@ -114,6 +117,7 @@ void nDetMaterials::initialize(){
 	materialList["noa170"] = fNOA170;	
 	materialList["abs"] = fABS;
  	materialList["yso"] = fYSO;
+	materialList["lyso"] = fLYSO;
 	materialList["labr3"] = fLaBr3;
 	materialList["yap"] = fYAP;
 	materialList["cebr3"] = fCeBr3;
@@ -151,6 +155,7 @@ void nDetMaterials::initialize(){
 	visAttributesList["ej200"] = visScint;
 	visAttributesList["ej276"] = visScint;
 	visAttributesList["yso"] = visScint;
+	visAttributesList["lyso"] = visScint;
 	visAttributesList["labr3"] = visScint;
 	visAttributesList["yap"] = visScint;
 	visAttributesList["cebr3"] = visScint;
@@ -439,6 +444,7 @@ void nDetMaterials::defineMaterials(){
 	fGa = nist.searchForElement("Ga");
 	fCe = nist.searchForElement("Ce");
 	fZr = nist.searchForElement("Zr");
+	fLu = nist.searchForElement("Lu");
 
 	// Air
     fAir = nist.searchForMaterial("G4_AIR");
@@ -867,6 +873,8 @@ void nDetMaterials::defineScintillators(){
 		delete fEJ276MPT;
 		delete fYSO;
 		delete fYSOMPT;
+		delete fLYSO;
+		delete fLYSOMPT;
 		delete fLaBr3;
 		delete fLaBr3MPT;
 		delete fCeBr3;
@@ -1074,6 +1082,69 @@ void nDetMaterials::defineScintillators(){
 
 	fYSO->SetMaterialPropertiesTable(fYSOMPT);
 	
+
+	/////////////////////////////////////////////////////////////////
+	//  LYSO
+	/////////////////////////////////////////////////////////////////
+
+	fLYSO = new G4Material("LYSO", 7.25*g/cm3, 4);
+  	fLYSO->AddElement(fY,0.0125);
+  	fLYSO->AddElement(fLu,0.2375);
+	fLYSO->AddElement(fSi,0.125);
+	fLYSO->AddElement(fO,0.625);
+
+	G4double photonEnergy_LYSO[44] = {2.004*eV, 2.058*eV, 2.112*eV, 2.166*eV, 2.220*eV, 2.274*eV, 2.328*eV, 2.382*eV, 2.436*eV, 2.490*eV, 
+		                               2.517*eV, 2.552*eV, 2.585*eV, 2.613*eV, 2.635*eV, 2.656*eV, 2.686*eV, 2.720*eV, 2.749*eV, 2.772*eV, 
+		                               2.791*eV, 2.809*eV, 2.826*eV, 2.842*eV, 2.861*eV, 2.884*eV, 2.919*eV, 2.946*eV, 2.954*eV, 2.961*eV, 
+		                               2.967*eV, 2.974*eV, 2.981*eV, 2.987*eV, 2.994*eV, 3.001*eV, 3.009*eV, 3.018*eV, 3.029*eV, 3.041*eV, 
+		                               3.056*eV, 3.083*eV, 3.137*eV, 3.191*eV};
+
+	G4double ScintilFast_LYSO[44] = {0.000, 0.001, 0.001, 0.002, 0.003, 0.006, 0.010, 0.018, 0.033, 0.060, 
+		                              0.084, 0.122, 0.175, 0.234, 0.294, 0.356, 0.416, 0.473, 0.533, 0.594, 
+		                              0.657, 0.720, 0.784, 0.846, 0.903, 0.962, 1.000, 0.917, 0.857, 0.798, 
+		                              0.732, 0.669, 0.604, 0.542, 0.480, 0.422, 0.359, 0.297, 0.237, 0.170, 
+		                              0.105, 0.028, 0.004, 0.000};
+
+	//G4double photonEnergy_YAP[13] = {16.8179*keV, 23.0707*keV, 30.8922*keV, 50.0014*keV, 59.1033*keV, 80.4609*keV, 122.4170*keV, 280.3698*keV, 504.5552*keV, 659.8267*keV, 830.5057*keV, 1188.7809*keV, 1316.9683*keV};
+
+	//G4double ScintilFast_YAP[13] = {0.0482746, 0.0585062, 0.0648312, 0.0774812, 0.0748768, 0.0707841, 0.0776672, 0.0854804, 0.0878988, 0.0888289, 0.089387, 0.0880848, 0.0878988}; //This should be the efficiency curve..?
+
+	//G4double electronYield_YAP[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
+
+	G4double photonEnergy_LYSO2[2] = {16.8179*keV, 23.0707*keV};
+	G4double RefIndex_LYSO[2] = {1.82,1.82}; 
+	G4double Absorption_LYSO[2] = {2.7*cm, 2.7*cm}; 
+
+	fLYSOMPT = new G4MaterialPropertiesTable();
+	fLYSOMPT->AddProperty("RINDEX", photonEnergy_LYSO2, RefIndex_LYSO, 2);
+	fLYSOMPT->AddProperty("ABSLENGTH", photonEnergy_LYSO2, Absorption_LYSO, 2);
+	fLYSOMPT->AddProperty("FASTCOMPONENT", photonEnergy_LYSO, ScintilFast_LYSO, 44);
+
+	fLYSOMPT->AddConstProperty("SCINTILLATIONYIELD", 29000/MeV); 
+	fLYSOMPT->AddConstProperty("RESOLUTIONSCALE", 1.0); // Intrinsic resolution
+
+	fLYSOMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
+	fLYSOMPT->AddConstProperty("FASTTIMECONSTANT", 42.0*ns);
+	fLYSOMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
+
+	G4double electronYield_LYSO[36];
+	G4double protonYield_LYSO[36];
+	G4double ionYield_LYSO[36];
+
+	for(size_t i = 0; i < 36; i++){
+		electronYield_LYSO[i] = 0.86 * electronYield[i];
+		protonYield_LYSO[i] = 0.86 * protonYield[i];
+		ionYield_LYSO[i] = 0.86 * ionYield[i];
+	}
+
+	fLYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy, electronYield_LYSO, 36)->SetSpline(true);
+	fLYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
+	fLYSOMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_LYSO, 36)->SetSpline(true);
+	fLYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
+
+	fLYSO->SetMaterialPropertiesTable(fLYSOMPT);
+
+
 	/////////////////////////////////////////////////////////////////
 	// LaBr3 
 	/////////////////////////////////////////////////////////////////
@@ -1327,6 +1398,7 @@ void nDetMaterials::defineScintillators(){
 	materialList["ej200"] = fEJ200;
 	materialList["ej276"] = fEJ276;
  	materialList["yso"] = fYSO;
+	materialList["lyso"] = fLYSO;
 	materialList["labr3"] = fLaBr3;
 	materialList["yap"] = fYAP;
 	materialList["gagg"] = fGAGG;
