@@ -100,6 +100,7 @@ void nDetDetectorParams::SetRotation(const G4ThreeVector &rotation){
 
 void nDetDetectorParams::SetDetectorMaterial(const G4String &material){ 
 	detectorMaterialName = material;
+	materials->detectorMaterialName = material;
 }
 
 void nDetDetectorParams::SetWrappingMaterial(const G4String &material){ 
@@ -904,7 +905,7 @@ void nDetImplant::constructPSPmt(){
 	
 		G4CSGSolid *window_solidV = getVolume("window_solidV", pmtWidth, pmtHeight, fWindowThickness);
 		G4LogicalVolume *window_logV = new G4LogicalVolume(window_solidV, materials->fSiO2, "window_logV");
-		
+
 		window_logV->SetVisAttributes(materials->visWindow);
 
 		windowPhys = addBackComponent(window_logV, windowZ, "Quartz");

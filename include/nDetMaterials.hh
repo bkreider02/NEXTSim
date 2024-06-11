@@ -123,6 +123,9 @@ class nDetMaterials{
 		G4VisAttributes *visScint; ///< Visual attributes for the scintillator material
 		G4VisAttributes *visShadow; ///< Visual attributes for the shadow object
 	
+	// name of detector material
+	std::string detectorMaterialName = "";
+
 	/** Default constructor
 	  */
 	nDetMaterials();
@@ -239,6 +242,10 @@ class nDetMaterials{
 	  */
 	void listOptSurfaces() const ;
 
+	/** Define particle for ion source if not already defined. Interpolation is performed if necessary
+	  */
+	void setIonSourceType(const G4String &val);
+
 	/** Read an input material file and build a new material to add to the list
 	  * @param filename The path to the material file to read
 	  * @return True if the file is read successfully and return false otherwise
@@ -258,6 +265,8 @@ class nDetMaterials{
     G4double lightYieldScale; ///< Scaling parameter used for scintillation light yield (default=1)	
 
 	nistDatabase nist; ///< Database for pre-defined NIST element and material lookups
+
+	std::map<std::string,std::vector< std::vector<G4double> > > lightYieldTable; ///< table of light yields; used to interpolate light for undefined ions
 
 	std::map<G4String, G4Element*> elementList; ///< List of elements which are available for use
 	

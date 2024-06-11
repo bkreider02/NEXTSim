@@ -193,6 +193,9 @@ void nDetDetectorMessenger::addAllCommands(){
 	addCommand(new G4UIcmdWithADouble("/nDet/implant/setPmtGapThickness", this));
 	addGuidance("Set the gap thickness in mm of a segmented PMT");
 
+	addCommand(new G4UIcmdWithABool("/nDet/implant/useFrontWrapping",this));
+	addGuidance("Set whether to apply reflective wrapping to the front of the detector");
+
 	/////////////////////////////////////////////
 	// Segmented Light Guide commands
 	/////////////////////////////////////////////
@@ -432,36 +435,42 @@ void nDetDetectorMessenger::SetNewChildValue(G4UIcommand* command, G4String newV
 		std::cout<<"Setting PMT gap thickness to "<<val<<" mm"<<std::endl;
 		fDetector->SetPmtGapThickness(val*mm);
 	}
-	else if(index == 54){
+	else if (index == 54) {
+		bool val = command->ConvertToBool(newValue);
+		std::cout<<"Setting front wrapping to "<<val<<std::endl;
+		fDetector->SetFrontWrapping(val);
+	}
+
+	else if(index == 55){
 		G4double val = command->ConvertToDouble(newValue);
 		fDetector->setSegZThick(val);
 		std::cout<<"Setting Z thickness to "<<val<<std::endl;
 	}
-	else if(index == 55){
+	else if(index == 56){
 		G4double val = command->ConvertToDouble(newValue);
 		fDetector->setSegTopThick(val);
 	}
-	else if(index == 56){
+	else if(index == 57){
 		G4double val = command->ConvertToDouble(newValue);
 		fDetector->setSegTopWidth(val);
 	}
-	else if(index == 57){
+	else if(index == 58){
 		G4double val = command->ConvertToDouble(newValue);
 		fDetector->setSegBotThick(val);
 	}
-	else if(index == 58){
+	else if(index == 59){
 		G4double val = command->ConvertToDouble(newValue);
 		fDetector->setSegBotWidth(val);
 	}
-	else if(index == 59){
+	else if(index == 60){
 		G4int val = command->ConvertToInt(newValue);
 		fDetector->setSegX(val);
 	}
-	else if(index == 60){
+	else if(index == 61){
 		G4int val = command->ConvertToInt(newValue);
 		fDetector->setSegY(val);
 	}
-	else if(index == 61){
+	else if(index == 62){
 
 	}
 }

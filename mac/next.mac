@@ -67,7 +67,7 @@
 ################
 
 # Set the output filename prefix
-/nDet/output/filename next_test_1m.root
+/nDet/output/filename next_test_1m_alpha.root
 /nDet/output/title NEXT, 0.5 MeV, 1 m from detector
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -101,7 +101,11 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 252Cf
 
+#/nDet/source/type alpha 1.5
 /nDet/source/type neutron 1.5
+#/nDet/source/type gamma 1.5
+#/nDet/source/type ion 2000 24 8 # Example for 24O at 2 GeV
+#/nDet/source/type ion 10 4 2
 #/nDet/source/beam gamma 0.25
 #/nDet/source/beam 137Cs
 #/nDet/source/beam gamma 0.03
@@ -123,4 +127,4 @@
 # RUN CONTROL #
 ###############
 
-/run/beamOn 10
+/run/beamOn 10000

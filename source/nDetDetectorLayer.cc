@@ -46,7 +46,7 @@ std::string greaseLayer::syntaxStr() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 diffuserLayer::diffuserLayer(const G4String &arg_) : nDetWorldObject(arg_, 3), x(0), y(0), thickness(0) { 
-	material = "G4_SILICON_DIOXIDE"; 
+	material = "G4_SILICON_DIOXIDE";
 }
 
 bool diffuserLayer::decodeArgs(){

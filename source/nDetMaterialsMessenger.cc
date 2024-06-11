@@ -38,6 +38,9 @@ void nDetMaterialsMessenger::addAllCommands(){
 	
 	addCommand(new G4UIcmdWithAString("/nDet/materials/printMaterial", this));
 	addGuidance("Print parameters for a defined NEXTSim construction material");
+
+	addCommand(new G4UIcmdWithAString("/nDet/materials/ionSourceType", this));
+	addGuidance("Specify what ion to use for the particle source. Defaults to alpha particles");
 }
 
 void nDetMaterialsMessenger::SetNewChildValue(G4UIcommand* command, G4String newValue){
@@ -67,5 +70,8 @@ void nDetMaterialsMessenger::SetNewChildValue(G4UIcommand* command, G4String new
 	}
 	else if(index == 6){
 		fMaterials->printMaterial(newValue);
+	}
+	else if (index == 7) {
+		fMaterials->setIonSourceType(newValue);
 	}
 }

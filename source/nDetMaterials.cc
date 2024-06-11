@@ -11,6 +11,8 @@
 #include "nDetMaterialsMessenger.hh"
 #include "nDetDynamicMaterial.hh"
 
+#include "optionHandler.hh"
+
 nDetMaterials::nDetMaterials() : messenger(), isInitialized(false), scintsAreDefined(false), lightYieldScale(1) { 
 	messenger = new nDetMaterialsMessenger(this);
 }
@@ -525,7 +527,7 @@ void nDetMaterials::defineMaterials(){
 
     G4double greasePhotonEnergy[3] = { 2*eV, 3*eV, 4*eV};
     G4double refIndexGrease[3] = {1.465, 1.465, 1.465};
-    G4double absorptionGrease[3] = {195*mm, 195*mm, 195*mm};
+	G4double absorptionGrease[3] = {195*mm, 195*mm, 195*mm};
 
     fGreaseMPT = new G4MaterialPropertiesTable();
     fGreaseMPT->AddProperty("RINDEX", greasePhotonEnergy, refIndexGrease, 3);
@@ -664,6 +666,7 @@ void nDetMaterials::defineMaterials(){
     fSiO2MPT->AddProperty("RINDEX", greasePhotonEnergy, refIndexSiO2, 3);
     fSiO2MPT->AddProperty("ABSLENGTH", greasePhotonEnergy, absorptionSiO2, 3);   
     fSiO2->SetMaterialPropertiesTable(fSiO2MPT);
+
 
 	/////////////////////////////////////////////////////////////////
 	// Silicon (Si)
@@ -941,6 +944,10 @@ void nDetMaterials::defineScintillators(){
 		                        58313.7*pSF, 65047.2*pSF, 72027.4*pSF, 79254.2*pSF, 86727.6*pSF, 94447.6*pSF, 102414.2*pSF, 110627.4*pSF, 119087.2*pSF};
 
     fEJ200MPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield, 36)->SetSpline(true);
+    fEJ200MPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield, 36)->SetSpline(true);
+	fEJ200MPT->AddProperty("TRITONSCINTILLATIONYIELD", particleEnergy, protonYield, 36)->SetSpline(true);
+    fEJ200MPT->AddProperty("DEUTERONSCINTILLATIONYIELD", particleEnergy, protonYield, 36)->SetSpline(true);
+	fEJ200MPT->AddProperty("TRITONSCINTILLATIONYIELD", particleEnergy, protonYield, 36)->SetSpline(true);
 
 	G4double ionYield[36] = {0.2*pEF, 10.4*pEF, 12.7*pEF, 15.7*pEF, 17.9*pEF, 20.8*pEF, 25.1*pEF, 27.9*pEF, 31.9*pEF, 
 		                     36.8*pEF, 43.6*pEF, 50.2*pEF, 56.9*pEF, 65.7*pEF, 81.3*pEF, 101.6*pEF, 116.5*pEF, 136.3*pEF, 
@@ -1041,7 +1048,20 @@ void nDetMaterials::defineScintillators(){
     fYSOMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
     fYSOMPT->AddConstProperty("FASTTIMECONSTANT", 50.0*ns);
     fYSOMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
-	
+
+	G4double electronYield_YSO[36];
+	G4double protonYield_YSO[36];
+	G4double ionYield_YSO[36];
+
+	// Produce the scaled light-yield for YAP (scaled down from EJ200 by 14%). This will need to be adjusted for YAP as it has a different light yield than EJ276.
+	for(size_t i = 0; i < 36; i++){
+		electronYield_YSO[i] = 0.86 * electronYield[i];
+		protonYield_YSO[i] = 0.86 * protonYield[i];
+		ionYield_YSO[i] = 0.86 * ionYield[i];
+	}
+
+	//TEMPORARY CHANGE
+	/*
 	G4double particleEnergy_YSO[130];
 	G4double electronYield_YSO[130];
 	G4double protonYield_YSO[130];
@@ -1062,8 +1082,9 @@ void nDetMaterials::defineScintillators(){
 		fin[1]>>en>>light;
 		protonYield_YSO[i] = light*pEF;
 		fin[2]>>en>>light;
-		ionYield_YSO[i] = light;
+		ionYield_YSO[i] = light*peF;
 	}
+	*/
 
 	// G4double electronYield_YSO[36];
 	// G4double protonYield_YSO[36];
@@ -1075,10 +1096,12 @@ void nDetMaterials::defineScintillators(){
 	// 	protonYield_YSO[i] = 0.86 * protonYield[i];
 	// 	ionYield_YSO[i] = 0.86 * ionYield[i];
 	// }
-    fYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy_YSO, electronYield_YSO, 130)->SetSpline(true);
-    fYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
-    fYSOMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy_YSO, ionYield_YSO, 130)->SetSpline(true);
-	fYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy_YSO, protonYield_YSO, 130)->SetSpline(true);
+
+	// TEMPORARY CHANGE; CHANGE BACK TO YSO PARTICLE ENERGY LATER
+    fYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", particleEnergy, electronYield_YSO, 130)->SetSpline(true);
+    fYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_YSO, 130)->SetSpline(true);
+    fYSOMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_YSO, 130)->SetSpline(true);
+	fYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield_YSO, 130)->SetSpline(true);
 
 	fYSO->SetMaterialPropertiesTable(fYSOMPT);
 	
@@ -1125,8 +1148,10 @@ void nDetMaterials::defineScintillators(){
 
 	fLYSOMPT->AddConstProperty("FASTSCINTILLATIONRISETIME", 2.0*ns);
 	fLYSOMPT->AddConstProperty("FASTTIMECONSTANT", 42.0*ns);
-	fLYSOMPT->AddConstProperty("YIELDRATIO",1);// the strength of the fast component as a function of total scintillation yield
+	fLYSOMPT->AddConstProperty("YIELDRATIO",1); // the strength of the fast component as a function of total scintillation yield
 
+	
+	/*  Original version, not trustworthy because copy-pasted.
 	G4double electronYield_LYSO[36];
 	G4double protonYield_LYSO[36];
 	G4double ionYield_LYSO[36];
@@ -1141,6 +1166,75 @@ void nDetMaterials::defineScintillators(){
 	fLYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
 	fLYSOMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_LYSO, 36)->SetSpline(true);
 	fLYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
+	fLYSOMPT->AddProperty("DEUTERONSCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
+	fLYSOMPT->AddProperty("TRITONSCINTILLATIONYIELD", particleEnergy, protonYield_LYSO, 36)->SetSpline(true);
+	*/
+
+	// Average Value Approximation (Birks formula) coefficients for LYSO
+	G4double a_LYSO = 0.596, b_LYSO = 0.00877;
+
+	// Use a different photon emission factor since AVA/Birks formula is calibrated to energy
+	G4double pEF_LYSO = 10000;
+
+	// Just assume here that: energy = light yield, i.e. no quenching occurs
+	std::vector<G4double> particleEnergyElectron_LYSO = {0.01*MeV, 0.011*MeV, 0.012*MeV, 0.013*MeV, 0.014*MeV, 0.015*MeV, 0.016*MeV, 0.017*MeV, 0.018*MeV, 0.02*MeV, 0.0225*MeV, 0.025*MeV, 0.0275*MeV, 0.03*MeV, 0.0325*MeV, 0.035*MeV, 0.0375*MeV, 0.04*MeV, 0.045*MeV, 0.05*MeV, 0.055*MeV, 0.06*MeV, 0.065*MeV, 0.07*MeV, 0.08*MeV, 0.09*MeV, 0.1*MeV, 0.11*MeV, 0.12*MeV, 0.13*MeV, 0.14*MeV, 0.15*MeV, 0.16*MeV, 0.17*MeV, 0.18*MeV, 0.2*MeV, 0.225*MeV, 0.25*MeV, 0.275*MeV, 0.3*MeV, 0.325*MeV, 0.35*MeV, 0.375*MeV, 0.4*MeV, 0.45*MeV, 0.5*MeV, 0.55*MeV, 0.6*MeV, 0.65*MeV, 0.7*MeV, 0.8*MeV, 0.9*MeV, 1*MeV, 1.1*MeV, 1.2*MeV, 1.3*MeV, 1.4*MeV, 1.5*MeV, 1.6*MeV, 1.7*MeV, 1.8*MeV, 2*MeV, 2.25*MeV, 2.5*MeV, 2.75*MeV, 3*MeV, 3.25*MeV, 3.5*MeV, 3.75*MeV, 4*MeV, 4.5*MeV, 5*MeV, 5.5*MeV, 6*MeV, 6.5*MeV, 7*MeV, 8*MeV, 9*MeV, 10*MeV, 11*MeV, 12*MeV, 13*MeV, 14*MeV, 15*MeV, 16*MeV, 17*MeV, 18*MeV, 20*MeV, 22.5*MeV, 25*MeV, 27.5*MeV, 30*MeV, 32.5*MeV, 35*MeV, 37.5*MeV, 40*MeV, 45*MeV, 50*MeV, 55*MeV, 60*MeV, 65*MeV, 70*MeV, 80*MeV, 90*MeV, 100*MeV, 110*MeV, 120*MeV, 130*MeV, 140*MeV, 150*MeV, 160*MeV, 170*MeV, 180*MeV, 200*MeV, 225*MeV, 250*MeV, 275*MeV, 300*MeV, 325*MeV, 350*MeV, 375*MeV, 400*MeV, 450*MeV, 500*MeV, 550*MeV, 600*MeV, 650*MeV, 700*MeV, 800*MeV, 900*MeV, 1000*MeV, 1100*MeV, 1200*MeV, 1300*MeV, 1400*MeV, 1500*MeV, 1600*MeV, 1700*MeV, 1800*MeV, 2000*MeV, 2250*MeV, 2500*MeV, 2750*MeV, 3000*MeV, 3250*MeV, 3500*MeV, 3750*MeV, 4000*MeV, 4500*MeV, 5000*MeV, 5500*MeV, 6000*MeV, 6500*MeV, 7000*MeV, 8000*MeV, 9000*MeV, 10000*MeV};
+	std::vector<G4double> electronYield_LYSO = {0.01*MeV, 0.011*MeV, 0.012*MeV, 0.013*MeV, 0.014*MeV, 0.015*MeV, 0.016*MeV, 0.017*MeV, 0.018*MeV, 0.02*MeV, 0.0225*MeV, 0.025*MeV, 0.0275*MeV, 0.03*MeV, 0.0325*MeV, 0.035*MeV, 0.0375*MeV, 0.04*MeV, 0.045*MeV, 0.05*MeV, 0.055*MeV, 0.06*MeV, 0.065*MeV, 0.07*MeV, 0.08*MeV, 0.09*MeV, 0.1*MeV, 0.11*MeV, 0.12*MeV, 0.13*MeV, 0.14*MeV, 0.15*MeV, 0.16*MeV, 0.17*MeV, 0.18*MeV, 0.2*MeV, 0.225*MeV, 0.25*MeV, 0.275*MeV, 0.3*MeV, 0.325*MeV, 0.35*MeV, 0.375*MeV, 0.4*MeV, 0.45*MeV, 0.5*MeV, 0.55*MeV, 0.6*MeV, 0.65*MeV, 0.7*MeV, 0.8*MeV, 0.9*MeV, 1*MeV, 1.1*MeV, 1.2*MeV, 1.3*MeV, 1.4*MeV, 1.5*MeV, 1.6*MeV, 1.7*MeV, 1.8*MeV, 2*MeV, 2.25*MeV, 2.5*MeV, 2.75*MeV, 3*MeV, 3.25*MeV, 3.5*MeV, 3.75*MeV, 4*MeV, 4.5*MeV, 5*MeV, 5.5*MeV, 6*MeV, 6.5*MeV, 7*MeV, 8*MeV, 9*MeV, 10*MeV, 11*MeV, 12*MeV, 13*MeV, 14*MeV, 15*MeV, 16*MeV, 17*MeV, 18*MeV, 20*MeV, 22.5*MeV, 25*MeV, 27.5*MeV, 30*MeV, 32.5*MeV, 35*MeV, 37.5*MeV, 40*MeV, 45*MeV, 50*MeV, 55*MeV, 60*MeV, 65*MeV, 70*MeV, 80*MeV, 90*MeV, 100*MeV, 110*MeV, 120*MeV, 130*MeV, 140*MeV, 150*MeV, 160*MeV, 170*MeV, 180*MeV, 200*MeV, 225*MeV, 250*MeV, 275*MeV, 300*MeV, 325*MeV, 350*MeV, 375*MeV, 400*MeV, 450*MeV, 500*MeV, 550*MeV, 600*MeV, 650*MeV, 700*MeV, 800*MeV, 900*MeV, 1000*MeV, 1100*MeV, 1200*MeV, 1300*MeV, 1400*MeV, 1500*MeV, 1600*MeV, 1700*MeV, 1800*MeV, 2000*MeV, 2250*MeV, 2500*MeV, 2750*MeV, 3000*MeV, 3250*MeV, 3500*MeV, 3750*MeV, 4000*MeV, 4500*MeV, 5000*MeV, 5500*MeV, 6000*MeV, 6500*MeV, 7000*MeV, 8000*MeV, 9000*MeV, 10000*MeV};
+
+	// Calculate light output with AVA/Birks formula. NOTE that the stopping power dE/dx data is taken
+	//  from SRIM!
+	std::vector<G4double> particleEnergy_LYSO = {0.01*MeV, 0.011*MeV, 0.012*MeV, 0.013*MeV, 0.014*MeV, 0.015*MeV, 0.016*MeV, 0.017*MeV, 0.018*MeV, 0.02*MeV, 0.0225*MeV, 0.025*MeV, 0.0275*MeV, 0.03*MeV, 0.0325*MeV, 0.035*MeV, 0.0375*MeV, 0.04*MeV, 0.045*MeV, 0.05*MeV, 0.055*MeV, 0.06*MeV, 0.065*MeV, 0.07*MeV, 0.08*MeV, 0.09*MeV, 0.1*MeV, 0.11*MeV, 0.12*MeV, 0.13*MeV, 0.14*MeV, 0.15*MeV, 0.16*MeV, 0.17*MeV, 0.18*MeV, 0.2*MeV, 0.225*MeV, 0.25*MeV, 0.275*MeV, 0.3*MeV, 0.325*MeV, 0.35*MeV, 0.375*MeV, 0.4*MeV, 0.45*MeV, 0.5*MeV, 0.55*MeV, 0.6*MeV, 0.65*MeV, 0.7*MeV, 0.8*MeV, 0.9*MeV, 1*MeV, 1.1*MeV, 1.2*MeV, 1.3*MeV, 1.4*MeV, 1.5*MeV, 1.6*MeV, 1.7*MeV, 1.8*MeV, 2*MeV, 2.25*MeV, 2.5*MeV, 2.75*MeV, 3*MeV, 3.25*MeV, 3.5*MeV, 3.75*MeV, 4*MeV, 4.5*MeV, 5*MeV, 5.5*MeV, 6*MeV, 6.5*MeV, 7*MeV, 8*MeV, 9*MeV, 10*MeV, 11*MeV, 12*MeV, 13*MeV, 14*MeV, 15*MeV, 16*MeV, 17*MeV, 18*MeV, 20*MeV, 22.5*MeV, 25*MeV, 27.5*MeV, 30*MeV, 32.5*MeV, 35*MeV, 37.5*MeV, 40*MeV, 45*MeV, 50*MeV, 55*MeV, 60*MeV, 65*MeV, 70*MeV, 80*MeV, 90*MeV, 100*MeV, 110*MeV, 120*MeV, 130*MeV, 140*MeV, 150*MeV, 160*MeV, 170*MeV, 180*MeV, 200*MeV, 225*MeV, 250*MeV, 275*MeV, 300*MeV, 325*MeV, 350*MeV, 375*MeV, 400*MeV, 450*MeV, 500*MeV, 550*MeV, 600*MeV, 650*MeV, 700*MeV, 800*MeV, 900*MeV, 1000*MeV, 1100*MeV, 1200*MeV, 1300*MeV, 1400*MeV, 1500*MeV, 1600*MeV, 1700*MeV, 1800*MeV, 2000*MeV, 2250*MeV, 2500*MeV, 2750*MeV, 3000*MeV, 3250*MeV, 3500*MeV, 3750*MeV, 4000*MeV, 4500*MeV, 5000*MeV, 5500*MeV, 6000*MeV, 6500*MeV, 7000*MeV, 8000*MeV, 9000*MeV, 10000*MeV};
+	std::vector<G4double> protonStopping_LYSO = {118.687, 123.895, 128.913, 133.64, 138.273, 142.713, 146.858, 151.007, 154.86, 162.277, 170.687, 178.41, 185.444, 191.885, 197.834, 203.287, 208.246, 212.708, 220.742, 227.487, 233.039, 237.697, 241.461, 244.528, 248.773, 250.928, 251.49, 250.858, 249.331, 247.106, 244.385, 241.166, 237.749, 234.134, 230.42, 222.896, 213.471, 204.35, 195.832, 187.917, 180.504, 173.693, 167.382, 161.573, 151.358, 142.645, 135.235, 128.826, 123.318, 118.611, 110.8, 104.691, 99.9231, 95.9168, 91.9215, 88.1169, 84.6929, 81.5694, 78.7063, 76.0535, 73.591, 69.1767, 64.4423, 60.4087, 56.9157, 53.8732, 51.191, 48.7991, 46.6674, 44.7359, 41.3835, 38.5714, 36.1597, 34.0783, 32.2571, 30.646, 27.9243, 25.6929, 23.8417, 22.2708, 20.92, 19.7393, 18.7087, 17.7882, 16.9678, 16.2274, 15.557, 14.3864, 13.1858, 12.1952, 11.3548, 10.6445, 10.0241, 9.48088, 9.00365, 8.57945, 7.8571, 7.26382, 6.76759, 6.3454, 5.98223, 5.66609, 5.14185, 4.72367, 4.38251, 4.09939, 3.85928, 3.65319, 3.47512, 3.31905, 3.18099, 3.05894, 2.94889, 2.76081, 2.57073, 2.41666, 2.29061, 2.18456, 2.09552, 2.01849, 1.95146, 1.89343, 1.79639, 1.72035, 1.65832, 1.6073, 1.56528, 1.52926, 1.47423, 1.4322, 1.40219, 1.37817, 1.36016, 1.34615, 1.33514, 1.32713, 1.32112, 1.31611, 1.31311, 1.3091, 1.30809, 1.31008, 1.31407, 1.31907, 1.32406, 1.33106, 1.33705, 1.34405, 1.35805, 1.37104, 1.38504, 1.39804, 1.41003, 1.42203, 1.44403, 1.46502, 1.48402};
+	std::vector<G4double> alphaStopping_LYSO = {118.69, 122.91, 127.16, 131.26, 135.21, 139.2, 143.13, 146.99, 150.89, 158.45, 167.65, 176.54, 185.33, 193.78, 202.08, 210.14, 218.03, 225.76, 240.705, 255.042, 268.852, 282.221, 295.138, 307.595, 331.405, 353.914, 374.998, 395.04, 413.928, 431.953, 448.909, 465.091, 480.494, 495.115, 508.953, 534.766, 563.567, 589.117, 611.604, 631.421, 648.861, 664.12, 677.595, 689.283, 708.09, 721.83, 731.496, 737.68, 740.98, 741.992, 738.845, 730.626, 719.129, 705.647, 691.177, 676.116, 660.963, 646.016, 631.375, 617.138, 603.404, 577.447, 547.987, 521.438, 497.598, 476.163, 456.733, 439.207, 423.285, 408.664, 383.13, 361.402, 342.779, 326.559, 312.342, 299.827, 278.703, 261.083, 244.167, 229.954, 217.443, 206.534, 196.825, 188.118, 180.212, 173.106, 166.601, 155.192, 143.183, 133.176, 124.67, 117.264, 110.86, 105.156, 100.153, 95.62, 87.8351, 81.3711, 75.9078, 71.215, 67.1326, 63.5605, 57.5671, 52.7244, 48.7322, 45.3804, 42.5088, 40.0375, 37.8664, 35.9554, 34.2646, 32.7438, 31.3731, 28.9919, 26.5607, 24.5697, 22.9089, 21.4983, 20.2877, 19.2272, 18.2967, 17.4864, 16.0957, 14.9652, 14.0248, 13.2344, 12.5641, 11.9738, 11.0134, 10.253, 9.64276, 9.13853, 8.71733, 8.36017, 8.05403, 7.7879, 7.55579, 7.3527, 7.17161, 6.86646, 6.56631, 6.33119, 6.14309, 5.991, 5.86593, 5.76187, 5.67582, 5.60377, 5.49069, 5.40963, 5.35157, 5.30953, 5.27949, 5.25846, 5.23741, 5.23436, 5.24233};
+	std::vector<G4double> C12Stopping_LYSO = {340.1, 344.4, 348.5, 352.3, 356, 359.5, 362.9, 366.3, 369.5, 375.7, 383.1, 390.8, 398.7, 406.2, 413.2, 419.8, 426.2, 432.5, 444.4, 456.2, 467.6, 478.9, 490, 501.1, 522.8, 544.42, 565.79, 586.91, 607.98, 628.93, 649.69, 670.41, 690.88, 711.14, 731.28, 771.02, 819.47, 866.73, 912.65, 957.15, 1000.46, 1042.42, 1083, 1123.26, 1198.22, 1270.66, 1338.46, 1402.55, 1462.87, 1521.38, 1629.86, 1727.8, 1819.07, 1901.61, 1978.34, 2049.24, 2114.27, 2174.41, 2230.64, 2282.95, 2330.32, 2416.22, 2506.08, 2579.14, 2639.35, 2689.67, 2729.09, 2761.57, 2788.12, 2809.71, 2839.02, 2854.46, 2861.98, 2861.57, 2855.22, 2845.92, 2816.41, 2779, 2736.67, 2692.39, 2646.16, 2600.95, 2555.78, 2510.62, 2467.48, 2425.36, 2385.25, 2308.06, 2219.86, 2140.7, 2059.57, 1975.46, 1899.36, 1829.28, 1764.2, 1704.14, 1596.03, 1501.94, 1419.87, 1346.8, 1282.75, 1224.7, 1124.63, 1042.56, 971.914, 911.373, 858.438, 811.709, 770.083, 732.56, 698.54, 667.622, 639.406, 589.479, 537.452, 494.329, 458.61, 429.095, 404.681, 384.97, 366.759, 349.251, 319.435, 294.923, 274.413, 257.005, 241.997, 228.891, 207.281, 189.973, 175.866, 164.161, 154.256, 145.652, 138.349, 131.846, 126.143, 121.041, 116.439, 108.635, 100.732, 94.3487, 89.0663, 84.6343, 80.8726, 77.6311, 74.8198, 72.3487, 68.2468, 64.9752, 62.314, 60.1129, 58.272, 56.7112, 54.2399, 52.3789, 50.9481};
+	std::vector<G4double> Ar40Stopping_LYSO = {1204, 1225.3, 1245.2, 1262.8, 1278.1, 1293.2, 1306, 1317.6, 1328, 1347.4, 1368, 1384.8, 1399.9, 1411.4, 1422.4, 1432, 1440.2, 1447, 1459.6, 1469.1, 1477.6, 1484.4, 1490.4, 1495.7, 1503.8, 1510.5, 1517, 1522, 1526, 1529.3, 1532.1, 1534.8, 1537.1, 1539.6, 1542.3, 1547.8, 1556, 1565.9, 1577.4, 1590.8, 1605.8, 1622.1, 1640.1, 1659.3, 1699, 1743.7, 1788.4, 1835.8, 1883.3, 1931.7, 2027.2, 2121.6, 2213.7, 2301.9, 2387.6, 2470.3, 2550.6, 2628.4, 2704.4, 2778.4, 2850.4, 2989.6, 3158.7, 3322.8, 3484.2, 3644.3, 3802.9, 3959.7, 4117.5, 4274.1, 4584.3, 4891.7, 5193.6, 5487.8, 5774, 6052, 6574.91, 7055.75, 7492.99, 7890.28, 8248.39, 8571.16, 8862.45, 9125.17, 9362.24, 9576.62, 9769.25, 10097.1, 10422.9, 10679.4, 10866.5, 11014, 11121.9, 11200, 11248.4, 11286.9, 11304.4, 11292.4, 11250.7, 11199.2, 11138, 11066.9, 10925.1, 10753.7, 10502.5, 10271.5, 10050.7, 9843.02, 9644.4, 9456.86, 9279.39, 9110.96, 8951.58, 8655.92, 8324.25, 8025.71, 7753.26, 7502.87, 7269.55, 7051.26, 6845.01, 6648.79, 6284.42, 5951.12, 5643.87, 5360.66, 5100.48, 4860.32, 4439.06, 4092.86, 3813.69, 3598.55, 3441.44, 3260.34, 3100.25, 2957.18, 2829.11, 2714.05, 2609, 2419.91, 2220.82, 2055.75, 1917.69, 1800.63, 1699.59, 1611.55, 1534.52, 1465.49, 1349.44, 1254.4, 1176.37, 1109.34, 1052.31, 1003.29, 922.461, 858.634, 807.113};
+	std::vector<G4double> Xe108Stopping_LYSO = {2701, 2793.6, 2878.8, 2958.8, 3032.5, 3102, 3167.3, 3228.3, 3286.2, 3393.6, 3513.9, 3620.6, 3717.6, 3805.1, 3886.2, 3959.8, 4028, 4090.9, 4203.8, 4303.7, 4391.8, 4470, 4539.6, 4603.6, 4713.1, 4804.9, 4882.2, 4948.3, 5005.3, 5054.3, 5096.6, 5134.1, 5166.9, 5196.1, 5221.7, 5263.5, 5296.5, 5309.9, 5318.5, 5324.8, 5326.1, 5326, 5322.5, 5317.5, 5304.4, 5288, 5270, 5252, 5235, 5218, 5191, 5171, 5157, 5151, 5150, 5155, 5164, 5177, 5194, 5214, 5235, 5285, 5355, 5430, 5510, 5592, 5674, 5758, 5843, 5927, 6098, 6271, 6446, 6625, 6807, 6993, 7379, 7781, 8199, 8632, 9078, 9531, 9992, 10456.9, 10927.1, 11391, 11858.1, 12780.2, 13899.6, 14979, 16005.9, 16978.8, 17916.4, 18787.8, 19622.5, 20419.8, 21880.9, 23208.6, 24411.3, 25497.9, 26497.7, 27419.9, 29040.2, 30446.3, 31656.6, 32740.1, 33695.9, 34563.7, 35343.1, 36063.7, 36725.4, 37337.9, 37911.2, 38949.5, 40127.6, 40927.8, 41399.6, 41802.7, 42126.7, 42371.5, 42556.9, 42702.8, 42866, 42920.4, 42875.7, 42771.7, 42618.3, 42415.3, 41900.5, 41286.6, 40593.4, 39830.8, 39028.5, 38196.6, 37355, 36493.5, 35642.2, 34791.1, 33950.1, 32348.3, 30486.5, 28845.1, 27433.9, 26272.8, 25342, 24331.2, 23400.5, 22560, 21049, 19758.2, 18647.5, 17667, 16806.5, 16036.1, 14735.4, 13674.8, 12784.4};
+
+	// Eventually want to be able to interpolate this based on the ion specified as the source, 
+	//  but don't worry for now. Currently set to: alpha particle.
+	//G4double ionStopping_LYSO[157] = {118.69, 122.91, 127.16, 131.26, 135.21, 139.2, 143.13, 146.99, 150.89, 158.45, 167.65, 176.54, 185.33, 193.78, 202.08, 210.14, 218.03, 225.76, 240.705, 255.042, 268.852, 282.221, 295.138, 307.595, 331.405, 353.914, 374.998, 395.04, 413.928, 431.953, 448.909, 465.091, 480.494, 495.115, 508.953, 534.766, 563.567, 589.117, 611.604, 631.421, 648.861, 664.12, 677.595, 689.283, 708.09, 721.83, 731.496, 737.68, 740.98, 741.992, 738.845, 730.626, 719.129, 705.647, 691.177, 676.116, 660.963, 646.016, 631.375, 617.138, 603.404, 577.447, 547.987, 521.438, 497.598, 476.163, 456.733, 439.207, 423.285, 408.664, 383.13, 361.402, 342.779, 326.559, 312.342, 299.827, 278.703, 261.083, 244.167, 229.954, 217.443, 206.534, 196.825, 188.118, 180.212, 173.106, 166.601, 155.192, 143.183, 133.176, 124.67, 117.264, 110.86, 105.156, 100.153, 95.62, 87.8351, 81.3711, 75.9078, 71.215, 67.1326, 63.5605, 57.5671, 52.7244, 48.7322, 45.3804, 42.5088, 40.0375, 37.8664, 35.9554, 34.2646, 32.7438, 31.3731, 28.9919, 26.5607, 24.5697, 22.9089, 21.4983, 20.2877, 19.2272, 18.2967, 17.4864, 16.0957, 14.9652, 14.0248, 13.2344, 12.5641, 11.9738, 11.0134, 10.253, 9.64276, 9.13853, 8.71733, 8.36017, 8.05403, 7.7879, 7.55579, 7.3527, 7.17161, 6.86646, 6.56631, 6.33119, 6.14309, 5.991, 5.86593, 5.76187, 5.67582, 5.60377, 5.49069, 5.40963, 5.35157, 5.30953, 5.27949, 5.25846, 5.23741, 5.23436, 5.24233};
+
+	std::vector<G4double> protonYield_LYSO(particleEnergy_LYSO.size()+1);
+	protonYield_LYSO[0] = 1;
+	std::vector<G4double> alphaYield_LYSO(particleEnergy_LYSO.size()+1);
+	alphaYield_LYSO[0] = 4;
+	std::vector<G4double> C12Yield_LYSO(particleEnergy_LYSO.size()+1);
+	C12Yield_LYSO[0] = 12;
+	std::vector<G4double> Ar40Yield_LYSO(particleEnergy_LYSO.size()+1);
+	Ar40Yield_LYSO[0] = 40;
+	std::vector<G4double> Xe108Yield_LYSO(particleEnergy_LYSO.size()+1);
+	Xe108Yield_LYSO[0] = 108;
+
+
+	//G4double ionYield_LYSO[157]; // Eventually want to be able to interpolate this based on the ion specified as the source, but don't worry for now
+	for (int i=1; i < protonYield_LYSO.size(); i++) {
+		protonYield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i-1]*a_LYSO/(1+b_LYSO*protonStopping_LYSO[i]);
+		alphaYield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i-1]*a_LYSO/(1+b_LYSO*alphaStopping_LYSO[i]);
+		C12Yield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i-1]*a_LYSO/(1+b_LYSO*C12Stopping_LYSO[i]);
+		Ar40Yield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i-1]*a_LYSO/(1+b_LYSO*Ar40Stopping_LYSO[i]);
+		Xe108Yield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i-1]*a_LYSO/(1+b_LYSO*Xe108Stopping_LYSO[i]);
+		//ionYield_LYSO[i] = pEF_LYSO*particleEnergy_LYSO[i]*a_LYSO/(1+b_LYSO*ionStopping_LYSO[i]);
+
+	}
+
+	// Create a matrix of light yields. NOTE that the first column gives the mass
+	//  of the ion in a particular row
+	std::vector< std::vector<G4double> > lightMatrix_LYSO;
+	lightMatrix_LYSO.push_back(protonYield_LYSO);
+	lightMatrix_LYSO.push_back(alphaYield_LYSO);
+	lightMatrix_LYSO.push_back(C12Yield_LYSO);
+	lightMatrix_LYSO.push_back(Ar40Yield_LYSO);
+	lightMatrix_LYSO.push_back(Xe108Yield_LYSO);
+
+	lightYieldTable["lyso"] = lightMatrix_LYSO;
+
+
+	// Be careful about whether 0 or 1 is used as the index!!!
+	fLYSOMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", &particleEnergyElectron_LYSO[0], &electronYield_LYSO[0], 157)->SetSpline(true);
+	fLYSOMPT->AddProperty("PROTONSCINTILLATIONYIELD", &particleEnergy_LYSO[0], &protonYield_LYSO[1], 157)->SetSpline(true);
+	fLYSOMPT->AddProperty("IONSCINTILLATIONYIELD", &particleEnergy_LYSO[0], &alphaYield_LYSO[1], 157)->SetSpline(true);		// set ion light to alpha particle as default
+	fLYSOMPT->AddProperty("ALPHASCINTILLATIONYIELD", &particleEnergy_LYSO[0], &alphaYield_LYSO[1], 157)->SetSpline(true);
+	fLYSOMPT->AddProperty("DEUTERONSCINTILLATIONYIELD", &particleEnergy_LYSO[0], &protonYield_LYSO[1], 157)->SetSpline(true);
+	fLYSOMPT->AddProperty("TRITONSCINTILLATIONYIELD", &particleEnergy_LYSO[0], &protonYield_LYSO[1], 157)->SetSpline(true);
 
 	fLYSO->SetMaterialPropertiesTable(fLYSOMPT);
 
@@ -1241,7 +1335,8 @@ void nDetMaterials::defineScintillators(){
 	//G4double electronYield_YAP[13] = {54.3455, 65.8639, 72.9843, 87.2251, 84.2932, 79.6859, 87.4346, 96.2304, 98.9529, 100, 100.628, 99.1623, 98.9529}; //I am not sure if this is the correct units
 
 	G4double photonEnergy_YAP2[2] = {16.8179*keV, 23.0707*keV};
-	G4double RefIndex_YAP[2] = {1.94,1.94}; 
+
+	G4double RefIndex_YAP[2] = {1.94,1.94};
 	G4double Absorption_YAP[2] = {2.7*cm, 2.7*cm}; 
 
 	fYAPMPT = new G4MaterialPropertiesTable();
@@ -1271,6 +1366,8 @@ void nDetMaterials::defineScintillators(){
 	fYAPMPT->AddProperty("PROTONSCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
 	fYAPMPT->AddProperty("IONSCINTILLATIONYIELD", particleEnergy, ionYield_YAP, 36)->SetSpline(true);
 	fYAPMPT->AddProperty("ALPHASCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
+	fYAPMPT->AddProperty("DEUTERONSCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
+    fYAPMPT->AddProperty("TRITONSCINTILLATIONYIELD", particleEnergy, protonYield_YAP, 36)->SetSpline(true);
 
 	fYAP->SetMaterialPropertiesTable(fYAPMPT);
 
@@ -1407,3 +1504,76 @@ void nDetMaterials::defineScintillators(){
 	scintsAreDefined = true;
 }
 
+void nDetMaterials::setIonSourceType(const G4String &val) {
+
+	// need to make sure the scintillator actually has a light yield matrix first
+	if(lightYieldTable.find(detectorMaterialName) == lightYieldTable.end()){
+		std::cout << "No light yield matrix has been defined for " << detectorMaterialName << ". Source will default to alpha particles." << std::endl;
+		lightYieldTable.clear();
+		return;
+	}
+
+	std::vector<G4double> particleEnergy = {0.01*MeV, 0.011*MeV, 0.012*MeV, 0.013*MeV, 0.014*MeV, 0.015*MeV, 0.016*MeV, 0.017*MeV, 0.018*MeV, 0.02*MeV, 0.0225*MeV, 0.025*MeV, 0.0275*MeV, 0.03*MeV, 0.0325*MeV, 0.035*MeV, 0.0375*MeV, 0.04*MeV, 0.045*MeV, 0.05*MeV, 0.055*MeV, 0.06*MeV, 0.065*MeV, 0.07*MeV, 0.08*MeV, 0.09*MeV, 0.1*MeV, 0.11*MeV, 0.12*MeV, 0.13*MeV, 0.14*MeV, 0.15*MeV, 0.16*MeV, 0.17*MeV, 0.18*MeV, 0.2*MeV, 0.225*MeV, 0.25*MeV, 0.275*MeV, 0.3*MeV, 0.325*MeV, 0.35*MeV, 0.375*MeV, 0.4*MeV, 0.45*MeV, 0.5*MeV, 0.55*MeV, 0.6*MeV, 0.65*MeV, 0.7*MeV, 0.8*MeV, 0.9*MeV, 1*MeV, 1.1*MeV, 1.2*MeV, 1.3*MeV, 1.4*MeV, 1.5*MeV, 1.6*MeV, 1.7*MeV, 1.8*MeV, 2*MeV, 2.25*MeV, 2.5*MeV, 2.75*MeV, 3*MeV, 3.25*MeV, 3.5*MeV, 3.75*MeV, 4*MeV, 4.5*MeV, 5*MeV, 5.5*MeV, 6*MeV, 6.5*MeV, 7*MeV, 8*MeV, 9*MeV, 10*MeV, 11*MeV, 12*MeV, 13*MeV, 14*MeV, 15*MeV, 16*MeV, 17*MeV, 18*MeV, 20*MeV, 22.5*MeV, 25*MeV, 27.5*MeV, 30*MeV, 32.5*MeV, 35*MeV, 37.5*MeV, 40*MeV, 45*MeV, 50*MeV, 55*MeV, 60*MeV, 65*MeV, 70*MeV, 80*MeV, 90*MeV, 100*MeV, 110*MeV, 120*MeV, 130*MeV, 140*MeV, 150*MeV, 160*MeV, 170*MeV, 180*MeV, 200*MeV, 225*MeV, 250*MeV, 275*MeV, 300*MeV, 325*MeV, 350*MeV, 375*MeV, 400*MeV, 450*MeV, 500*MeV, 550*MeV, 600*MeV, 650*MeV, 700*MeV, 800*MeV, 900*MeV, 1000*MeV, 1100*MeV, 1200*MeV, 1300*MeV, 1400*MeV, 1500*MeV, 1600*MeV, 1700*MeV, 1800*MeV, 2000*MeV, 2250*MeV, 2500*MeV, 2750*MeV, 3000*MeV, 3250*MeV, 3500*MeV, 3750*MeV, 4000*MeV, 4500*MeV, 5000*MeV, 5500*MeV, 6000*MeV, 6500*MeV, 7000*MeV, 8000*MeV, 9000*MeV, 10000*MeV};
+
+	std::vector<std::string> args;
+	unsigned int Nargs = split_str(val, args);
+
+	if (Nargs != 2) {
+		std::cout << "Invalid number of arguments. Need to specify element and mass. Source will default to alpha particles." << std::endl;
+	}
+
+	std::string ionname = args[0];
+	G4int mass = std::stoi(args[1]);
+
+	if (mass < 1) {
+		std::cout << "Mass must be at least 1. Source will default to alpha particles." << std::endl;
+	}
+
+	G4int upper = 999, upper_index = 0, lower = -1, lower_index = 0;
+	for (int i=0; i < lightYieldTable[detectorMaterialName].size(); i++) {
+		if (lightYieldTable[detectorMaterialName][i][0] == mass) {
+
+			// if the mass is in the light yield matrix, then use the data from the table
+			if (detectorMaterialName == "lyso") {
+				fLYSOMPT->AddProperty("IONSCINTILLATIONYIELD", &particleEnergy[0], &lightYieldTable[detectorMaterialName][i][1], 157)->SetSpline(true);
+				fLYSO->SetMaterialPropertiesTable(fLYSOMPT);
+
+			}
+
+			// clear light yield table since it isn't needed anymore
+			lightYieldTable.clear();
+			return;
+		}
+		else if (lightYieldTable[detectorMaterialName][i][0] < mass && lightYieldTable[detectorMaterialName][i][0] > lower) {
+			lower = lightYieldTable[detectorMaterialName][i][0];
+			lower_index = i;
+		}
+		else if (lightYieldTable[detectorMaterialName][i][0] > mass && lightYieldTable[detectorMaterialName][i][0] < upper) {
+			upper = lightYieldTable[detectorMaterialName][i][0];
+			upper_index = 1;
+		}
+	}
+
+	// if mass not in matrix, perform linear interpolation
+	std::vector<G4double> ionYield(particleEnergy.size());
+
+	if (upper == 999) { // Mass larger than largest mass for which light yield is defined
+		std::cout << mass << ionname << " has larger mass than all ions with defined light yield. Linear interpolation cannot be performed. Source will default to alpha particles." << std::endl;
+		lightYieldTable.clear();
+		return;
+	}
+
+	std::cout << "Light yield for " << mass << ionname << " has not been defined. A linear interpolation will be performed." << std::endl;
+	for (int i=0; i < particleEnergy.size(); i++) {
+		ionYield[i] = lightYieldTable[detectorMaterialName][upper_index][i+1] + (upper-mass)/(upper-lower) * (lightYieldTable[detectorMaterialName][lower_index][i+1]-lightYieldTable[detectorMaterialName][upper_index][i+1]);
+	}
+
+
+	if (detectorMaterialName == "lyso") {
+		fLYSOMPT->AddProperty("IONSCINTILLATIONYIELD", &particleEnergy[0], &ionYield[0], 157)->SetSpline(true);
+		fLYSO->SetMaterialPropertiesTable(fLYSOMPT);
+	}
+
+	// clear light yield table since it isn't needed anymore
+	lightYieldTable.clear();
+}

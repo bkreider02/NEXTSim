@@ -330,18 +330,6 @@ bool nDetRunAction::processDetector(nDetDetector* det){
 	debugData.photonDetComY[0] = centerL.getY(); debugData.photonDetComY[1] = centerR.getY(); 
 	//debugData.photonDetComZ[0] = centerL.getZ(); debugData.photonDetComZ[1] = centerR.getZ(); 
 
-	// TEMPORARY CHANGE
-	double pmtWidth = params.GetPmtWidth();
-	double pmtHeight = params.GetPmtHeight();
-	double pixelWidth = params.GetPmtPixelWidth();
-	double pixelHeight = params.GetPmtPixelHeight();
-	int col = (debugData.photonDetComX[0] + 0.5*pmtWidth)/pixelWidth;
-	int row = (debugData.photonDetComY[0] + 0.5*pmtHeight)/pixelHeight;
-	outData.photonComCol = col;
-	outData.photonComRow = row;
-	debugData.pmtX[0] = 0.5*pmtWidth+debugData.photonDetComX[0]-(col+0.5)*pixelWidth;
-	debugData.pmtY[0] = 0.5*pmtHeight+debugData.photonDetComY[0]-(row+0.5)*pixelHeight;
-
 	// Get photon arrival times at the PMTs
 	debugData.photonMinTime[0] = cmL->getMinArrivalTime();
 	debugData.photonAvgTime[0] = cmL->getAvgArrivalTime();
@@ -416,16 +404,18 @@ bool nDetRunAction::processDetector(nDetDetector* det){
 	}
 	
 	// Get the digitizer response of the anodes.
-	/*pmtResponse *anodeResponseL = cmL->getAnodeResponse();
-	pmtResponse *anodeResponseR = cmR->getAnodeResponse();
+	std::vector<pmtResponse> *anodeResponseL = cmL->getAnodeResponse();
+	std::vector<pmtResponse> *anodeResponseR = cmR->getAnodeResponse();
 
 	// Digitize anode waveforms and integrate.
-	float anodeQDC[2][4];
+	double anodeQDC[2][4];
 	for(size_t i = 0; i < 4; i++){
-		anodeResponseL[i].digitize();
-		anodeResponseR[i].digitize();
-		debugData.anodeQDC[0][i] = anodeResponseL[i].integratePulseFromMaximum();
-		debugData.anodeQDC[1][i] = anodeResponseR[i].integratePulseFromMaximum();
+		anodeResponseL->at(i).digitize();
+		anodeResponseR->at(i).digitize();
+		debugData.anodeQDC[0][i] = anodeResponseL->at(i).integratePulseFromMaximum();
+		debugData.anodeQDC[1][i] = anodeResponseR->at(i).integratePulseFromMaximum();
+		anodeQDC[0][i] = debugData.anodeQDC[0][i];
+		anodeQDC[1][i] = debugData.anodeQDC[1][i];
 	}	
 	
 	// Compute the anode positions.
@@ -434,7 +424,7 @@ bool nDetRunAction::processDetector(nDetDetector* det){
 		debugData.reconDetComY[i] = ((anodeQDC[i][1]+anodeQDC[i][2])-(anodeQDC[i][3]+anodeQDC[i][0]))/(anodeQDC[i][0]+anodeQDC[i][1]+anodeQDC[i][2]+anodeQDC[i][3]);
 	}
 	outData.reconComX = (debugData.reconDetComX[0] + debugData.reconDetComX[1]) / 2;
-	outData.reconComY = (debugData.reconDetComY[0] + debugData.reconDetComY[1]) / 2;*/
+	outData.reconComY = (debugData.reconDetComY[0] + debugData.reconDetComY[1]) / 2;
 	
 	if(outputDebug || outputMultiDebug){
 		// Perform CFD on digitized anode waveforms.
@@ -692,6 +682,17 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	outImplantData.photonComY = (debugData.photonDetComY[0]);
 	// Get the segment of the detector where the photon CoM occurs.
 	cmI->getCenterSegment(debugData.centerOfMassColumn[0], debugData.centerOfMassRow[0]);	
+
+	// THIS MAY NEED TO BE CHANGED FOR PMTs WITH GAP
+	// calculate the location of contact within the pmt segment
+	double pmtWidth = params.GetPmtWidth();
+	double pmtHeight = params.GetPmtHeight();
+	double pixelWidth = cmI->getPmtPixelWidth();
+	double pixelHeight = cmI->getPmtPixelHeight();
+	int col = debugData.centerOfMassColumn[0];
+	int row = debugData.centerOfMassRow[0];
+	debugData.pmtX[0] = 0.5*pmtWidth+debugData.photonDetComX[0]-(col+0.5)*pixelWidth;
+	debugData.pmtY[0] = 0.5*pmtHeight+debugData.photonDetComY[0]-(row+0.5)*pixelHeight;
 
 	// Update photon statistics.
 	numPhotonsTotal += outImplantData.nPhotonsTot;

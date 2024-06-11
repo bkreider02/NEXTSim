@@ -32,7 +32,7 @@ public:
 	nDetDetectorParams() : pmtWidth(30), pmtHeight(30), fWrappingThickness(0), fGreaseThickness(0.1), fWindowThickness(0.1), fSensitiveThickness(1), 
 	                   fDetectorLength(600), fDetectorHeight(30), fDetectorWidth(30), fTrapezoidLength(0), fTrapezoidAngle(60), fDiffuserLength(0), fSegmentWidth(0), fSegmentHeight(0),
 	                   fNumColumns(1), fNumRows(1), fNumColumnsPmt(-1), fNumRowsPmt(-1), assemblyLength(0), assemblyHeight(0), assemblyWidth(0), scintCopyNum(1), 
-	                   fPolishedInterface(true), fSquarePMTs(true), isStart(false), 
+	                   fPolishedInterface(true), fSquarePMTs(true), isStart(false),
 	                   detectorMaterialName("ej200"), wrappingMaterialName("mylar"),
 	                   constantWidth(true), constantHeight(true),
 	                   geomType("undefined"),
@@ -121,6 +121,10 @@ public:
 	/** Enable or disable a polished optical interface between the edge of the detector and the optical grease layer
 	  */
 	void SetPolishedInterface(const bool &state){ fPolishedInterface = state; }
+
+	/** Enable or disable reflective wrapping on front of detector
+	  */
+	void SetFrontWrapping(const bool &state){ frontWrapping = state; }
 
 	/** Enable or disable square PMTs
 	  * @note If set to false, the PMTs will be circular
@@ -288,6 +292,10 @@ public:
 	  */
 	bool WrappingEnabled() const { return (fWrappingThickness > 0); }
 
+	/** Return true if reflective wrapping should be applied to front of detector and return false otherwise
+	  */
+	bool UseFrontWrapping() const { return frontWrapping; }
+
 	/** Print all detector parameters
 	  */
 	void Print() const ;
@@ -314,6 +322,7 @@ protected:
 	bool pmtHasGaps = false; ///< flag indicating that the user has specified a PMT gap thickness
 	G4double pmtGapThickness = 0; ///< thickness of gap in between PMT segments (in mm)
 	G4double fWrappingThickness; ///< Thickness of the inner and outer detector wrapping (in mm)
+	bool frontWrapping = true; ///< flag indicating whether reflective wrapping should be applied to front of detector
 	G4double fGreaseThickness; ///< Thickness of all optical grease layers (in mm)
 	G4double fWindowThickness; ///< Thickness of all optical window layers (in mm)
 	G4double fSensitiveThickness; ///< Thickness of the optical photon-sensitive surfaces (in mm)

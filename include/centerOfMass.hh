@@ -116,6 +116,14 @@ class centerOfMass{
 	  */
 	short getNumRows() const { return Nrow; }
 
+	/** Get the width of a segmented PMT pixel
+	  */
+	double getPmtPixelWidth() const { return pixelWidth; }
+	
+	/** Get the height of a segmented PMT pixel
+	  */
+	double getPmtPixelHeight() const { return pixelHeight; }
+
 	/** Get the width of the optical photon sensitive surface (in mm)
 	  */
 	double getActiveAreaWidth() const { return activeWidth; }

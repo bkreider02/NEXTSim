@@ -375,11 +375,14 @@ void implantType::buildDetector(){
 		// Place the outer wrapping into the assembly.
 		wrapping_physV = addToDetectorBody(wrapping_logV, "Wrapping");
 
-		auto wrappingFace = new G4Box("wrappingFace",fDetectorWidth/2+fWrappingThickness, fDetectorHeight/2+fWrappingThickness,fWrappingThickness/4.); 
-		auto wrappingFace_log = new G4LogicalVolume(wrappingFace,outerMylar,"wrappingFace_log");
-		wrappingFace_log->SetVisAttributes(windowVisAtt);	
-		wrappingFacePhys = addFrontComponent(wrappingFace_log,-1*fDetectorLength/2-fWrappingThickness/4.,"wrappingFacePhys");
-		
+		if (UseFrontWrapping()) {
+			// Place front wrapping unless specified otherwise
+			auto wrappingFace = new G4Box("wrappingFace",fDetectorWidth/2+fWrappingThickness, fDetectorHeight/2+fWrappingThickness,fWrappingThickness/4.); 
+			auto wrappingFace_log = new G4LogicalVolume(wrappingFace,outerMylar,"wrappingFace_log");
+			wrappingFace_log->SetVisAttributes(windowVisAtt);	
+			wrappingFacePhys = addFrontComponent(wrappingFace_log,-1*fDetectorLength/2-fWrappingThickness/4.,"wrappingFacePhys");
+		}
+
 		// Construct vertical and horizontal reflector layers for later use.
 		mylarVertLayer = new G4Box("mylarVertLayer", fWrappingThickness/2, fDetectorHeight/2, fDetectorLength/2);
 		mylarHorizLayer = new G4Box("mylarHorizLayer", cellWidth/2, fWrappingThickness/2, fDetectorLength/2);

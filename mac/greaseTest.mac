@@ -17,13 +17,13 @@
 
 # Mylar and optical grease thickness.
 /nDet/implant/setMylarThickness 0.03
-/nDet/implant/setGreaseThickness 0.05
+/nDet/implant/setGreaseThickness 0.02
 
 # Light 
 /nDet/implant/setDiffuserLength 1.5
 
 # Choose Scintillator
-/nDet/implant/setMaterial lyso
+/nDet/implant/setMaterial yap
 
 # PMT segmentation and gap thickness
 /nDet/implant/setPmtColumns 8
@@ -61,19 +61,19 @@
 /nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
 
 # Set the position and rotation of the detector in the lab frame.
-/nDet/implant/setPosition 2.5 0 0 mm
+/nDet/implant/setPosition 0 0 0 cm
 #/nDet/implant/setCylindrical 0.5 0 0
 /nDet/implant/setRotation 0 270 0
 /nDet/implant/addGeometry module
 
-/nDet/implant/addGreaseLayer 50.8 50.8 0.02
+/nDet/implant/addGreaseLayer 50.8 50.8 0.02 noa61
 #/nDet/implant/addPhoswich 24 24 2.0 50.8 50.8 0.03 yso air
-#/nDet/implant/addDiffuserLayer 50 50 2.0
+/nDet/implant/addDiffuserLayer 50 50 1.0
 #/nDet/implant/addLightGuide 50 50 50 50 5 
 #/nDet/segLightGuide/thickness 10
-/nDet/implant/setSegmentedLightGuide 24 24 5.0 50.8 50.8 50.8 50.8 G4_Pyrex_Glass
-#/nDet/implant/addGreaseLayer 50.8 50.8 0.02
-/nDet/implant/addDiffuserLayer 50 50 1.0
+#/nDet/implant/setSegmentedLightGuide 24 24 5.0 50.8 50.8 50.8 50.8 G4_Pyrex_Glass
+#/nDet/implant/addDiffuserLayer 50 50 0.5
+
 #/nDet/implant/addBox abs 1.5 1.5
 
 /nDet/implant/update
@@ -85,7 +85,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename lyso1mm_point_test_1mm_diff_moved_det_1mil.root
+/nDet/output/filename grease_1765.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -125,13 +125,9 @@
 #/nDet/source/range 1 5 0
 #/nDet/source/setGaussianEnergy 1 1
 #/nDet/source/type electron 1
-
-/nDet/source/shape point
-/nDet/source/position 0 0 0 mm
-
-#/nDet/source/spot 25 #half-width for beam
-#/nDet/source/shape square
-
+#/nDet/source/shape point
+/nDet/source/spot 25 #half-width for beam
+/nDet/source/shape square
 #/nDet/source/shape circle
 #/nDet/source/beam 137Cs
 #/nDet/source/beam gamma 0.03
@@ -153,4 +149,4 @@
 # RUN CONTROL #
 ###############
 
-#/run/beamOn 1000000
+/run/beamOn 100000
