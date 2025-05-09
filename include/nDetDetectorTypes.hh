@@ -217,6 +217,34 @@ public:
 protected:
 };
 
+
+
+
+
+class domeType : public nDetImplant {
+public:
+
+	domeType() : nDetImplant() { }
+
+
+	domeType(nDetConstruction *detector, nDetMaterials *matptr) : nDetImplant(detector, matptr) { }
+
+
+	~domeType(){ }
+
+
+	virtual void prepareToBuild();
+
+	virtual void buildDetector();
+
+protected:
+};
+
+
+
+
+
+
 /** @class hagridType
   * @author Cory R. Thornsberry (cthornsb@vols.utk.edu)
   * @date September 25, 2019
@@ -253,6 +281,30 @@ public:
 
 protected:
 };
+
+
+/** @class cubeType
+  * @author Ben T. Kreider (bkreider@vols.utk.edu)
+  * @date June 25, 2024
+  * @brief 3D scintillator array geometry
+  */
+/*
+class cubeType : public nDetImplant {
+public:
+	// Default constructor
+	cubeType() : nDetImplant() {}
+
+	// NEED COMMENTS HERE
+	cubeType(nDetConstruction *detector, nDetMaterials *matptr) : nDetImplant(detector, matptr) {}
+	~cubeType() {}
+	virtual void prepareToBuild();
+	virtual void buildDetector();
+
+protected:
+
+};
+
+*/
 
 
 } // namespace nDetDetectorTypes

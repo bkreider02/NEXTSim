@@ -262,6 +262,7 @@ void centerOfMass::copyGainMatrix(const centerOfMass *other){
 
 void centerOfMass::clear(){
 	Npts = 0;
+	secondaryEnergy = 0;
 	NnotDetected = 0;
 	tSum = 0;
 	lambdaSum = 0;
@@ -377,6 +378,7 @@ bool centerOfMass::addPoint(const double &energy, const double &time, const G4Th
 	
 	return true;
 }
+
 
 void centerOfMass::printCounts() const {
 	for(short i = Nrow-1; i >= 0; i--){

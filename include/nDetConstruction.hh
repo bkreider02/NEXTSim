@@ -174,6 +174,9 @@ class nDetConstruction : public G4VUserDetectorConstruction{
 
 	// Add a box around the implant
 	void AddBox(const G4String &input);
+
+	// Set parameters for dome-type implant
+	void SetDomeParameters(const G4String &input);
 	
 	/** Add an array of detectors in a cylindrical setup
 	  * @note String syntax: <geom> <r0> <startTheta> <stopTheta> <Ndet> <br>

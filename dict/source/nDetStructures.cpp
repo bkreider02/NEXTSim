@@ -430,5 +430,6 @@ void nDetDebugStructure::Zero(){
 		}
 	}
 	mult = 0;
+	secondaryEnergy = 0;
 }
 

@@ -722,6 +722,28 @@ void nDetImplant::addBox(const G4String &input) {
 	boxAdded = true;
 }
 
+
+void nDetImplant::setDomeParameters(const G4String &input) {
+	// Expects a space-delimited string of the form:
+	// "setDomeParameters <dome shape> <is pixelated?> <relevant dimension> <margin size>"
+	// (dimension in mm)
+	std::vector<std::string> args;
+	unsigned int Nargs = split_str(input, args);
+	domeShape = args.at(0);
+	if ((domeShape != "spherical")&&(domeShape != "pyramidal"))
+		domeShape = "pyramidal";
+
+    std::string pixelated = args.at(1);
+	isPixelated = (pixelated[0]=='t') ? true : false;
+
+	domeDimension = strtod(args.at(2).c_str(),NULL)*mm;
+
+	marginSize = strtod(args.at(3).c_str(),NULL)*mm;
+
+	std::cout << "Dome parameters: " << domeShape << " " << (isPixelated ? "pixelated" : "continuous") << " " << domeDimension << std::endl;
+}
+
+
 void nDetImplant::construct(){
 	// Update the size of the assembly in the event it has changed
 	UpdateSize(); 

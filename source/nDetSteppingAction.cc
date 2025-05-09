@@ -1,10 +1,12 @@
 #include "G4Step.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4OpticalPhoton.hh"
+#include "G4UnitsTable.hh"
 
 #include "nDetSteppingAction.hh"
 #include "nDetConstruction.hh"
 #include "nDetRunAction.hh"
+
 
 nDetSteppingAction::nDetSteppingAction(nDetRunAction* runAct) : runAction(runAct) {
 	neutronTrack = false;
@@ -35,6 +37,27 @@ void nDetSteppingAction::UserSteppingAction(const G4Step* aStep){
 		runAction->initializeNeutron(aStep);
 		neutronTrack = true;
 	}
+
+
+	// check for secondary electrons and add their energy to the running total
+	auto secondary = aStep->GetSecondaryInCurrentStep();
+	size_t size_secondary = (*secondary).size();
+	if (size_secondary){
+		double energy;
+		for (size_t i=0; i<(size_secondary);i++){
+			auto secstep = (*secondary)[i];
+
+			G4String secondaryName = secstep->GetDefinition()->GetParticleName();
+
+			if (secondaryName == "e-") {
+				energy = secstep->GetKineticEnergy();
+
+				runAction->AddDetectedSecondary(aStep,energy);
+			}
+		}
+	}
+
+
 }
 
 void nDetSteppingAction::Reset(){

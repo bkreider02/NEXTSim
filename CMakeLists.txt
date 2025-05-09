@@ -6,9 +6,11 @@ project (nextSim)
 if (CMAKE_COMPILER_IS_GNUCXX)
 	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.3" AND
             ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS "4.7")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+            #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x") # CHANGE IS HERE
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
     elseif(${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.6")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+        #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") # CHANGE IS HERE
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif(${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.3" AND

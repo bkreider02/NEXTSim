@@ -280,6 +280,15 @@ class nDetRunAction : public G4UserRunAction
 	  */
 	bool AddDetectedPhoton(const G4Step *step, const double &mass=1);
 
+
+	/** Add a detected secondary electron to the running total
+	  * @param step Pointer to the G4Step corresponding to the optical photon
+	  * @param energy The energy of the secondary electron (MeV)
+	  * @return True if a matching detector was found and the secondary electron was added successfully and return false otherwise
+	  */
+	bool AddDetectedSecondary(const G4Step *step, const double &energy);
+
+
 	/** Set initial primary particle scatter information with parameters from a G4Step
 	  */
 	void initializeNeutron(const G4Step *step);
@@ -304,6 +313,7 @@ class nDetRunAction : public G4UserRunAction
 	* @param src  pointer to pmtResponse object to which the parameters will be copied
 	*/
 	void copyResponseParameters(pmtResponse *dest, pmtResponse *src);
+
 
   private:
 	G4Timer* timer; ///< Timer used to measure the total time for a run (in seconds)
@@ -380,6 +390,8 @@ class nDetRunAction : public G4UserRunAction
 	  * @return True if the detector has detected optical photons and return false otherwise
 	  */
 	bool processStartImplant(nDetImplant* imp, double &startTime);
+
 };
+
 
 #endif

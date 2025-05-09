@@ -104,6 +104,10 @@ class centerOfMass{
 	  */
 	size_t getNumDetected() const { return Npts; }
 
+	/** Get the total kinetic energy imparted to secondary electrons
+	  */
+	double getSecondaryEnergy() const { return secondaryEnergy; }
+
 	/** Get the number of photons not detected
 	  */
 	size_t getNumNotDetected() const { return NnotDetected; }
@@ -176,7 +180,7 @@ class centerOfMass{
 	/** Get the anode hit count matrix
 	  */
 	void getCountMatrix(std::vector<std::vector<int> > &matrix) const { matrix = countMatrix; }
-	
+
 	/** Set the number of anode columns
 	  * @param col_ Number of anode columns
 	  * @return The number of columns
@@ -251,6 +255,10 @@ class centerOfMass{
 	  */	
 	bool addPoint(const double &energy, const double &time, const G4ThreeVector &position, const double &mass=1);
 
+	/** Add a secondary electron to the running total
+	  */
+	void addSecondaryElectron(const double &energy) { secondaryEnergy += energy; }
+
 	/** Print the number of detected photons for each anode to stdout
 	  */
 	void printCounts() const ;
@@ -266,6 +274,7 @@ class centerOfMass{
 
 	size_t Npts; ///< Number of photons added to the weighted average
 	size_t NnotDetected; ///< Number of photons not detected by the sensitive surface
+	double secondaryEnergy; ///< total energy imparted to secondary electrons
 	
 	double totalMass; ///< Total photon weight for the weighted average
 	double t0; ///< Photon minimum time-of-arrival
@@ -292,7 +301,7 @@ class centerOfMass{
 	
 	std::vector<std::vector<double> > gainMatrix; ///< Matrix containing the gain of each PSPMT anode (in percent)
 	std::vector<std::vector<int> > countMatrix; ///< Matrix containing the number of photon counts of each PSPMT anode
-	
+
 	/** Increment the anode hit count matrix at position (x, y)
 	  * @param x Anode column
 	  * @param y Anode row

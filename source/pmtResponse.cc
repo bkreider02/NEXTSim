@@ -322,7 +322,9 @@ double pmtResponse::integratePulse(const size_t &start_, const size_t &stop_){
 	double qdc = 0.0;
 	for(size_t i = start_+1; i < stop; i++){ // Integrate using trapezoidal rule.
 		qdc += 0.5*(pulseArray[i-1] + pulseArray[i]) - baseline;
+
 	}
+
 
 	if(qdc>50) isTriggered = true;
 	return qdc;

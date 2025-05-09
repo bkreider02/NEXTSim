@@ -166,6 +166,9 @@ void nDetConstructionMessenger::addAllCommands(){
 	addCommand(new G4UIcmdWithAString("/nDet/implant/addBox", this));
 	addGuidance("Add a box around the implant detector (should be called right before /update). Dimensions in mm. \n SYNTAX: <material> <thickness> <gap>");
 
+	addCommand(new G4UIcmdWithAString("/nDet/implant/setDomeParameters", this));
+	addGuidance("Set style/parameters of dome-type detector. \n SYNTAX: <type> <is pixelated?> <relevant dimension (radius or step size)> <margin size>");
+
 	// addCommand(new G4UIcmdWithABool("/nDet/implant/setReconLogic",this));
 	// addGuidance("Sets the logic used for calculating the reconstructed position, 0 = anger logic, 1 = sipm logic");
 
@@ -518,7 +521,11 @@ void nDetConstructionMessenger::SetNewChildValue(G4UIcommand* command, G4String 
 			fDetector->AddBox(newValue);
 		}
 
-		else if(index == 31){
+		else if(index == 31) {
+			fDetector->SetDomeParameters(newValue);
+		}
+
+		else if(index == 32){
 			bool val = command->ConvertToBool(newValue);
 			std::cout<<"Setting Construction Recon Logic to "<<val<<std::endl;
 			// fDetector->setReconLogic(val);

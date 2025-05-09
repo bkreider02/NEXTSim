@@ -158,7 +158,8 @@ bool nDetMasterOutputFile::openRootFile(const G4Run* aRun){
 		Display::WarningPrint("Failed to find master run manager.", "nDetMasterOutputFile");
 
 	// Create root tree.
-	if(treename.empty()) treename = "data"; //"neutronEvent";
+	//if(treename.empty()) treename = "data"; //"neutronEvent";
+	if(treename.empty()) treename = "simData"; //"neutronEvent";
 	fTree = new TTree(treename.c_str(), "Primary particle scattering data");
 
 	// Add the branches

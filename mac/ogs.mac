@@ -22,6 +22,9 @@
 # Light diffuser.
 #/nDet/detector/setDiffuserLength 0.5
 
+# Detector material
+/nDet/detector/setMaterial ogs
+
 # PMT segmentation.
 /nDet/detector/setPmtColumns 8
 /nDet/detector/setPmtRows 8
@@ -67,8 +70,8 @@
 ################
 
 # Set the output filename prefix
-/nDet/output/filename next_test_gamma_662.root
-/nDet/output/title NEXT, 0.5 MeV, 1 m from detector
+/nDet/output/filename ogs_test_gamma_662.root
+/nDet/output/title NEXT w/ OGS, 0.5 MeV, 1 m from detector
 #/nDet/output/index 69
 #/nDet/output/overwrite true
 #/nDet/output/persistent true

@@ -16,6 +16,7 @@
 #include "nDetDetector.hh"
 #include "termColors.hh"
 #include "G4RunManager.hh"
+#include "G4UnitsTable.hh"
 
 #include <random>
 
@@ -213,8 +214,45 @@ void nDetRunAction::EndOfRunAction(const G4Run* aRun)
 }
 
 void nDetRunAction::initializePmtResponses() {
-	// NEED TO DO THIS FOR DETECTORS AS WELL
-	// PROBABLY SHOULD HAVE TWO ARRAYS IN THE ROOT TREE
+
+	// FOR DETECTORS!!!!! VERIFY THIS WORKS!!!
+	// (SOMETHING ABOUT TWO ARRAYS IN THE ROOT TREE (?))
+	for (auto& det : userDetectors) {
+		centerOfMass *cmL = det.getCenterOfMassL();
+		centerOfMass *cmR = det.getCenterOfMassR();
+		pmtResponse *pmtL = cmL->getPmtResponse();
+		pmtResponse *pmtR = cmR->getPmtResponse();
+		copyResponseParameters(pmtL,detector->GetCenterOfMassL()->getPmtResponse());
+		copyResponseParameters(pmtR,detector->GetCenterOfMassR()->getPmtResponse());
+
+		std::vector<pmtResponse> *anodeResponseL = cmL->getAnodeResponse();
+		std::vector<pmtResponse> *anodeResponseR = cmR->getAnodeResponse();
+
+		std::vector<pmtResponse> *tempAL = detector->GetCenterOfMassL()->getAnodeResponse();
+		std::vector<pmtResponse> *tempAR = detector->GetCenterOfMassR()->getAnodeResponse();
+
+		for(size_t i = 0; i < 4; i++){
+			copyResponseParameters(&anodeResponseL->at(i),&tempAL->at(i));
+			copyResponseParameters(&anodeResponseR->at(i),&tempAR->at(i));
+		}
+
+		std::vector<pmtResponse> *pixelResponseL = cmL->getPixelResponse();
+		std::vector<pmtResponse> *pixelResponseR = cmR->getPixelResponse();
+
+		std::vector<pmtResponse> *tempPL = detector->GetCenterOfMassL()->getPixelResponse();
+		std::vector<pmtResponse> *tempPR = detector->GetCenterOfMassR()->getPixelResponse();
+
+		if (detector->GetDetectorParameters().GetNumPmtRows() == 8 && detector->GetDetectorParameters().GetNumPmtColumns() == 8) { // only record pixel response for 8x8 pmts
+			for (size_t i = 0; i < 8; i++) {
+				for (size_t j = 0; j < 8; j++) {
+					copyResponseParameters(&pixelResponseL->at(8*i+j),&tempPL->at(8*i+j));
+					copyResponseParameters(&pixelResponseR->at(8*i+j),&tempPR->at(8*i+j));
+				}
+			}
+		}
+	}
+
+
 	for (auto& imp : userImplants) {
 		centerOfMass *cmI = imp.getCenterOfMass();
 		pmtResponse *pmtI = cmI->getPmtResponse();
@@ -321,7 +359,7 @@ bool nDetRunAction::processDetector(nDetDetector* det){
 	if(outData.nPhotonsTot > 0)
 		outData.photonDetEff = outData.nPhotonsDet/(double)outData.nPhotonsTot;
 	else
-		outData.photonDetEff = -1;			
+		outData.photonDetEff = -1;		
 
 	// Get the photon center-of-mass positions
 	G4ThreeVector centerL = cmL->getCenter();
@@ -554,6 +592,8 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	// Do some light pulse analysis
 	debugData.pulsePhase[0] = pmtI->analyzePolyCFD() + targetTimeOffset;
 	debugData.pulseQDC[0] = pmtI->integratePulseFromMaximum();
+
+
 	debugData.pulseMax[0] = pmtI->getMaximum();
 	debugData.pulseMaxTime[0] = pmtI->getMaximumTime();
 	debugData.pulseArrival[0] = pmtI->getWeightedPhotonArrivalTime();	
@@ -594,6 +634,15 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	}
 
 	std::vector<pmtResponse> *pixelResponseI = cmI->getPixelResponse();
+
+	for (size_t i = 0; i < 8; i++)
+		for (size_t j = 0; j < 8; j++) {
+			debugData.photonsPerPixel[i][j] = 0;
+			debugData.pixelQDC[i][j] = 0;
+		}
+
+	/*
+
 	double pixelQDC[8][8];
 	double photonsPerPixel[8][8];
 
@@ -608,6 +657,7 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 		for (size_t i = 0; i < 8; i++) {
 			for (size_t j = 0; j < 8; j++) {
 				if (pixelResponseI->at(8*i+j).getPhotonCount() != 0) { // don't bother with pixels that aren't hit
+					
 					// get number of photons
 					debugData.photonsPerPixel[i][j] = pixelResponseI->at(8*i+j).getPhotonCount();
 
@@ -616,10 +666,12 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 
 					pixelQDC[i][j] = debugData.pixelQDC[i][j];
 					photonsPerPixel[i][j] = debugData.photonsPerPixel[i][j];
+					
 				}
 			}
 		}
 	}
+	*/
 	
 	// Compute the anode positions.
 	//debugData.reconDetComX[0] = -((anodeQDC[0]+anodeQDC[1])-(anodeQDC[2]+anodeQDC[3]))/(anodeQDC[0]+anodeQDC[1]+anodeQDC[2]+anodeQDC[3]);
@@ -698,7 +750,8 @@ bool nDetRunAction::processImplant(nDetImplant* imp){
 	numPhotonsTotal += outImplantData.nPhotonsTot;
 	numPhotonsDetTotal += outImplantData.nPhotonsDet;
 	
-
+	debugData.secondaryEnergy = cmI->getSecondaryEnergy();
+	
 	return true;
 }
 
@@ -917,6 +970,63 @@ bool nDetRunAction::AddDetectedPhoton(const G4Step *step, const double &mass/*=1
 	return false;
 }
 
+
+bool nDetRunAction::AddDetectedSecondary(const G4Step *step, const double &energy){
+	if(!step->GetPostStepPoint()){
+		Display::WarningPrint("INVALID POST POINT!", "nDetRunAction");
+		return false;
+	}
+
+	/*
+	// Find which detector this secondary is inside.
+	G4int copyNum = step->GetPostStepPoint()->GetTouchable()->GetCopyNumber();
+	bool foundMatch=false, isLeft=0, isImplant=0;
+	G4ThreeVector *detPos;
+	G4RotationMatrix *detRot;
+	centerOfMass *hitDetPmtL;
+	centerOfMass *hitDetPmtR;
+	centerOfMass *hitDetPmtI;
+
+	for(std::vector<nDetDetector>::iterator iter = userDetectors.begin(); iter != userDetectors.end(); iter++){
+		if(iter->checkPmtCopyNumber(copyNum, isLeft)){
+			foundMatch = true;
+			//detPos = iter->getPosition();
+			//detRot = iter->getRotation();
+			hitDetPmtL = iter->getCenterOfMassL();
+			hitDetPmtR = iter->getCenterOfMassR();
+			//hitDetPmtL->setNumColumns(iter->GetNumPmtColumns());
+			//hitDetPmtL->setNumRows(iter->GetNumPmtRows());
+			//hitDetPmtR->setNumColumns(iter->GetNumPmtColumns());
+			//hitDetPmtR->setNumRows(iter->GetNumPmtRows());
+			break;
+		}
+	}
+	for(std::vector<nDetImplant>::iterator iter = userImplants.begin(); iter != userImplants.end(); iter++){
+		if(iter->checkPmtCopyNumber(copyNum, isImplant)){
+			foundMatch = true;
+			//detPos = iter->getPosition();
+			//detRot = iter->getRotation();
+			hitDetPmtI = iter->getCenterOfMass();
+			//hitDetPmtI->setNumColumns(iter->GetNumPmtColumns());
+			//hitDetPmtI->setNumRows(iter->GetNumPmtRows());
+			break;
+		}
+	}
+	
+	if(!foundMatch){
+		Display::WarningPrint("Failed to find matching detector for detected secondary?", "nDetRunAction");
+		std::cout << "Energy is " << energy << std::endl;
+		// Not sure what it means when this fails...?
+		return false;
+	}
+	*/
+	centerOfMass *pmtI = startImplant->getCenterOfMass();
+
+	pmtI->addSecondaryElectron(energy);
+	return true;
+}
+
+
 bool nDetRunAction::scatterEvent(){
 	if(primaryTracks.size() <= 1)
 		return false;
@@ -1011,6 +1121,7 @@ bool nDetRunAction::scatterNeutron(const G4Step *step){
 			if(verbose) 
 				std::cout << "OT: final kE=0 (absorbed)" << std::endl;
 		}
+
 		return true;
 	}
 	return false;

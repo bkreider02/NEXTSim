@@ -17,7 +17,7 @@
 
 # Mylar and optical grease thickness.
 /nDet/implant/setMylarThickness 0.03
-/nDet/implant/setGreaseThickness 0.05
+/nDet/implant/setGreaseThickness 0.02
 
 # Light 
 /nDet/implant/setDiffuserLength 1.5
@@ -52,6 +52,7 @@
 
 # Set the wrapping.
 /nDet/implant/setWrapping perfect
+/nDet/implant/useFrontWrapping false
 
 # Load PSPMT gain matrix 
 # NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
@@ -61,7 +62,7 @@
 /nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
 
 # Set the position and rotation of the detector in the lab frame.
-/nDet/implant/setPosition 2.5 0 0 mm
+/nDet/implant/setPosition 0.501 0 0 mm
 #/nDet/implant/setCylindrical 0.5 0 0
 /nDet/implant/setRotation 0 270 0
 /nDet/implant/addGeometry module
@@ -85,7 +86,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename lyso1mm_point_test_1mm_diff_moved_det_1mil.root
+/nDet/output/filename Si28_100MeV_official.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -107,7 +108,8 @@
 /nDet/output/trace/setTraceDelay 60
 /nDet/output/trace/setTraceLength 500
 /nDet/output/trace/setBitRange 16
-/nDet/output/trace/setGain 1000
+#/nDet/output/trace/setGain 1000
+/nDet/output/trace/setGain 100
 /nDet/output/trace/setCfdFraction 0.5
 /nDet/output/trace/setIntegralLow 5
 /nDet/output/trace/setIntegralHigh 10
@@ -120,14 +122,15 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 252Cf
 
-/nDet/source/type alpha 5
-#/nDet/source/type gamma 1
+/nDet/source/type ion 100 28 14 # Silicon-28
+#/nDet/source/type 137Cs
+#/nDet/source/type gamma 0.662
 #/nDet/source/range 1 5 0
-#/nDet/source/setGaussianEnergy 1 1
+#/nDet/source/setGaussianEnergy 10 1
 #/nDet/source/type electron 1
 
 /nDet/source/shape point
-/nDet/source/position 0 0 0 mm
+#/nDet/source/position 0 0 0 mm
 
 #/nDet/source/spot 25 #half-width for beam
 #/nDet/source/shape square
@@ -153,4 +156,4 @@
 # RUN CONTROL #
 ###############
 
-#/run/beamOn 1000000
+/run/beamOn 50000

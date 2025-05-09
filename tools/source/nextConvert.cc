@@ -230,7 +230,8 @@ bool processPSPMT(TTree *data, const std::string &fname, const double &t0=0, con
 		pack.setEnergyRange(Elo, Ehi);
 
 	TFile *ofile = new TFile(fname.c_str(), "RECREATE");
-	TTree *otree = new TTree("data", "simpleScan style PSPMT data generated from nextSim output");
+	//TTree *otree = new TTree("data", "simpleScan style PSPMT data generated from nextSim output");
+	TTree *otree = new TTree("simData", "simpleScan style PSPMT data generated from nextSim output");
 
 	otree->Branch("pspmt", &pspmt);
 
@@ -272,7 +273,8 @@ bool processGenericBar(TTree *data, const std::string &fname, const double &t0=0
 		pack.setEnergyRange(Elo, Ehi);
 
 	TFile *ofile = new TFile(fname.c_str(), "RECREATE");
-	TTree *otree = new TTree("data", "simpleScan style GenericBar data generated from nextSim output");
+	//TTree *otree = new TTree("data", "simpleScan style GenericBar data generated from nextSim output");
+	TTree *otree = new TTree("simData", "simpleScan style GenericBar data generated from nextSim output");
 
 	otree->Branch("genericbar", &bar);
 
@@ -428,7 +430,8 @@ int main(int argc, char *argv[]){
 	std::cout << " Using detector position of (x=" << detectorPos[0] << " cm, y=" << detectorPos[1] << " cm, z=" << detectorPos[2] << " cm)\n";
 	std::cout << "  * Corresponding gamma-flash time offset is " << t0 << " ns\n";	
 	
-	TTree *t = (TTree*)f->Get("data");
+	//TTree *t = (TTree*)f->Get("data");
+	TTree *t = (TTree*)f->Get("simData");
 	if(!t) return 1;
 
 	bool retval;

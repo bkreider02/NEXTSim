@@ -163,8 +163,10 @@ bool nDetParticleSource::SetSourceType(const G4String &str){
 		SetNeutronBeam(beamEnergy);
 	else if(typeName == "alpha")
 		SetAlphaBeam(beamEnergy);
-	else if(typeName == "ion")
+	else if(typeName == "ion") {
+		(&nDetConstruction::getInstance())->GetMaterials()->setIonSourceType(mass);
 		SetIonBeam(beamEnergy,mass,charge);
+	}
 	else if(typeName == "gamma")
 		SetGammaRayBeam(beamEnergy);
 	else if(typeName == "laser"){
@@ -335,6 +337,7 @@ void nDetParticleSource::SetAlphaBeam(const double &energy_){
 
 void nDetParticleSource::SetIonBeam(const double &energy_, const int &A, const int &Z, const double &exE/*=0.*/){
 	std::cout<<"Ion Beam with A="<<A<<" and Z="<<Z<<std::endl;
+	
 	Reset();
 	// GetCurrentSource()->SetParticleDefinition(G4ParticleTable::GetIon(A,Z,exE));
 	GetCurrentSource()->SetParticleDefinition(G4IonTable::GetIonTable()->GetIon(Z,A,exE));
@@ -558,7 +561,8 @@ bool nDetParticleSource::Test(const char *filename, const size_t &Nevents){
 		Display::ErrorPrint("Failed to open output ROOT file.", "nDetParticleSource");
 		return false;
 	}
-	TTree *tree = new TTree("data", "Energy dist test");
+	//TTree *tree = new TTree("data", "Energy dist test");
+	TTree *tree = new TTree("simData", "Energy dist test");
 	tree->Branch("energy", &energy);
 	tree->Branch("theta", &theta);
 	tree->Branch("pos[3]", pos);

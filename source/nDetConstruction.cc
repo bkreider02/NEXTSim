@@ -400,6 +400,15 @@ void nDetConstruction::AddBox(const G4String &input) {
 		Display::ErrorPrint("Cannot add a box before a detector is defined!", "nDetConstruction");
 }
 
+
+void nDetConstruction::SetDomeParameters(const G4String &input) {
+	if (currentImplant)
+		currentImplant->setDomeParameters(input);
+	else
+		Display::ErrorPrint("Cannot set dome parameters before a detector is defined!", "nDetConstruction");
+}
+
+
 void nDetConstruction::AddDetectorArray(const G4String &input){
 	// Expects a space-delimited string of the form:
 	//  "addDiffuserLayer width(mm) height(mm) thickness(mm) material"

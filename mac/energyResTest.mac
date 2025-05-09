@@ -52,7 +52,7 @@
 
 # Set the wrapping.
 /nDet/implant/setWrapping perfect
-/nDet/implant/useFrontWrapping false
+#/nDet/implant/useFrontWrapping false
 
 # Load PSPMT gain matrix 
 # NOTE: This MUST be done AFTER calling '/nDet/implant/update' otherwise it will fail
@@ -62,7 +62,7 @@
 /nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
 
 # Set the position and rotation of the detector in the lab frame.
-/nDet/implant/setPosition 1 0 0 mm
+/nDet/implant/setPosition 0 0 0 mm
 #/nDet/implant/setCylindrical 0.5 0 0
 /nDet/implant/setRotation 0 270 0
 /nDet/implant/addGeometry module
@@ -86,7 +86,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename energyRes_210Po_alpha_1mm.root
+/nDet/output/filename energyRes_calibration_gain_50.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -108,10 +108,11 @@
 /nDet/output/trace/setTraceDelay 60
 /nDet/output/trace/setTraceLength 500
 /nDet/output/trace/setBitRange 16
-/nDet/output/trace/setGain 1000
+#/nDet/output/trace/setGain 100
+/nDet/output/trace/setGain 50
 /nDet/output/trace/setCfdFraction 0.5
-/nDet/output/trace/setIntegralLow 10
-/nDet/output/trace/setIntegralHigh 50
+/nDet/output/trace/setIntegralLow 5
+/nDet/output/trace/setIntegralHigh 10
 
 
 ################
@@ -121,9 +122,9 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 252Cf
 
-/nDet/source/type alpha 5.3043
+#/nDet/source/type alpha 5.3043
 #/nDet/source/type 137Cs
-#/nDet/source/type gamma 0.662
+/nDet/source/type gamma 0.662
 #/nDet/source/range 1 5 0
 #/nDet/source/setGaussianEnergy 10 1
 #/nDet/source/type electron 1

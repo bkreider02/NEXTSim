@@ -977,6 +977,10 @@ public:
 	  */
 	void addBox(const G4String &input);
 
+	/** Set style/parameters of dome-type detector; this includes the shape and (if spherical) the radius of curvature
+	  */
+	void setDomeParameters(const G4String &input);
+
 	/** Build the assembly volume for the current detector
 	  * @param boundingBox The returned X, Y, and Z size of the assembly volume for the current detector
 	  * @return A pointer to the logical volume of the assembly of the current detector
@@ -1135,8 +1139,14 @@ protected:
 
 	bool boxAdded; ///< Flag indicating that a box has been added around the implant (and thus the assembly volume should be increased)
 	G4Material *boxMaterial; ///< Material out of which box is made
-	double boxThickness; ///< Thickness of added box in mm
-	double boxGap; ///< Thickness of gap between added box and implant in mm
+	G4double boxThickness; ///< Thickness of added box in mm
+	G4double boxGap; ///< Thickness of gap between added box and implant in mm
+
+	bool isDome; ///< Flag indicating that the implant is "dome"-shaped
+	bool isPixelated; ///< Flag indicating whether dome is pixelated/discrete or continuous
+	G4String domeShape; ///< string indicating the dome's shape (spherical, pyramidal, GDML, etc.)
+	G4double domeDimension; ///< relevant dome dimension (radius of curvature for spherical dome and step size for pyramidal dome)
+	G4double marginSize; ///< size of margin left behind dome shape
 
 	centerOfMass cmI; ///< Center-of-mass calculator for the PMT
 

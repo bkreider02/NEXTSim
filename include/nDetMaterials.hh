@@ -37,6 +37,8 @@ class nDetMaterials{
  		G4Element* fY; ///< Yttrium
 		G4Element* fLa; ///< Lanthinum
 		G4Element* fBr; ///< Bromine
+		//G4Element* fCs; ///< Cesium
+		//G4Element* fI;  ///< Iodine
 		G4Element* fGd; ///< Gadolinium
 		G4Element* fGa; ///< Gallium
 		G4Element* fCe; ///< Cerium
@@ -49,6 +51,7 @@ class nDetMaterials{
 	G4Material* fAl2O3; ///< Material corresponding to aluminum oxide
     G4Material* fEJ200; ///< Material corresponding to EJ-200 scintillator
     G4Material* fEJ276; ///< Material corresponding to EJ-276 scintillator
+	G4Material* fOGS; ///< Material corresponding to organic glass scintillator (OGS)
     G4Material* fGrease; ///< Material corresponding to optical grease
 	G4Material* fNOA61; ///< Material corresponding to NOA-61 (Norland optical adhesive)
 	G4Material* fNOA68; ///< Material corresponding to NOA-68 (Norland optical adhesive)
@@ -66,6 +69,7 @@ class nDetMaterials{
 		G4Material* fGAGG; ///< Gadolinium Aluminum Gallium Garnet (Gd3Al2Ga3O12)
 		G4Material* fLaBr3; ///< Lanthinum Bromide 
 		G4Material* fCeBr3; ///< Cerium Bromide
+		//G4Material* fCsI; ///< Cesium Iodide
 
 
     // Material table properties
@@ -74,12 +78,14 @@ class nDetMaterials{
 	G4MaterialPropertiesTable* fAl2O3MPT; ///< Material properties table for aluminum oxide
     G4MaterialPropertiesTable* fEJ200MPT; ///< Material properties table for EJ-200 scintillator
     G4MaterialPropertiesTable* fEJ276MPT; ///< Material properties table for EJ-276 scintillator
+	G4MaterialPropertiesTable* fOGSMPT; ///< Material properties table for OGS scintillator
 		G4MaterialPropertiesTable* fYSOMPT; ///< Material properties table for YSO scintillator
 		G4MaterialPropertiesTable* fLYSOMPT; ///< Material properties table for LYSO scintillator
 		G4MaterialPropertiesTable* fYAPMPT; ///< MPT for YAP scintillator
 		G4MaterialPropertiesTable* fGAGGMPT; ///< MPT for GAGG scintillator
 		G4MaterialPropertiesTable* fLaBr3MPT; ///< MPT for LaBr3 scintillator
 		G4MaterialPropertiesTable* fCeBr3MPT; ///< MPT for CeBr3 scintillator
+		//G4MaterialPropertiesTable* fCsIMPT; ///< MPT for CsI scintillator
     G4MaterialPropertiesTable* fGreaseMPT; ///< Material properties table for optical grease
 	//G4MaterialPropertiesTable* fMercaptoMPT; ///< Material properties table for Mercapto-ester
 	//G4MaterialPropertiesTable* fTriallylMPT; ///< Material properties table for Triallyl Isocyanurate
@@ -242,9 +248,13 @@ class nDetMaterials{
 	  */
 	void listOptSurfaces() const ;
 
-	/** Define particle for ion source if not already defined. Interpolation is performed if necessary
+	/** Calculate Average Scintillation Efficiency with AVA/Birks formula with offset
+	 */
+	G4double dLdE(G4double dEdx, G4double a, G4double b, G4double c);
+
+	/** Define light yield for ion source if not already defined. Interpolation is performed if necessary
 	  */
-	void setIonSourceType(const G4String &val);
+	void setIonSourceType(G4int mass);
 
 	/** Read an input material file and build a new material to add to the list
 	  * @param filename The path to the material file to read

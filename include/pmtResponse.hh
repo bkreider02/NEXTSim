@@ -533,7 +533,7 @@ private:
 	std::vector<photonArrivalTime> arrivalTimes; ///< Vector of all optical photon arrival times and their individual single-photon response gains
 
 	int photonCount; ///< number of photons included in the response
-	
+
 	/** Evaluate the single-photon-response function for a given time and time offset
 	  * @param t The time to along the pulse at which to evaluate the single-photon-response function (in ns)
 	  * @param dt The offset of the pulse along the time axis (in ns)

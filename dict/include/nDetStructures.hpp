@@ -294,6 +294,7 @@ class nDetDebugStructure : public TObject {
 	double reconDetComY[2]; ///< Left and right PMT photon center-of-mass along the Y-axis computed using Anger Logic reconstruction
 	short centerOfMassColumn[2]; ///< Segmented PMT anode column corresponding to the photon center-of-mass for the left and right PMT
 	short centerOfMassRow[2]; ///< Segmented PMT anode row corresponding to the photon center-of-mass for the left and right PMT
+	double secondaryEnergy; ///< Total energy imparted to secondary electrons
 
 	/** Default constructor
 	  */

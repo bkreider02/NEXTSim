@@ -62,7 +62,7 @@
 /nDet/implant/setSpectralResponse ~/opt/NEXTSim/spectral/hamamatsuH12700A.root
 
 # Set the position and rotation of the detector in the lab frame.
-/nDet/implant/setPosition 25.5 0 0 mm
+/nDet/implant/setPosition 0 0 0 mm
 #/nDet/implant/setCylindrical 0.5 0 0
 /nDet/implant/setRotation 0 270 0
 /nDet/implant/addGeometry module
@@ -86,7 +86,7 @@
 
 
 # Set the output filename prefix
-/nDet/output/filename heavy_ion_test_Ar40_500MeV_25_and_halfmm.root
+/nDet/output/filename heavy_ion_test_C12_100MeV_0mm.root
 /nDet/output/title SiPM array
 #/nDet/output/index 69
 #/nDet/output/overwrite true
@@ -109,10 +109,10 @@
 /nDet/output/trace/setTraceLength 500
 /nDet/output/trace/setBitRange 16
 #/nDet/output/trace/setGain 1000
-/nDet/output/trace/setGain 10
+/nDet/output/trace/setGain 100
 /nDet/output/trace/setCfdFraction 0.5
-/nDet/output/trace/setIntegralLow 10
-/nDet/output/trace/setIntegralHigh 50
+/nDet/output/trace/setIntegralLow 5
+/nDet/output/trace/setIntegralHigh 10
 
 
 ################
@@ -122,8 +122,8 @@
 # Available source types: 137Cs 60Co 133Ba 241Am 90Sr 252Cf
 #/nDet/source/type 252Cf
 
-/nDet/materials/ionSourceType Ar 40
-/nDet/source/type ion 500 40 18
+/nDet/materials/ionSourceType C 12
+/nDet/source/type ion 100 12 6
 #/nDet/source/type 137Cs
 #/nDet/source/type gamma 0.662
 #/nDet/source/range 1 5 0
