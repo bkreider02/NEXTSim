@@ -480,6 +480,8 @@ void domeType::prepareToBuild(){
 }
 
 void domeType::buildDetector(){
+
+	/*
 	const G4double cellWidth = GetSegmentWidth();
 	const G4double cellHeight = GetSegmentHeight();
 	
@@ -506,7 +508,31 @@ void domeType::buildDetector(){
 	// Build the wrapping.
 	G4PVPlacement *wrapping_physV = NULL;
 	G4PVPlacement* wrappingFacePhys = NULL;
+	*/
 
+
+
+	const G4double cellWidth = GetSegmentWidth();
+	const G4double cellHeight = GetSegmentHeight();
+	
+	// Get the number of rows and columns for this segmented detector
+	int Ncol = fNumColumns;
+	int Nrow = fNumRows;
+
+	// Update the detector's copy numbers
+	firstSegmentCopyNum = scintCopyNum; 
+	lastSegmentCopyNum = firstSegmentCopyNum; //startCopyNum+col*row;
+
+
+	G4Box *mylarVertLayer = NULL;
+	G4Box *mylarHorizLayer = NULL;
+	
+	G4LogicalVolume *mylarVertLayer_logV = NULL;
+	G4LogicalVolume *mylarHorizLayer_logV = NULL;
+
+	// Build the wrapping.
+	G4PVPlacement *wrapping_physV = NULL;
+	G4PVPlacement* wrappingFacePhys = NULL;
 
 
 	// NEED LOGIC TO DECIDE WHETHER IMPLANT IS PIXELATED,
@@ -579,6 +605,11 @@ void domeType::buildDetector(){
 					y += 0.5*cellHeight;
 				double h = sqrt(domeDimension*domeDimension-x*x-y*y);
 				double z_center = (h-fDetectorLength/2)/2; // where z_max is just the scintillator thickness as set by the user
+
+				// Construct the scintillator cell
+				G4Box *cellScint = new G4Box("scintillator", cellWidth/2, cellHeight/2, h/2);
+				G4LogicalVolume *cellScint_logV = new G4LogicalVolume(cellScint, scintMaterial, "scint_log");
+				cellScint_logV->SetVisAttributes(scintVisAtt);
 
 				G4ThreeVector cellCenter(-fDetectorWidth/2 + col*fWrappingThickness + (col+0.5)*cellWidth, -fDetectorHeight/2 + row*fWrappingThickness + (row+0.5)*cellHeight, z_center);
 
@@ -695,6 +726,11 @@ void domeType::buildDetector(){
 
 				//double h = sqrt(domeDimension*domeDimension-x*x-y*y);
 				double z_center = (h-fDetectorLength/2)/2; // where z_max is just the scintillator thickness as set by the user
+
+				// Construct the scintillator cell
+				G4Box *cellScint = new G4Box("scintillator", cellWidth/2, cellHeight/2, h/2);
+				G4LogicalVolume *cellScint_logV = new G4LogicalVolume(cellScint, scintMaterial, "scint_log");
+				cellScint_logV->SetVisAttributes(scintVisAtt);
 
 				G4ThreeVector cellCenter(-fDetectorWidth/2 + col*fWrappingThickness + (col+0.5)*cellWidth, -fDetectorHeight/2 + row*fWrappingThickness + (row+0.5)*cellHeight, z_center);
 
