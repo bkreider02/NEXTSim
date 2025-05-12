@@ -590,7 +590,10 @@ void domeType::buildDetector(){
 		// Place the scintillator segments into the assembly.
 		std::vector<G4PVPlacement*> mylarVertLayer_physV(Ncol, NULL);
 		std::vector<std::vector<G4PVPlacement*> > mylarHorizLayer_physV(Ncol, std::vector<G4PVPlacement*>(Nrow, NULL));
-		std::vector<std::vector<G4PVPlacement*> > cellScint_physV(Ncol, std::vector<G4PVPlacement*>(Nrow, NULL));	
+		std::vector<std::vector<G4PVPlacement*> > cellScint_physV(Ncol, std::vector<G4PVPlacement*>(Nrow, NULL));
+		double x_edge = -fDetectorWidth/2 + (Ncol-1)*fWrappingThickness + (Ncol-1+0.5)*cellWidth + 0.5*cellWidth;
+		double y_edge = x_edge;
+		double h_edge = sqrt(domeDimension*domeDimension-x_edge*x_edge-y_edge*y_edge);	
 		for(int col = 0; col < Ncol; col++){
 			for(int row = 0; row < Nrow; row++){
 				double x = -fDetectorWidth/2 + col*fWrappingThickness + (col+0.5)*cellWidth;
@@ -603,7 +606,7 @@ void domeType::buildDetector(){
 					y -= 0.5*cellHeight;
 				else
 					y += 0.5*cellHeight;
-				double h = sqrt(domeDimension*domeDimension-x*x-y*y);
+				double h = sqrt(domeDimension*domeDimension-x*x-y*y) - h_edge + marginSize;
 				double z_center = fDetectorLength/2-h/2; // where z_max is just the scintillator thickness as set by the user
 
 				// Construct the scintillator cell
