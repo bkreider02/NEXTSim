@@ -604,7 +604,7 @@ void domeType::buildDetector(){
 				else
 					y += 0.5*cellHeight;
 				double h = sqrt(domeDimension*domeDimension-x*x-y*y);
-				double z_center = (h-fDetectorLength/2)/2; // where z_max is just the scintillator thickness as set by the user
+				double z_center = (fDetectorLength/2-h)/2; // where z_max is just the scintillator thickness as set by the user
 
 				// Construct the scintillator cell
 				G4Box *cellScint = new G4Box("scintillator", cellWidth/2, cellHeight/2, h/2);
@@ -725,7 +725,7 @@ void domeType::buildDetector(){
 				double h = (fDetectorLength-numSteps*domeDimension > marginSize)? fDetectorLength-numSteps*domeDimension : marginSize;
 
 				//double h = sqrt(domeDimension*domeDimension-x*x-y*y);
-				double z_center = (h-fDetectorLength/2)/2; // where z_max is just the scintillator thickness as set by the user
+				double z_center = (fDetectorLength/2-h)/2; // where z_max is just the scintillator thickness as set by the user
 
 				// Construct the scintillator cell
 				G4Box *cellScint = new G4Box("scintillator", cellWidth/2, cellHeight/2, h/2);
