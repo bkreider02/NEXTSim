@@ -69,6 +69,9 @@ void nDetParticleSourceMessenger::addAllCommands(){
 	addCommand(new G4UIcmdWith3Vector("/nDet/source/position", this)); // position of source
 	addGuidance("Set the position of the source by specifying angles about the x, y, and z axes");
 
+	addCommand(new G4UIcmdWithAString("/nDet/source/dome", this)); // source for simulating dome implant
+	addGuidance("...");
+
 	// addCommand(new G4UIcmdWithAString("/nDet/source/ion", this)); 
 	// addGuidance("Set a pre-defined isotropic ion particle source");
 	// addGuidance("108Xe for Xenon-108 beam for implantation");
@@ -128,5 +131,8 @@ void nDetParticleSourceMessenger::SetNewChildValue(G4UIcommand* command, G4Strin
 	}
 	else if(index==16){
 		fAction->SetSourcePosition(G4UIcommand::ConvertTo3Vector(newValue));
+	}
+	else if(index==17){
+		fAction->SetDomeSource(newValue);
 	}
 }

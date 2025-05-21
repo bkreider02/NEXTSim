@@ -88,6 +88,11 @@ class nDetParticleSource : public G4GeneralParticleSource {
 	  */	
 	void SetSourcePosition(const G4ThreeVector &position);	
 
+	/** Configures the source to emulate a dome-style implant
+	  * SYNTAX GOES HERE
+	  */	
+	void SetDomeSource(const G4String &str);	
+
 	/** Set the default direction of the source
 	  * @param d The direction vector normal to the plane of the surface of the source/beam
 	  */
@@ -335,6 +340,8 @@ class nDetParticleSource : public G4GeneralParticleSource {
 	double b2bEnergy[2]; ///< Array containing particle energies for back-to-back particle emitter state
 
 	std::mutex generatorLock; ///< Mutex lock for thread-safe TTree filling
+
+	bool isDome = false; ///< Flag indicating special source for dome-type implant
 
 	/** Default constructor (private for singleton class)
 	  */

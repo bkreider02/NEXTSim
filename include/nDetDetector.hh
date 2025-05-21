@@ -236,6 +236,14 @@ public:
 	  */
 	G4RotationMatrix GetDetectorRot() const { return detectorRotation; }
 
+	/** Get the number of segmented scintillator columns
+	  */
+	G4int GetNumColumns() const { return fNumColumns; }
+
+	/** Get the number of segmented scintillator rows
+	  */
+	G4int GetNumRows() const { return fNumRows; }
+
 	/** Get the number of segmented PMT columns
 	  */
 	G4int GetNumPmtColumns() const { return fNumColumnsPmt; }

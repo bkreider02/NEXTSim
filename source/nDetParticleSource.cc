@@ -103,6 +103,104 @@ void nDetParticleSource::SetSourcePosition(const G4ThreeVector &position){
 	}
 }
 
+
+void nDetParticleSource::SetDomeSource(const G4String &str){
+	isDome = true;
+
+	std::vector<std::string> args;
+	unsigned int Nargs = split_str(str, args);
+
+	std::string domeType = args.at(0);
+	int Nrow = std::stoi(args.at(1));
+	int Ncol = std::stoi(args.at(2));
+
+	double scintHeight = std::stod(args.at(3));
+	double scintWidth = std::stod(args.at(4));
+	double scintThickness = std::stod(args.at(5)); // i.e. fDetectorLength, but in mm
+	double wrappingThickness = std::stod(args.at(6)); 
+	double domeDimension = std::stod(args.at(7));
+	double marginSize = std::stod(args.at(8));
+	double implantDepth = std::stod(args.at(9));
+	std::string particleType = args.at(10);
+	double energy = std::stod(args.at(11));
+
+	std::vector<G4SingleParticleSource*> temp(Ncol);
+	std::vector< std::vector<G4SingleParticleSource*> > sources(Nrow,temp);
+	sources[0][0] = nextSource();
+
+	// calculate pixel dimensions:
+	double scintPixelWidth = (scintWidth-(Ncol-1)*wrappingThickness)/Ncol;
+	double scintPixelHeight = (scintHeight-(Nrow-1)*wrappingThickness)/Nrow;
+
+	// Need this or no????
+	double x_edge = -scintWidth/2 + (Ncol-1)*wrappingThickness + (Ncol-1+0.5)*scintPixelWidth + 0.5*scintPixelWidth;
+	double y_edge = -scintHeight/2 + (Nrow-1)*wrappingThickness + (Nrow-1+0.5)*scintPixelHeight + 0.5*scintPixelHeight;
+	double h_edge = sqrt(domeDimension*domeDimension-x_edge*x_edge-y_edge*y_edge);
+
+	for (int i=0; i < Nrow; i++) {
+		for (int j=0; j < Ncol; j++) {
+			if (i != 0 && j != 0)
+				sources[i][j] = addNewSource();
+
+			// Here, need to calculate
+			//    a.) x,y center location
+			//    b.) z center location (fDetectorLength/2-h+implantDepth?)
+
+			double x = -scintWidth/2 + j*wrappingThickness + (j+0.5)*scintPixelWidth;
+			double y = -scintHeight/2 + i*wrappingThickness + (i+0.5)*scintPixelHeight;
+
+			double h;
+			if (domeType == "spherical") {
+				h = sqrt(domeDimension*domeDimension-x*x-y*y) - h_edge + marginSize;
+			}
+			else if (domeType == "pyramidal") {
+				double midpoint = (Ncol-1)/2.0;
+				int numSteps = std::max(std::floor(std::fabs(j-midpoint)),std::floor(std::fabs(i-midpoint)));
+				h = (scintThickness-numSteps*domeDimension > marginSize)? scintThickness-numSteps*domeDimension : marginSize;
+			}
+			else {
+				// use default source
+				std::cout << "Error: " << domeType << " is not a valid dome geometry. Using default source instead..." << std::endl;
+			}
+
+			double z_center = scintThickness/2-h+implantDepth; // where z_max is just the scintillator thickness as set by the user
+
+			G4ThreeVector *position = new G4ThreeVector(x,y,z_center);
+			sources[i][j]->GetPosDist()->SetCentreCoords(*position);
+
+
+			// Start with just gammas?
+			if (particleType == "electron") {
+				sources[i][j]->SetParticleDefinition(G4Electron::ElectronDefinition());
+			}
+			else if (particleType == "alpha") {
+				sources[i][j]->SetParticleDefinition(G4Alpha::AlphaDefinition());
+			}
+			else {
+				sources[i][j]->SetParticleDefinition(G4Gamma::GammaDefinition());
+			}
+
+			sources[i][j]->GetEneDist()->SetEnergyDisType("Mono");
+			sources[i][j]->GetEneDist()->SetMonoEnergy(energy*MeV);
+
+			// Set square beams
+			G4SPSPosDistribution *pos = sources[i][j]->GetPosDist();	
+			pos->SetPosDisType("Plane");
+			pos->SetPosDisShape("Rectangle");
+			pos->SetHalfX(scintPixelWidth/2);
+			pos->SetHalfY(scintPixelHeight/2);
+
+			// Assume default direction?
+
+			// Then, need to set source type, position, etc.
+
+
+		}
+	}
+
+}
+
+
 void nDetParticleSource::SetSourceDirection(const G4ThreeVector &d){ 
 	// Reset the unit vectors and the source rotation matrix
 	unitX = G4ThreeVector(1, 0, 0);
@@ -520,13 +618,19 @@ void nDetParticleSource::Reset(){
 }
 
 void nDetParticleSource::UpdateAll(){
+
+	// NEED TO ACCOUNT FOR DOME-TYPE SOURCES!!!!
+
 	G4SingleParticleSource *src;
 	while( (src = nextSource()) ){ // Iterate over all defined sources
-		// Set the center of the source
-		src->GetPosDist()->SetCentreCoords(sourceOrigin);
 
-		// Set the profile of the source
-		setBeamProfile(src);
+		if (!isDome) {
+			// Set the center of the source
+			src->GetPosDist()->SetCentreCoords(sourceOrigin);
+
+			// Set the profile of the source
+			setBeamProfile(src);
+		}
 
 		// For now, the "beam" is along the +X axis
 		// I'll change this  back to the +Z axis later. CRT	
