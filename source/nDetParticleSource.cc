@@ -107,6 +107,9 @@ void nDetParticleSource::SetSourcePosition(const G4ThreeVector &position){
 void nDetParticleSource::SetDomeSource(const G4String &str){
 	isDome = true;
 
+	isotropic = true;
+	realIsotropic = false;
+
 	std::vector<std::string> args;
 	unsigned int Nargs = split_str(str, args);
 
