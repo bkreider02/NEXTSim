@@ -105,6 +105,8 @@ void nDetParticleSource::SetSourcePosition(const G4ThreeVector &position){
 
 
 void nDetParticleSource::SetDomeSource(const G4String &str){
+	Reset();
+
 	isDome = true;
 
 	isotropic = true;
@@ -129,7 +131,8 @@ void nDetParticleSource::SetDomeSource(const G4String &str){
 
 	std::vector<G4SingleParticleSource*> temp(Ncol);
 	std::vector< std::vector<G4SingleParticleSource*> > sources(Nrow,temp);
-	sources[0][0] = nextSource();
+	sources[0][0] = GetCurrentSource();
+
 
 	// calculate pixel dimensions:
 	double scintPixelWidth = (scintWidth-(Ncol-1)*wrappingThickness)/Ncol;
@@ -142,8 +145,9 @@ void nDetParticleSource::SetDomeSource(const G4String &str){
 
 	for (int i=0; i < Nrow; i++) {
 		for (int j=0; j < Ncol; j++) {
-			if (i != 0 && j != 0)
+			if (i != 0 || j != 0) {
 				sources[i][j] = addNewSource();
+			}
 
 			// Here, need to calculate
 			//    a.) x,y center location
@@ -633,15 +637,16 @@ void nDetParticleSource::UpdateAll(){
 
 			// Set the profile of the source
 			setBeamProfile(src);
-		}
+		
 
-		// For now, the "beam" is along the +X axis
-		// I'll change this  back to the +Z axis later. CRT	
-		src->GetAngDist()->SetParticleMomentumDirection(unitX);
-	
-		// Set the rotation of the source plane
-		src->GetPosDist()->SetPosRot1(unitZ); // This is x'
-		src->GetPosDist()->SetPosRot2(unitY); // This is y'
+			// For now, the "beam" is along the +X axis
+			// I'll change this  back to the +Z axis later. CRT	
+			src->GetAngDist()->SetParticleMomentumDirection(unitX);
+		
+			// Set the rotation of the source plane
+			src->GetPosDist()->SetPosRot1(unitZ); // This is x'
+			src->GetPosDist()->SetPosRot2(unitY); // This is y'
+		}
 	}
 }
 
