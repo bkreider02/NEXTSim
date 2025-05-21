@@ -165,6 +165,12 @@ void nDetParticleSource::SetDomeSource(const G4String &str){
 				int numSteps = std::max(std::floor(std::fabs(j-midpoint)),std::floor(std::fabs(i-midpoint)));
 				h = (scintThickness-numSteps*domeDimension > marginSize)? scintThickness-numSteps*domeDimension : marginSize;
 			}
+			else if (domeType == "cone") {
+				double midpointX = (Ncol/2); // NOTE: we're effectively flooring the value here
+				double midpointY = (Nrow/2);
+				int numSteps = std::abs(midpointY-i) + std::abs(midpointX-j) + 1;
+				h = (scintThickness-numSteps*domeDimension > marginSize)? scintThickness-numSteps*domeDimension : marginSize;
+			}
 			else {
 				// use default source
 				std::cout << "Error: " << domeType << " is not a valid dome geometry. Using default source instead..." << std::endl;

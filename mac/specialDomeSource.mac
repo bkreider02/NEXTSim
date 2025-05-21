@@ -148,7 +148,8 @@
 #/nDet/source/range 1.175 1.225 0
 
 
-/nDet/source/dome pyramidal 8 8 50.8 50.8 2.0 0.0 0.5 0.5 0.25 gamma 0.8
+#/nDet/source/dome pyramidal 8 8 50.8 50.8 2.0 0.0 0.5 0.5 0.25 gamma 0.8
+/nDet/source/dome cone 9 9 50.8 50.8 5 0.0 0.5 0.5 0.25 gamma 0.8
 /nDet/source/test dome_source_test 100000
 
 ###############
