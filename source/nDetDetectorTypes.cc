@@ -847,7 +847,7 @@ void domeType::buildDetector(){
 				//	y += 0.5*cellHeight;
 				double midpointX = (Ncol/2); // NOTE: we're effectively flooring the value here
 				double midpointY = (Nrow/2);
-				int numSteps = std::abs(midpointY-row) + std::abs(midpointX-col) + 1;
+				int numSteps = std::abs(midpointY-row) + std::abs(midpointX-col);
 				double h = (fDetectorLength-numSteps*domeDimension > marginSize)? fDetectorLength-numSteps*domeDimension : marginSize;
 
 				//double h = sqrt(domeDimension*domeDimension-x*x-y*y);

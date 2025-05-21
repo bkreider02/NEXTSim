@@ -168,7 +168,7 @@ void nDetParticleSource::SetDomeSource(const G4String &str){
 			else if (domeType == "cone") {
 				double midpointX = (Ncol/2); // NOTE: we're effectively flooring the value here
 				double midpointY = (Nrow/2);
-				int numSteps = std::abs(midpointY-i) + std::abs(midpointX-j) + 1;
+				int numSteps = std::abs(midpointY-i) + std::abs(midpointX-j);
 				h = (scintThickness-numSteps*domeDimension > marginSize)? scintThickness-numSteps*domeDimension : marginSize;
 			}
 			else {
