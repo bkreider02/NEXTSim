@@ -730,7 +730,7 @@ void nDetImplant::setDomeParameters(const G4String &input) {
 	std::vector<std::string> args;
 	unsigned int Nargs = split_str(input, args);
 	domeShape = args.at(0);
-	if ((domeShape != "spherical")&&(domeShape != "pyramidal"))
+	if ((domeShape != "spherical")&&(domeShape != "pyramidal")&&(domeShape != "cone"))
 		domeShape = "pyramidal";
 
     std::string pixelated = args.at(1);
