@@ -39,6 +39,7 @@ void nDetSteppingAction::UserSteppingAction(const G4Step* aStep){
 	}
 
 
+	/*
 	// check for secondary electrons and add their energy to the running total
 	auto secondary = aStep->GetSecondaryInCurrentStep();
 	size_t size_secondary = (*secondary).size();
@@ -56,6 +57,7 @@ void nDetSteppingAction::UserSteppingAction(const G4Step* aStep){
 			}
 		}
 	}
+	*/
 
 
 }
